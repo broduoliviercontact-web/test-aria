@@ -1,0 +1,78 @@
+/* src/components/CharacterXP.css */
+
+.character-xp {
+  margin-top: 1.2rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(120, 90, 60, 0.4);
+}
+
+.character-xp h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+  color: #3b2a1a;
+}
+
+.xp-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.xp-btn {
+  border: 1px solid rgba(120, 90, 60, 0.85);
+  background: #f9f3e5;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #3b2a1a;
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 2px 4px rgba(0, 0, 0, 0.15);
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+
+.xp-btn:hover {
+  background: #f1e0c5;
+}
+
+.xp-btn:active {
+  background: #e2cfa8;
+  transform: translateY(1px);
+}
+
+.xp-value-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.xp-input {
+  width: 5rem;
+  padding: 0.2rem 1.8rem 0.2rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(140, 105, 70, 0.8);
+  background: #fdf7ea;
+  font-size: 0.85rem;
+  text-align: right;
+  color: #2f2115;
+}
+
+.xp-suffix {
+  position: absolute;
+  right: 0.35rem;
+  font-size: 0.75rem;
+  color: #6a4a2f;
+}
+
+.xp-hint {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #6b563d;
+  text-align: center;
+  font-style: italic;
+}

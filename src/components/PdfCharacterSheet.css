@@ -1,0 +1,226 @@
+/* src/components/PdfCharacterSheet.css */
+
+/* ===========================
+   LAYOUT FICHE PDF OFFICIELLE
+   =========================== */
+.pdf-sheet {
+  width: 190mm;
+  height: 270mm;          /* un peu plus court */
+  margin: 0 auto;
+  padding: 14mm 18mm;     /* padding haut/bas légèrement réduit */
+  background: #f6ebd3;
+  border-radius: 12mm;
+  box-shadow: none;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #2c1e12;
+  display: flex;
+  flex-direction: column;
+  gap: 4mm;               /* moins d’espace entre les blocs */
+  box-sizing: border-box;
+}
+
+
+.pdf-header {
+  text-align: center;
+}
+
+.pdf-title {
+  margin: 0;
+  font-size: 18pt;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Bandeau haut : identité / caracs / portrait */
+
+.pdf-top-row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr;
+  gap: 6mm;
+}
+
+.pdf-card {
+  background: #f9f1dd;
+  border-radius: 4mm;
+  border: 0.4mm solid rgba(120, 90, 60, 0.6);
+  padding: 4mm 5mm;
+  box-sizing: border-box;
+}
+
+.pdf-card-title {
+  margin: 0 0 3mm;
+  font-size: 11pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Identité */
+
+.pdf-identity-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9pt;
+  margin-bottom: 2mm;
+}
+
+.pdf-identity-line span:first-child {
+  font-weight: 600;
+}
+
+.pdf-identity-value {
+  margin-left: 4mm;
+}
+
+/* Caractéristiques */
+
+.pdf-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 2mm;
+  column-gap: 6mm;
+  font-size: 9pt;
+}
+
+.pdf-stat-row span:first-child {
+  justify-self: flex-start;
+}
+
+.pdf-stat-value {
+  font-weight: 700;
+}
+
+/* Portrait : juste un cadre pour l'instant */
+
+.pdf-portrait {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Compétences */
+
+.pdf-competences {
+  flex: 1;
+}
+
+.pdf-competence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+}
+
+.pdf-competence-table th,
+.pdf-competence-table td {
+  border-bottom: 0.2mm solid rgba(140, 110, 80, 0.4);
+  padding: 1mm 1.5mm;
+}
+
+.pdf-competence-table th {
+  text-align: left;
+  font-size: 8.5pt;
+}
+
+/* Bas de page : XP / Bourse / Joueur */
+
+.pdf-bottom-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 6mm;
+  align-items: flex-end;
+}
+
+.pdf-bottom-left {
+  display: flex;
+  gap: 4mm;
+  align-items: stretch;
+}
+
+.pdf-xp-card {
+  min-width: 35mm;
+}
+
+.pdf-xp-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9pt;
+}
+
+.pdf-xp-value {
+  font-weight: 600;
+}
+
+.pdf-purse-card {
+  flex: 1;
+}
+
+.pdf-card-subtitle {
+  margin: 0 0 2mm;
+  font-size: 9pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pdf-purse-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8.5pt;
+}
+
+.pdf-player-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9pt;
+}
+
+.pdf-player-name {
+  min-width: 40mm;
+  border-bottom: 0.2mm solid #3a2717;
+  margin-left: 4mm;
+  padding-bottom: 0.3mm;
+}
+
+.pdf-portrait {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.pdf-portrait-img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 3mm;
+  object-fit: cover;
+}
+
+/* Santé : PV / Blessures / Armure */
+
+.pdf-health-row {
+  display: flex;
+  gap: 2mm;
+  margin-top: -1mm;
+}
+
+.pdf-health-card {
+  flex: 1;
+  text-align: center;
+}
+
+.pdf-health-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1mm;
+  margin-top: 0.5mm;
+}
+
+.pdf-health-icon {
+  width: 14mm;
+  height: auto;
+}
+
+.pdf-health-value {
+  font-size: 14pt;
+  font-weight: 700;
+}

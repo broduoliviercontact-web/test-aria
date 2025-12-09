@@ -1,0 +1,199 @@
+/* src/components/GoldPouch.css */
+
+.purse-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.purse-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.purse-label {
+  flex: 1;
+}
+
+.purse-value {
+  width: 3rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.purse-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.purse-actions button {
+  padding: 0.15rem 0.5rem;
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+.purse-total {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* Icônes de pièces médiévales */
+.pouch-icon {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 0.4rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+}
+
+.pouch-icon-gold {
+  background-image: url("/coin-gold.png");
+}
+
+.pouch-icon-silver {
+  background-image: url("/coin-silver.png");
+}
+
+.pouch-icon-copper {
+  background-image: url("/coin-copper.png");
+}
+
+.pouch-icon-iron {
+  background-image: url("/coin-iron.png");
+}
+
+.pouch-icon-gold { background-color: #d4af37; border-radius: 50%; }
+.pouch-icon-silver { background-color: #c0c0c0; border-radius: 50%; }
+.pouch-icon-copper { background-color: #b87333; border-radius: 50%; }
+.pouch-icon-iron { background-color: #555555; border-radius: 50%; }
+
+.goldpouch-card {
+
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(140, 105, 70, 0.5);
+  border-radius: 22px;
+  background: #fffef8;
+  width: fit-content;
+  background-image: url("/parchment-bg2.jpg");
+  position: relative;        
+  max-width: 250px;   /* pour les ornements */
+  overflow: visible;
+}
+
+/* Coins décorés */
+.goldpouch-card::before,
+.goldpouch-card::after {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background-image: url("/ornament-corner.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* coin haut-gauche */
+.goldpouch-card::before {
+  top: -10px;
+  left: -10px;
+}
+
+/* coin bas-droit (retourné) */
+.goldpouch-card::after {
+  bottom: -10px;
+  right: -10px;
+  transform: scaleX(-1) scaleY(-1);
+}
+
+.goldpouch-title {
+  font-size: 0.9rem;
+
+}
+
+/* Lignes de pièces */
+.pouch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1rem;     /* plus discret */
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid #000;
+}
+
+
+.pouch-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.pouch-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pouch-value-container {
+  position: relative;
+  min-width: 40px;
+  display: flex;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+
+.pouch-value {
+  display: inline-block;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+}
+
+/* Couleurs + / - */
+.pouch-value--plus {
+  color: #2e7d32;
+  font-weight: 700;
+  transform: scale(1.05);
+}
+
+.pouch-value--minus {
+  color: #c62828;
+  font-weight: 700;
+  transform: scale(1.05);
+}
+
+/* Popup + / - */
+.pouch-popup {
+  position: absolute;
+  right: -42px;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  background: #fffef8;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+
+.pouch-popup button {
+  width: 30px;
+  height: 30px;
+  font-size: 1.3rem;
+  border-radius: 8px;
+  border: 2px solid #000;
+  background: white;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.pouch-popup button:hover {
+  background: #f0f0f0;
+}

@@ -1,0 +1,82 @@
+.identity-portrait {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.portrait-frame {
+  width: 213px;
+  height: 233px;
+  border-radius: 12px;
+  border: 1px solid rgba(80, 50, 30, 0.8);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.25),
+    inset 0 0 12px rgba(0, 0, 0, 0.35);
+  background: rgba(249, 243, 229, 0.9);
+  overflow: hidden;
+}
+
+.portrait-image {
+  width: 100%;
+  height: 100%;
+  object-fit:cover;
+}
+
+/* Sur petit écran, on mettra l'image au-dessus (optionnel) */
+@media (max-width: 768px) {
+  .identity-portrait {
+    margin-top: 0.5rem;
+  }
+}
+.portrait-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(249, 243, 229, 0.9);
+  border-radius: 10px;
+  border: 1px solid rgba(120, 90, 60, 0.8);
+  padding: 0.5rem;
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 3px 6px rgba(0, 0, 0, 0.12);
+  background-image: url("/parchment-bg2.jpg");
+}
+
+.portrait-frame {
+  width: 100%;
+  max-width: 160px;
+  max-height: 160px;
+  aspect-ratio: 3 / 4;
+  border: 2px solid rgba(80, 50, 30, 0.8);
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portrait-placeholder {
+  font-size: 0.3rem;
+  color: #5a4330;
+  text-align: center;
+  padding: 0.3rem;
+}
+
+.portrait-upload-btn {
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 60, 0.8);
+  background: rgba(0, 0, 0, 0.08);
+  font-family: "MedievalSharp", "Georgia", serif;
+}

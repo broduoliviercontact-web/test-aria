@@ -1,0 +1,212 @@
+/* src/components/CompetenceList.css */
+
+.competence-section {
+  margin-top: 1.2rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(140, 105, 70, 0.7);
+  background: rgba(249, 243, 229, 0.9);
+  background-image: url("/parchment-bg2.jpg");
+  background-size: cover;
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 3px 6px rgba(0, 0, 0, 0.14);
+}
+
+.competence-section h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-family: "MedievalSharp", "Georgia", serif;
+  color: #3b2a1a;
+}
+
+/* Tableau */
+
+.competence-table {
+  border-radius: 8px;
+  border: 1px solid rgba(140, 105, 70, 0.5);
+  background: rgba(249, 243, 229, 0.9);
+  overflow: hidden;
+  font-size: 0.85rem;
+}
+
+/* Ligne type grid (header + lignes) */
+.row {
+  display: grid;
+  grid-template-columns: 2fr 0.6fr 0.9fr;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+}
+
+.competence-header {
+  background: rgba(140, 105, 70, 0.12);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4a321f;
+  border-bottom: 1px solid rgba(140, 105, 70, 0.5);
+}
+
+/* Conteneur d'une compétence (ligne + bulle) */
+.competence-row {
+  position: relative;
+  color: #2f2115;
+  border-bottom: 1px solid rgba(140, 105, 70, 0.25);
+}
+
+/* Ligne cliquable (pour ouvrir la description) */
+.competence-row-main {
+  cursor: pointer;
+  background: transparent;
+  transition: background-color 0.12s ease;
+}
+
+.competence-row:nth-child(odd) .competence-row-main {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.competence-row-main:hover {
+  background: rgba(200, 170, 120, 0.25);
+}
+
+.competence-row-main.is-open {
+  background: rgba(180, 150, 110, 0.25);
+}
+
+/* colonnes */
+
+.col-name {
+  padding-right: 0.5rem;
+}
+
+.col-link {
+  font-family: "Merienda", cursive;
+  color: #5f422a;
+}
+
+.col-score {
+  text-align: right;
+  padding-right: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 🫧 Bulle de description (sous la ligne) */
+
+.competence-tooltip {
+  margin: 0.25rem 0.5rem 0.5rem;
+  background: #f8f1e2;
+  border: 1px solid rgba(140, 105, 70, 0.8);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+
+  color: #2f2115;
+  font-size: 0.8rem;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.15),
+    inset 0 0 18px rgba(60, 40, 25, 0.12);
+
+  animation: tooltipIn 0.15s ease-out;
+}
+
+@keyframes tooltipIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.competence-tooltip h3 {
+  margin: 0 0 0.2rem;
+  font-size: 0.9rem;
+  color: #3b2a1a;
+}
+
+.link-hint {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  color: #6a4a2f;
+}
+
+/* Éditeur de score dans le tooltip */
+
+.score-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.score-label {
+  font-size: 0.8rem;
+  color: #4a321f;
+}
+
+.score-value {
+  min-width: 3ch;
+  text-align: center;
+}
+
+.score-btn {
+  border: 1px solid rgba(206, 103, 0, 0.8);
+  background: #f9f3e5;
+  border-radius: 999px;
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  color: #3b2a1a;
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 2px 4px rgba(0, 0, 0, 0.12);
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+
+.score-btn:hover {
+  background: #f1e0c5;
+}
+
+.score-btn:active {
+  background: #e2cfa8;
+  transform: translateY(1px);
+}
+
+.rules-hint {
+  margin-top: 0.45rem;
+  font-size: 0.7rem;
+  color: #6b563d;
+  font-style: italic;
+}
+
+/* 📱 Responsive */
+
+@media (max-width: 768px) {
+  .competence-table {
+    font-size: 0.8rem;
+  }
+
+  .row {
+    grid-template-columns: 2fr 0.7fr 0.9fr;
+  }
+
+  .competence-tooltip {
+    margin: 0.3rem 0.4rem 0.5rem;
+  }
+}
+
+.points-remaining {
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  color: #4a321f;
+  font-style: italic;
+}

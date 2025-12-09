@@ -1,0 +1,92 @@
+/* src/components/ArmureBadge.css */
+
+.armure-badge-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Bouton principal (icône + valeur) */
+.armure-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.armure-badge-icon {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  display: block;
+}
+
+.armure-badge-value {
+  position: absolute;
+  top: 50%;
+  left: 49%;
+  transform: translate(-50%, -50%);
+  font-family: "MedievalSharp", "Georgia", serif;
+  font-size: 1.9rem;
+  color: #3b2311;
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 6px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+/* Label “Armure” sous l’icône */
+.armure-badge-label {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-family: "MedievalSharp", "Georgia", serif;
+  color: #3b2311;
+}
+
+/* Panneau d’édition sous le badge */
+.armure-badge-editor {
+  position: absolute;
+  top: 100%;
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(249, 243, 229, 0.95);
+  border-radius: 8px;
+  border: 1px solid rgba(120, 90, 60, 0.9);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(120, 90, 60, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  z-index: 20;
+}
+
+/* Boutons -1 / +1 */
+.armure-editor-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 60, 0.9);
+  background: #f0dfbf;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: "MedievalSharp", "Georgia", serif;
+}
+
+.armure-editor-btn:hover {
+  background: #e6d0aa;
+}
+
+/* Input numérique */
+.armure-editor-input {
+  width: 3rem;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid rgba(120, 90, 60, 0.9);
+  background: #fdf7e8;
+  font-size: 0.85rem;
+}

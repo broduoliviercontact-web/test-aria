@@ -1,0 +1,147 @@
+/* ===========================
+   SECTION ARME
+   =========================== */
+
+.weapon-section {
+  background: rgba(249, 243, 229, 0.9);
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 90, 60, 0.8);
+  box-shadow: 0 1px 0 #e0d2b8, 0 3px 6px rgba(0, 0, 0, 0.12);
+  background-image: url("/parchment-bg2.jpg");
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.weapon-title {
+  margin: 0 0 0.6rem;
+  font-size: 1.1rem;
+  font-family: "MedievalSharp";
+  text-align: center;
+}
+
+
+/* ===========================
+   LIGNE D’UNE ARME
+   =========================== */
+
+.weapon-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.weapon-row--validated {
+  opacity: 0.98;
+}
+
+
+/* ===========================
+   SELECT DE L’ICÔNE
+   =========================== */
+
+.weapon-icon-select {
+  flex: 0 0 90px;
+  max-width: 19%;
+  font-size: 0.8rem;
+  padding: 0.2rem;
+}
+
+/* Quand validée, le select reste en place mais devient invisible */
+.weapon-row--validated .weapon-icon-select {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* ===========================
+   APERÇU ICÔNE
+   =========================== */
+
+.weapon-icon-preview {
+  width: 30px;
+  height: 30px;
+  flex: 2 0 24px;
+  background-color: rgb(0, 0, 0);
+}
+
+
+/* ===========================
+   INPUTS
+   =========================== */
+
+.weapon-input {
+  flex: 2 1 0;
+  min-width: 0;
+  padding: 0.3rem;
+  border-radius: 6px;
+  border: 1px solid rgba(120, 90, 60, 0.6);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Champ dégâts plus petit */
+.weapon-input.small {
+  flex: 0 0 43px;
+}
+
+
+/* ===========================
+   BOUTON VALIDER (✓)
+   =========================== */
+
+.weapon-validate {
+  background: #e0f4e0;
+  border: 1px solid rgba(60, 100, 60, 0.8);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.weapon-validate:hover {
+  background: #d0ebd0;
+}
+
+
+/* ===========================
+   BOUTON SUPPRIMER (✖)
+   =========================== */
+
+.weapon-delete {
+  background: rgba(120, 0, 0, 0.35);
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+
+/* ===========================
+   BOUTON + AJOUTER
+   =========================== */
+
+.weapon-add {
+  margin-top: 0.5rem;
+  width: 100%;
+  background: #f5e5c7;
+  border: 1px solid rgba(140, 105, 70, 0.8);
+  padding: 0.35rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.weapon-add:hover {
+  background: #f0d9ae;
+}

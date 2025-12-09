@@ -1,0 +1,103 @@
+/* src/components/Inventory.css */
+
+.inventory-card {
+  margin-top: 1.2rem;
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(111, 77, 45, 0.7);
+  background: rgba(249, 243, 229, 0.9);
+  background-image: url("/parchment-bg2.jpg");
+  background-size: cover;
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 3px 6px rgba(0, 0, 0, 0.14);
+}
+
+/* Titre */
+
+.inventory-title {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-family: "MedievalSharp", "Georgia", serif;
+  color: #4a311e;
+}
+
+/* Texte “vide” */
+
+.inventory-empty {
+  margin: 0.2rem 0 0.6rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #6a4a2a;
+}
+
+/* Ligne d’inventaire */
+
+.inventory-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 32px;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+/* Champs */
+
+.inventory-name,
+.inventory-qty {
+  font-size: 0.9rem;
+  padding: 0.25rem 0.35rem;
+  border-radius: 6px;
+  border: 1px solid rgba(120, 90, 60, 0.8);
+  background: rgba(255, 252, 242, 0.9);
+  font-family: inherit;
+}
+
+.inventory-name {
+  width: 100%;
+}
+
+.inventory-qty {
+  text-align: right;
+}
+
+/* Bouton supprimer */
+
+.inventory-delete {
+  border: none;
+  border-radius: 6px;
+  background: rgba(120, 40, 30, 0.9);
+  color: #fdf3df;
+  cursor: pointer;
+  padding: 0.15rem 0;
+  font-size: 0.9rem;
+  line-height: 1;
+  box-shadow: 0 1px 0 rgba(60, 20, 10, 0.5);
+}
+
+.inventory-delete:hover {
+  background: rgba(150, 50, 40, 1);
+}
+
+/* Bouton ajouter */
+
+.inventory-add {
+  margin-top: 0.4rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: #8b4513;
+  color: #fdf3df;
+  box-shadow: 0 2px 0 #4e2607;
+  font-family: "MedievalSharp", "Georgia", serif;
+  letter-spacing: 0.05em;
+}
+
+.inventory-add:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #4e2607;
+}
