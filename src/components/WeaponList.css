@@ -4,7 +4,7 @@
 
 .weapon-section {
   background: rgba(249, 243, 229, 0.9);
-  padding: 0.7rem 1rem;
+  padding: 0.7rem 0.7rem;
   border-radius: 10px;
   border: 1px solid rgba(120, 90, 60, 0.8);
   box-shadow: 0 1px 0 #e0d2b8, 0 3px 6px rgba(0, 0, 0, 0.12);
@@ -27,9 +27,13 @@
    LIGNE D’UNE ARME
    =========================== */
 
+/* ===========================
+   LIGNE D’UNE ARME
+   =========================== */
+
 .weapon-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;   /* 👉 les éléments se placent en haut, pas centrés */
   gap: 0.75rem;
   margin-bottom: 0.45rem;
   padding: 0.35rem 0.6rem;
@@ -40,7 +44,13 @@
     0 1px 0 #e0d2b8,
     0 2px 4px rgba(0, 0, 0, 0.12);
   position: relative;
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    border-color 0.15s ease-out,
+    background 0.15s ease-out;
 }
+
 
 /* petite barre décorative à gauche */
 .weapon-row::before {
@@ -59,8 +69,27 @@
   );
 }
 
+/* Hover général sur la ligne */
+.weapon-row:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 0 #e0d2b8,
+    0 4px 10px rgba(0, 0, 0, 0.25);
+  border-color: rgba(160, 120, 80, 0.9);
+}
+
 .weapon-row--validated {
   opacity: 0.96;
+}
+
+/* barre décorative devient dorée */
+.weapon-row--validated::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 200, 0.1),
+    rgba(212, 175, 55, 0.9),
+    rgba(255, 255, 200, 0.1)
+  );
 }
 
 /* ===========================
@@ -81,7 +110,20 @@
   height: 56px;
   border-radius: 999px;
   border: 2px solid rgba(0, 0, 0, 0.85);
-background: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#474747 39%,#2c2c2c 50%,#000000 51%,#111111 60%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%);
+  /* ta couleur custom de médaillon */
+  background: linear-gradient(
+    to bottom,
+    #4c4c4c 0%,
+    #595959 12%,
+    #666666 25%,
+    #474747 39%,
+    #2c2c2c 50%,
+    #000000 51%,
+    #111111 60%,
+    #2b2b2b 76%,
+    #1c1c1c 91%,
+    #131313 100%
+  );
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.25),
     inset 0 0 4px rgba(80, 50, 30, 0.5);
@@ -89,6 +131,11 @@ background: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#47474
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition:
+    transform 0.18s ease-out,
+    box-shadow 0.18s ease-out,
+    border-color 0.18s ease-out,
+    filter 0.18s ease-out;
 }
 
 .weapon-icon-preview {
@@ -96,6 +143,31 @@ background: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#47474
   height: 32px;
   object-fit: contain;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+  transition: transform 0.18s ease-out, filter 0.18s ease-out;
+}
+
+/* Hover sur la ligne = médaillon qui pop un peu */
+.weapon-row:hover .weapon-icon-frame {
+  transform: translateY(-1px) scale(1.06);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.45),
+    inset 0 0 5px rgba(200, 200, 200, 0.15);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.weapon-row:hover .weapon-icon-preview {
+  transform: translateY(-0.5px);
+  filter:
+    drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8))
+    brightness(1.05);
+}
+
+/* Icône en mode artefact validé */
+.weapon-row--validated .weapon-icon-preview {
+  filter:
+    drop-shadow(0 2px 2px rgba(0, 0, 0, 0.9))
+    saturate(1.15)
+    brightness(1.08);
 }
 
 /* select sous l'icône */
@@ -119,32 +191,28 @@ background: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#47474
 /* ===========================
    BLOC PRINCIPAL (nom + dégâts)
    =========================== */
+/* ===========================
+   BLOC PRINCIPAL (nom + dégâts)
+   =========================== */
 
 .weapon-main {
   flex: 1;
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  flex-direction: column;   /* 👉 vertical : nom puis dégâts */
+  gap: 0.35rem;
 }
 
-/* Inputs génériques */
-.weapon-input {
-  min-width: 0;
-  padding: 0.3rem 0.4rem;
-  border-radius: 6px;
-  border: 1px solid rgba(120, 90, 60, 0.6);
-  background: rgba(255, 255, 255, 0.7);
-  font-size: 0.85rem;
-}
-
-/* Nom de l'arme : prend plus de place */
+/* Nom de l'arme : pleine largeur */
 .weapon-name-input {
-  flex: 3 1 0;
+  flex: 0 0 auto;
+  width: 100%;
 }
 
-/* Dégâts : petit badge */
+/* Dégâts : petit badge aligné à droite, plus étroit */
 .weapon-damage-input {
-  flex: 0 0 70px;
+  align-self: center;     /* 👉 collé à droite */
+  width: 130px;
+  max-width: 40%;
   text-align: center;
   font-family: "MedievalSharp", "Georgia", serif;
   font-size: 0.8rem;
@@ -154,6 +222,7 @@ background: linear-gradient(to bottom, #4c4c4c 0%,#595959 12%,#666666 25%,#47474
     0 1px 0 #e0d2b8,
     0 2px 4px rgba(0, 0, 0, 0.18);
 }
+
 
 /* ===========================
    BOUTONS ACTIONS

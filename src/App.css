@@ -612,8 +612,6 @@ background: transparent;
     flex-direction: column;
   }
 }
-
-
 /* ===========================
    LAYOUT STATS + COMPETENCES
    =========================== */
@@ -625,9 +623,10 @@ background: transparent;
   margin-top: 0.6rem;
 }
 
-/* Colonne gauche : Inventaire + Bourse */
+/* Colonne gauche : Inventaire + Armes + Bourse */
 .stats-column {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;              /* 👈 autorise la colonne à rétrécir */
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -635,7 +634,8 @@ background: transparent;
 
 /* Colonne droite : Compétences */
 .competences-column {
-  flex: 1; /* même proportion que la colonne gauche */
+  flex: 1 1 0;               /* même règle que la gauche */
+  min-width: 0;              /* 👈 idem, évite les déformations */
 }
 
 
@@ -647,6 +647,8 @@ background: transparent;
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* =========================== hp section ========================= */

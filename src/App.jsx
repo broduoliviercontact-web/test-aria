@@ -663,22 +663,23 @@ const [weapons, setWeapons] = useState([]);
               top: 0,
             }}
           >
-            <PdfCharacterSheet
-              characterName={characterName}
-              playerName={playerName}
-              age={age}
-              profession={profession}
-              stats={stats}
-              competences={competences}
-              specialCompetences={specialCompetences}
-              xp={xp}
-              purseFer={purseFer}
-              inventory={inventory}
-              portraitUrl={portraitDataUrl}
-                hitPoints={hitPoints}
+<PdfCharacterSheet
+  characterName={characterName}
+  playerName={playerName}
+  age={age}
+  profession={profession}
+  stats={stats}
+  competences={competences}
+  specialCompetences={specialCompetences}
+  xp={xp}
+  purseFer={purseFer}
+  inventory={inventory}
+  weapons={weapons}    // 👈 AJOUTER ÇA
+  portraitUrl={portraitDataUrl}
+  hitPoints={hitPoints}
   wounds={wounds}
   armor={armor}
-            />
+/>
           </div>
 
           {/* Boutons hors fiche */}
@@ -691,13 +692,7 @@ const [weapons, setWeapons] = useState([]);
               Exporter la fiche en PDF
             </button>
 
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={handleSaveToBackend}
-            >
-              Envoyer au back-end
-            </button>
+      
           </div>
 
           {/* Validation / Edition / Suppression */}
@@ -717,6 +712,13 @@ const [weapons, setWeapons] = useState([]);
                   verrouillées. Vous pourrez toujours gérer l&apos;inventaire
                   et la bourse.
                 </p>
+                      <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleSaveToBackend}
+            >
+              Envoyer au back-end
+            </button>
               </>
             )}
 

@@ -1,6 +1,6 @@
 // src/components/PdfCharacterSheet.jsx
 import React from "react";
-import "./PdfCharacterSheet.css";   // ⬅⬅⬅ ajouter ça
+import "./PdfCharacterSheet.css";
 
 const FER_PER_COPPER = 10;
 const FER_PER_SILVER = 100;
@@ -29,23 +29,24 @@ export default function PdfCharacterSheet({
   xp,
   playerName,
   purseFer,
-  inventory,
-    portraitUrl,
-      hitPoints,
+  inventory = [],
+  weapons = [],
+  portraitUrl,
+  hitPoints,
   wounds,
   armor,
-
 }) {
   const { gold, silver, copper, iron } = breakdownPurse(purseFer || 0);
 
-  const allCompetences = [
-    ...(competences || []),
-    ...(specialCompetences || []),
-  ];
+  const baseCompetences = competences || [];
+  const special = specialCompetences || [];
 
-  // helper pour trouver une stat par id
-  const getStat = (id) =>
-    stats?.find((s) => s.id === id)?.value ?? "";
+  const safeWeapons = (weapons || []).filter(
+    (w) => w && (w.name || w.damage)
+  );
+  const safeInventory = (inventory || []).filter(
+    (item) => item && (item.name || item.quantity)
+  );
 
   return (
     <div className="pdf-sheet">
@@ -92,17 +93,18 @@ export default function PdfCharacterSheet({
           </div>
         </div>
 
-        {/* Portrait (juste un cadre, le rendu PDF ne prend pas le composant écran) */}
+        {/* Portrait */}
         <div className="pdf-card pdf-portrait">
-  {portraitUrl && (
-    <img
-      src={portraitUrl}
-      alt="Portrait du personnage"
-      className="pdf-portrait-img"
-    />
-  )}
-</div>
+          {portraitUrl && (
+            <img
+              src={portraitUrl}
+              alt="Portrait du personnage"
+              className="pdf-portrait-img"
+            />
+          )}
+        </div>
       </section>
+
       {/* Santé : PV / Blessures / Armure */}
       <section className="pdf-health-row">
         <div className="pdf-card pdf-health-card">
@@ -148,30 +150,117 @@ export default function PdfCharacterSheet({
         </div>
       </section>
 
-      {/* Compétences */}
-      <section className="pdf-card pdf-competences">
-        <h2 className="pdf-card-title">Compétences</h2>
+      {/* ZONE CENTRALE : 
+          - Colonne gauche = Armes / Inventaire / Compétences spéciales
+          - Colonne droite = Compétences
+      */}
+      <section className="pdf-main-row">
+        {/* Colonne GAUCHE : Armes / Inventaire / Compétences spéciales */}
+        <div className="pdf-right-column">
+          {/* Armes */}
+          <div className="pdf-card pdf-weapons-card">
+            <h2 className="pdf-card-title">Armes</h2>
+            {safeWeapons.length === 0 ? (
+              <p className="pdf-empty-text">Aucune arme.</p>
+            ) : (
+              <table className="pdf-weapons-table">
+                <thead>
+                  <tr>
+                    <th>Arme</th>
+                    <th>Dégâts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {safeWeapons.map((w, idx) => (
+                    <tr key={idx}>
+                      <td>{w.name || "—"}</td>
+                      <td>{w.damage || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
 
-        <table className="pdf-competence-table">
-          <thead>
-            <tr>
-              <th>Compétence</th>
-              <th>Type</th>
-              <th>Lien</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allCompetences.map((c) => (
-              <tr key={c.id || c.name}>
-                <td>{c.name}</td>
-                <td>{c.type || ""}</td>
-                <td>{c.link || ""}</td>
-                <td>{c.score != null ? `${c.score}%` : ""}</td>
+          {/* Inventaire */}
+          <div className="pdf-card pdf-inventory-card">
+            <h2 className="pdf-card-title">Inventaire</h2>
+            {safeInventory.length === 0 ? (
+              <p className="pdf-empty-text">Aucun objet.</p>
+            ) : (
+              <table className="pdf-inventory-table">
+                <thead>
+                  <tr>
+                    <th>Objet</th>
+                    <th>Qté</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {safeInventory.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.name || "—"}</td>
+                      <td>{item.quantity ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Compétences spéciales */}
+          <div className="pdf-card pdf-special-competences-card">
+            <h2 className="pdf-card-title">Compétences spéciales</h2>
+            {special.length === 0 ? (
+              <p className="pdf-empty-text">
+                Aucune compétence spéciale.
+              </p>
+            ) : (
+              <table className="pdf-special-competences-table">
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {special.map((sc) => (
+                    <tr key={sc.id || sc.name}>
+                      <td>{sc.name || "—"}</td>
+                      <td>
+                        {sc.score != null ? `${sc.score}%` : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* Colonne DROITE : Compétences */}
+        <div className="pdf-card pdf-competences">
+          <h2 className="pdf-card-title">Compétences</h2>
+          <table className="pdf-competence-table">
+            <thead>
+              <tr>
+                <th>Compétence</th>
+                <th>Type</th>
+                <th>Lien</th>
+                <th>Score</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {baseCompetences.map((c) => (
+                <tr key={c.id || c.name}>
+                  <td>{c.name}</td>
+                  <td>{c.type || ""}</td>
+                  <td>{c.link || ""}</td>
+                  <td>{c.score != null ? `${c.score}%` : ""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       {/* Bas de page : XP / Bourse / Joueur */}
@@ -204,7 +293,6 @@ export default function PdfCharacterSheet({
               <span>{String(iron).padStart(2, "0")}</span>
             </div>
           </div>
-          
         </div>
 
         {/* Joueur */}

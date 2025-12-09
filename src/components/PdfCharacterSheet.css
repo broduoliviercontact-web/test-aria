@@ -5,9 +5,9 @@
    =========================== */
 .pdf-sheet {
   width: 190mm;
-  height: 270mm;          /* un peu plus court */
+  height: 270mm;
   margin: 0 auto;
-  padding: 14mm 18mm;     /* padding haut/bas légèrement réduit */
+  padding: 10mm 16mm;
   background: #f6ebd3;
   border-radius: 12mm;
   box-shadow: none;
@@ -15,10 +15,9 @@
   color: #2c1e12;
   display: flex;
   flex-direction: column;
-  gap: 4mm;               /* moins d’espace entre les blocs */
+  gap: 3mm;
   box-sizing: border-box;
 }
-
 
 .pdf-header {
   text-align: center;
@@ -26,30 +25,34 @@
 
 .pdf-title {
   margin: 0;
-  font-size: 18pt;
+  font-size: 16pt;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-/* Bandeau haut : identité / caracs / portrait */
+/* ===========================
+   BANDEAU HAUT
+   =========================== */
 
 .pdf-top-row {
   display: grid;
   grid-template-columns: 2fr 2fr 2fr;
-  gap: 6mm;
+  gap: 4mm;
 }
+
+/* Cartes génériques */
 
 .pdf-card {
   background: #f9f1dd;
   border-radius: 4mm;
   border: 0.4mm solid rgba(120, 90, 60, 0.6);
-  padding: 4mm 5mm;
+  padding: 3mm 4mm;
   box-sizing: border-box;
 }
 
 .pdf-card-title {
-  margin: 0 0 3mm;
-  font-size: 11pt;
+  margin: 0 0 2mm;
+  font-size: 10pt;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -59,8 +62,8 @@
 .pdf-identity-line {
   display: flex;
   justify-content: space-between;
-  font-size: 9pt;
-  margin-bottom: 2mm;
+  font-size: 8pt;
+  margin-bottom: 1.5mm;
 }
 
 .pdf-identity-line span:first-child {
@@ -68,7 +71,7 @@
 }
 
 .pdf-identity-value {
-  margin-left: 4mm;
+  margin-left: 3mm;
 }
 
 /* Caractéristiques */
@@ -76,115 +79,21 @@
 .pdf-stats-grid {
   display: grid;
   grid-template-columns: 1fr auto;
-  row-gap: 2mm;
-  column-gap: 6mm;
-  font-size: 9pt;
-}
-
-.pdf-stat-row span:first-child {
-  justify-self: flex-start;
+  row-gap: 1.5mm;
+  column-gap: 4mm;
+  font-size: 8pt;
 }
 
 .pdf-stat-value {
   font-weight: 700;
 }
 
-/* Portrait : juste un cadre pour l'instant */
+/* Portrait */
 
 .pdf-portrait {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* Compétences */
-
-.pdf-competences {
-  flex: 1;
-}
-
-.pdf-competence-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 8pt;
-}
-
-.pdf-competence-table th,
-.pdf-competence-table td {
-  border-bottom: 0.2mm solid rgba(140, 110, 80, 0.4);
-  padding: 1mm 1.5mm;
-}
-
-.pdf-competence-table th {
-  text-align: left;
-  font-size: 8.5pt;
-}
-
-/* Bas de page : XP / Bourse / Joueur */
-
-.pdf-bottom-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 6mm;
-  align-items: flex-end;
-}
-
-.pdf-bottom-left {
-  display: flex;
-  gap: 4mm;
-  align-items: stretch;
-}
-
-.pdf-xp-card {
-  min-width: 35mm;
-}
-
-.pdf-xp-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 9pt;
-}
-
-.pdf-xp-value {
-  font-weight: 600;
-}
-
-.pdf-purse-card {
-  flex: 1;
-}
-
-.pdf-card-subtitle {
-  margin: 0 0 2mm;
-  font-size: 9pt;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.pdf-purse-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 8.5pt;
-}
-
-.pdf-player-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 9pt;
-}
-
-.pdf-player-name {
-  min-width: 40mm;
-  border-bottom: 0.2mm solid #3a2717;
-  margin-left: 4mm;
-  padding-bottom: 0.3mm;
-}
-
-.pdf-portrait {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
 }
 
 .pdf-portrait-img {
@@ -194,12 +103,13 @@
   object-fit: cover;
 }
 
-/* Santé : PV / Blessures / Armure */
+/* ===========================
+   SANTÉ
+   =========================== */
 
 .pdf-health-row {
   display: flex;
   gap: 2mm;
-  margin-top: -1mm;
 }
 
 .pdf-health-card {
@@ -207,20 +117,170 @@
   text-align: center;
 }
 
+.pdf-card-subtitle {
+  margin: 0 0 1.5mm;
+  font-size: 8pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .pdf-health-body {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1mm;
-  margin-top: 0.5mm;
 }
 
 .pdf-health-icon {
-  width: 14mm;
+  width: 12mm;
   height: auto;
 }
 
 .pdf-health-value {
-  font-size: 14pt;
+  font-size: 12pt;
   font-weight: 700;
+}
+
+/* ===========================
+   COMPÉTENCES + COLONNE GAUCHE (ARMES / INVENTAIRE / SPÉCIALES)
+   =========================== */
+
+.pdf-main-row {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr; /* GAUCHE = armes/inventaire/spéciales, DROITE = compétences */
+  gap: 4mm;
+  align-items: stretch; /* colonnes de même hauteur */
+}
+
+/* Colonne gauche : armes / inventaire / compétences spéciales */
+.pdf-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+  height: 100%;
+}
+
+/* IMPORTANT : les trois cartes de gauche remplissent la hauteur totale */
+.pdf-weapons-card,
+.pdf-inventory-card,
+.pdf-special-competences-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tables dans ces cartes */
+.pdf-weapons-table,
+.pdf-inventory-table,
+.pdf-special-competences-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7.1pt;
+}
+
+.pdf-weapons-table th,
+.pdf-weapons-table td,
+.pdf-inventory-table th,
+.pdf-inventory-table td,
+.pdf-special-competences-table th,
+.pdf-special-competences-table td {
+  border-bottom: 0.2mm solid rgba(140, 110, 80, 0.4);
+  padding: 0.6mm 1.2mm;
+}
+
+.pdf-weapons-table th,
+.pdf-inventory-table th,
+.pdf-special-competences-table th {
+  text-align: left;
+  font-size: 7.6pt;
+}
+
+/* Colonne droite : compétences */
+
+.pdf-competences {
+  height: 100%;
+}
+
+.pdf-competence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7.3pt;
+}
+
+.pdf-competence-table th,
+.pdf-competence-table td {
+  border-bottom: 0.2mm solid rgba(140, 110, 80, 0.4);
+  padding: 0.7mm 1.3mm;
+}
+
+.pdf-competence-table th {
+  text-align: left;
+  font-size: 7.8pt;
+}
+
+.pdf-empty-text {
+  font-size: 7.3pt;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ===========================
+   BAS DE PAGE : XP / BOURSE / JOUEUR
+   =========================== */
+
+.pdf-bottom-row {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr;
+  gap: 4mm;
+  align-items: stretch;
+}
+
+.pdf-bottom-left {
+  display: flex;
+  gap: 3mm;
+}
+
+/* XP plus petit */
+
+.pdf-xp-card {
+  min-width: 30mm;
+}
+
+.pdf-xp-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7pt;
+}
+
+.pdf-xp-value {
+  font-weight: 600;
+}
+
+/* Bourse */
+
+.pdf-purse-card {
+  flex: 1;
+}
+
+.pdf-purse-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.4pt;
+}
+
+/* Joueur */
+
+.pdf-player-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 7pt;
+}
+
+.pdf-player-name {
+  min-width: 38mm;
+  border-bottom: 0.2mm solid #3a2717;
+  margin-left: 3mm;
+  padding-bottom: 0.2mm;
+  font-size: 7pt;
 }
