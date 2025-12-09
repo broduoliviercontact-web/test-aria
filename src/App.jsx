@@ -284,7 +284,40 @@ function App() {
 
 const [isKitModalOpen, setIsKitModalOpen] = useState(false);
 const [selectedKit, setSelectedKit] = useState(null);
+// Quand on valide un kit d'équipement
+  const handleConfirmKit = (kit) => {
+    if (!kit) return;
 
+    const now = Date.now();
+
+    const kitItems = kit.content.map((rawItem, index) => {
+      let name = rawItem;
+      let quantity = 1;
+
+      // Essaie de détecter des trucs du style "Torche x 5" ou "Torches x5"
+      const match = rawItem.match(/^(.*?)[x×]\s*(\d+)\s*$/i);
+      if (match) {
+        name = match[1].trim();
+        quantity = parseInt(match[2], 10);
+      }
+
+      return {
+        id: `kit-${kit.id}-${index}-${now}`,
+        name,
+        quantity,
+        fromKit: true, // au cas où tu veuilles filtrer plus tard
+      };
+    });
+
+    // On ajoute les objets du kit à l'inventaire
+    setInventory((prev) => [...prev, ...kitItems]);
+
+    // On mémorise le kit choisi pour cacher le bouton
+    setSelectedKit(kit);
+
+    // Et on ferme la modale
+    setIsKitModalOpen(false);
+  };
 
   // 🔄 PV = Endurance (max 14) en mode création
   React.useEffect(() => {
@@ -322,24 +355,32 @@ const [selectedKit, setSelectedKit] = useState(null);
       console.warn("Impossible de stocker le portrait dans localStorage", e);
     }
   }, []);
-  const handleKitConfirm = (kit) => {
+
+
+const handleKitConfirm = (kit) => {
+  if (!kit) return;
+
   setSelectedKit(kit);
   setIsKitModalOpen(false);
 
-  // ➕ Ajouter les objets du kit dans l’inventaire
-setInventory((prev) => {
-    // on enlève d’éventuels anciens items venant d’un kit
+  setInventory((prev) => {
+    // Optionnel : si tu veux qu’un seul kit soit pris en compte,
+    // on enlève d’éventuels anciens objets "fromKit".
     const cleaned = prev.filter((item) => !item.fromKit);
 
+    const now = Date.now();
+
     const kitItems = kit.content.map((label, index) => ({
-      id: `kit-${kit.id}-${index}`,
-      label,
-      fromKit: true,
+      id: `kit-${kit.id}-${index}-${now}`,
+      name: label,      // 🔴 ICI : on remplit bien "name"
+      quantity: 1,      // 🔴 ICI : quantité par défaut
+      fromKit: true,    // pour savoir que ça vient d’un kit si besoin
     }));
 
     return [...cleaned, ...kitItems];
   });
 };
+
 
   /* ---------- Changement de modes ---------- */
 
@@ -687,25 +728,22 @@ setInventory((prev) => {
 
             <div className="stats-competences-layout">
               {/* Colonne gauche : Inventaire, armes, bourse */}
-          <div className="stats-column">
-
-  {/* 🔥 BOUTON CHOIX KIT - visible seulement en création */}
+       <div className="stats-column">
   {sheetMode === "create" && !selectedKit && (
     <button
       type="button"
-      className="btn-primary"
+      className="modal-primary-btn"
       onClick={() => setIsKitModalOpen(true)}
-      style={{ marginBottom: "0.5rem" }}
     >
       Choisir un kit d’équipement
     </button>
   )}
 
   <Inventory items={inventory} onChange={setInventory} />
-  
   <WeaponList weapons={weapons} onChange={setWeapons} />
 
 </div>
+
 
 
               {/* Colonne droite : Compétences */}
