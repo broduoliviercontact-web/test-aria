@@ -1,6 +1,6 @@
 // src/components/PhraseDeSynthese.jsx
 import React from "react";
-import "./phrasedeSynthese.css";
+import "./PhraseDeSynthese.css";
 import PhraseBloc from "./PhraseBloc";
 
 export default function PhraseDeSynthese({
@@ -17,6 +17,7 @@ export default function PhraseDeSynthese({
         <PhraseBloc
           title="Je suis génial parce que…"
           value={phraseGenial}
+          
           onChange={setPhraseGenial}
         />
 
