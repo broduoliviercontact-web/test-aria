@@ -20,6 +20,7 @@ import BlessureBadge from "./components/BlessureBadge";
 import ArmureBadge from "./components/ArmureBadge";
 import WeaponList from "./components/WeaponList";
 import PhraseDeSynthese from "./components/PhraseDeSynthese";
+import EquipmentKitModal from "./components/EquipmentKitModal";
 
 // PDF
 import jsPDF from "jspdf";
@@ -281,6 +282,10 @@ function App() {
   const [hitPoints, setHitPoints] = useState(20);
   const [maxHitPoints] = useState(24); // gardé au cas où plus tard
 
+const [isKitModalOpen, setIsKitModalOpen] = useState(false);
+const [selectedKit, setSelectedKit] = useState(null);
+
+
   // 🔄 PV = Endurance (max 14) en mode création
   React.useEffect(() => {
     if (sheetMode !== "create") return;
@@ -317,6 +322,24 @@ function App() {
       console.warn("Impossible de stocker le portrait dans localStorage", e);
     }
   }, []);
+  const handleKitConfirm = (kit) => {
+  setSelectedKit(kit);
+  setIsKitModalOpen(false);
+
+  // ➕ Ajouter les objets du kit dans l’inventaire
+setInventory((prev) => {
+    // on enlève d’éventuels anciens items venant d’un kit
+    const cleaned = prev.filter((item) => !item.fromKit);
+
+    const kitItems = kit.content.map((label, index) => ({
+      id: `kit-${kit.id}-${index}`,
+      label,
+      fromKit: true,
+    }));
+
+    return [...cleaned, ...kitItems];
+  });
+};
 
   /* ---------- Changement de modes ---------- */
 
@@ -389,6 +412,7 @@ function App() {
 
       return;
     }
+
 
     // En 3d6, on ne passe plus jamais ici en mode création car isStatsLockedForUi
     setStats((prevStats) =>
@@ -663,11 +687,26 @@ function App() {
 
             <div className="stats-competences-layout">
               {/* Colonne gauche : Inventaire, armes, bourse */}
-              <div className="stats-column">
-                <Inventory items={inventory} onChange={setInventory} />
-                <WeaponList weapons={weapons} onChange={setWeapons} />
-                <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
-              </div>
+          <div className="stats-column">
+
+  {/* 🔥 BOUTON CHOIX KIT - visible seulement en création */}
+  {sheetMode === "create" && !selectedKit && (
+    <button
+      type="button"
+      className="btn-primary"
+      onClick={() => setIsKitModalOpen(true)}
+      style={{ marginBottom: "0.5rem" }}
+    >
+      Choisir un kit d’équipement
+    </button>
+  )}
+
+  <Inventory items={inventory} onChange={setInventory} />
+  
+  <WeaponList weapons={weapons} onChange={setWeapons} />
+
+</div>
+
 
               {/* Colonne droite : Compétences */}
               <div className="competences-column">
@@ -815,14 +854,22 @@ function App() {
           >
             ← Retour à l&apos;accueil
           </button>
-
+    <EquipmentKitModal
+            isOpen={isKitModalOpen}
+            onClose={() => setIsKitModalOpen(false)}
+            onConfirm={handleKitConfirm}
+            initialKitId={selectedKit ? selectedKit.id : null}
+          />
           {/* Debug JSON */}
           <pre className="debug-json">
             {JSON.stringify(characterPayload, null, 2)}
           </pre>
+          
         </div>
+        
       </div>
     </div>
+    
   );
 }
 
