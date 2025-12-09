@@ -152,7 +152,9 @@ return (
             dés seront alors figés pour cette fiche.
           </li>
         </ol>
-
+        <button type="button" className="modal-primary-btn" onClick={onClose}>
+          Commencer la création
+        </button>
         <h3>Méthode de génération des caractéristiques</h3>
 
         <div className="mode-switch stat-mode-switch">
@@ -167,6 +169,7 @@ return (
               checked={isPointBuy}
               onChange={handleToggleStatMode}
             />
+            
             <span className="slider" />
             <span className="card-side" />
           </label>
@@ -214,9 +217,7 @@ return (
           puis points à répartir à la main.
         </p>
 
-        <button type="button" className="modal-primary-btn" onClick={onClose}>
-          Commencer la création
-        </button>
+
       </div>
     </div>
   );
