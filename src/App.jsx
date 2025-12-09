@@ -37,8 +37,8 @@ const INITIAL_STATS = [
   { id: "charisme", label: "Charisme", value: 10, min: 0, max: 20 },
 ];
 
-// Règles de point-buy
-const STAT_TOTAL_POINTS = 60;
+// Règles de point-buy (60 points au total)
+const STAT_TOTAL_POINTS = 84;
 const STAT_MIN = 4;
 const STAT_MAX = 18;
 
@@ -253,9 +253,6 @@ function App() {
 
   // Mode de la fiche : création / validé / édition
   const [sheetMode, setSheetMode] = useState("create"); // "create" | "validated" | "edit"
-  const isLocked = sheetMode === "validated";
-  const canEditStatsAndSkills = sheetMode !== "validated";
-  const canValidate = sheetMode !== "validated";
 
   const [showCreationModal, setShowCreationModal] = useState(true);
   const [isCreationDone, setIsCreationDone] = useState(false);
@@ -263,6 +260,15 @@ function App() {
   const [skillMode, setSkillMode] = useState("ready"); // "ready" | "custom"
   const [statMode, setStatMode] = useState("3d6"); // "3d6" | "point-buy"
   const [statPointsPool, setStatPointsPool] = useState(0);
+
+  // 🔑 dérivés
+  const isLocked = sheetMode === "validated";
+  // 🔒 Caracs verrouillées si : fiche validée OU méthode 3d6 en création
+  const isStatsLockedForUi =
+    sheetMode === "validated" || (sheetMode === "create" && statMode === "3d6");
+
+  const canEditStatsAndSkills = sheetMode !== "validated";
+  const canValidate = sheetMode !== "validated";
 
   const [competences, setCompetences] = useState([]);
   const [specialCompetences, setSpecialCompetences] = useState([]);
@@ -384,6 +390,7 @@ function App() {
       return;
     }
 
+    // En 3d6, on ne passe plus jamais ici en mode création car isStatsLockedForUi
     setStats((prevStats) =>
       prevStats.map((stat) => {
         if (stat.id !== id) return stat;
@@ -623,8 +630,15 @@ function App() {
                 <CharacterStats
                   stats={stats}
                   onChangeStat={handleChangeStat}
-                  isLocked={isLocked}
+                  isLocked={isStatsLockedForUi}
                 />
+                {/* ➕ Affichage des points restants en mode répartition */}
+                {sheetMode === "create" && statMode === "point-buy" && (
+                  <p className="stat-points-info">
+                    Points à répartir restants :{" "}
+                    <strong>{statPointsPool}</strong>
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -686,7 +700,7 @@ function App() {
               <img
                 src="/couronne-logo.svg"
                 alt="Ornement de couronne"
-                className="phrase-ornament-icon"
+                className="phrase-ornement-icon"
               />
             </div>
           </div>
