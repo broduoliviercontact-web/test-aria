@@ -1,9 +1,15 @@
+// src/components/WeaponList.jsx
 import React from "react";
 import "./WeaponList.css";
 import { weaponIcons } from "../bladeIcons"; // ⬅️ on importe la liste complète
 
 export default function WeaponList({ weapons, onChange }) {
-  const defaultIcon = weaponIcons[0]?.url ?? "";
+  // On crée une copie triée par label (ordre alphabétique FR)
+  const sortedWeaponIcons = [...weaponIcons].sort((a, b) =>
+    a.label.localeCompare(b.label, "fr", { sensitivity: "base" })
+  );
+
+  const defaultIcon = sortedWeaponIcons[0]?.url ?? "";
 
   const updateWeapon = (index, key, value) => {
     const copy = [...weapons];
@@ -55,7 +61,7 @@ export default function WeaponList({ weapons, onChange }) {
               onChange={(e) => updateWeapon(index, "icon", e.target.value)}
               className="weapon-icon-select"
             >
-              {weaponIcons.map((icon) => (
+              {sortedWeaponIcons.map((icon) => (
                 <option key={icon.id} value={icon.url}>
                   {icon.label}
                 </option>
@@ -74,9 +80,7 @@ export default function WeaponList({ weapons, onChange }) {
               type="text"
               placeholder="Nom de l'arme"
               value={weapon.name || ""}
-              onChange={(e) =>
-                updateWeapon(index, "name", e.target.value)
-              }
+              onChange={(e) => updateWeapon(index, "name", e.target.value)}
               className="weapon-input"
             />
 
@@ -85,9 +89,7 @@ export default function WeaponList({ weapons, onChange }) {
               type="text"
               placeholder="Dégâts (ex: 1D6)"
               value={weapon.damage || ""}
-              onChange={(e) =>
-                updateWeapon(index, "damage", e.target.value)
-              }
+              onChange={(e) => updateWeapon(index, "damage", e.target.value)}
               className="weapon-input small"
             />
 
