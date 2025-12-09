@@ -17,8 +17,9 @@ import Inventory from "./components/Inventory";
 import GoldPouch from "./components/GoldPouch";
 import HitPointsBadge from "./components/HitPointsBadge";
 import BlessureBadge from "./components/BlessureBadge";
-import ArmureBadge from "./components/ArmureBadge"; // 👈 ajoute ça
+import ArmureBadge from "./components/ArmureBadge";
 import WeaponList from "./components/WeaponList";
+import PhraseDeSynthese from "./components/PhraseDeSynthese"; // 🌟 nouveau import
 
 // PDF
 import jsPDF from "jspdf";
@@ -92,7 +93,8 @@ function Home({ onStart }) {
               </li>
               <li>Lance les dés ou répartis tes points.</li>
               <li>
-                Valide ton personnage pour verrouiller les caracs & compétences.
+                Valide ton personnage pour verrouiller les caracs &
+                compétences.
               </li>
               <li>
                 Gère ton inventaire, ta bourse, l’XP et exporte la fiche en PDF.
@@ -129,7 +131,7 @@ function CreationModal({
     onChangeStatMode(checked ? "point-buy" : "3d6");
   };
 
-return (
+  return (
     <div className="creation-modal-backdrop">
       <div className="creation-modal">
         <h2>Création de personnage</h2>
@@ -152,9 +154,11 @@ return (
             dés seront alors figés pour cette fiche.
           </li>
         </ol>
+
         <button type="button" className="modal-primary-btn" onClick={onClose}>
           Commencer la création
         </button>
+
         <h3>Méthode de génération des caractéristiques</h3>
 
         <div className="mode-switch stat-mode-switch">
@@ -169,7 +173,6 @@ return (
               checked={isPointBuy}
               onChange={handleToggleStatMode}
             />
-            
             <span className="slider" />
             <span className="card-side" />
           </label>
@@ -216,12 +219,11 @@ return (
           <strong>Personnalisation :</strong> compétences basées sur les caracs,
           puis points à répartir à la main.
         </p>
-
-
       </div>
     </div>
   );
 }
+
 /* ===========================
    APP PRINCIPALE
    =========================== */
@@ -235,7 +237,11 @@ function App() {
   const [age, setAge] = useState("");
   const [xp, setXp] = useState(0);
 
-  // Portrait en data URL (stocké en localStorage uniquement côté front)
+  // 🌟 Phrase de synthèse
+  const [phraseGenial, setPhraseGenial] = useState("");
+  const [phraseSociete, setPhraseSociete] = useState("");
+
+  // Portrait (dataURL, seulement en front)
   const [portraitDataUrl, setPortraitDataUrl] = useState(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -245,7 +251,7 @@ function App() {
     }
   });
 
-  // Mode de vie de la fiche : création, personnage validé, ou édition
+  // Mode de la fiche : création / validé / édition
   const [sheetMode, setSheetMode] = useState("create"); // "create" | "validated" | "edit"
   const isLocked = sheetMode === "validated";
   const canEditStatsAndSkills = sheetMode !== "validated";
@@ -262,11 +268,12 @@ function App() {
   const [specialCompetences, setSpecialCompetences] = useState([]);
   const [profession, setProfession] = useState("");
   const [inventory, setInventory] = useState([]);
+  const [weapons, setWeapons] = useState([]);
 
-
-const [wounds, setWounds] = useState(0);
-
+  const [wounds, setWounds] = useState(0);
   const [armor, setArmor] = useState(0);
+  const [hitPoints, setHitPoints] = useState(20);
+  const [maxHitPoints] = useState(24); // gardé au cas où plus tard
 
   // bourse (en pièces de fer)
   const [purseFer, setPurseFer] = useState(0);
@@ -275,13 +282,6 @@ const [wounds, setWounds] = useState(0);
   const screenSheetRef = useRef(null);
   const pdfSheetRef = useRef(null);
 
-// hit points
-  const [hitPoints, setHitPoints] = useState(20);
-const [maxHitPoints, setMaxHitPoints] = useState(24);
-
-
-const [weapons, setWeapons] = useState([]);
-
   const handleCompetencesChange = useCallback(
     (next) => {
       if (!canEditStatsAndSkills) return;
@@ -289,7 +289,6 @@ const [weapons, setWeapons] = useState([]);
     },
     [canEditStatsAndSkills]
   );
-
 
   /* ---------- Portrait : upload front-only ---------- */
 
@@ -328,7 +327,6 @@ const [weapons, setWeapons] = useState([]);
       );
       setStatPointsPool(pool);
     } else {
-      // Retour au mode 3d6 : reset "propre"
       setStats((prev) =>
         prev.map((stat) => ({
           ...stat,
@@ -341,7 +339,7 @@ const [weapons, setWeapons] = useState([]);
     }
   };
 
-  /* ---------- Changement de caracs ---------- */
+  /* ---------- Gestion des caracs ---------- */
 
   const handleChangeStat = (id, delta) => {
     if (!canEditStatsAndSkills) return;
@@ -352,7 +350,6 @@ const [weapons, setWeapons] = useState([]);
         if (index === -1) return prevStats;
 
         const stat = prevStats[index];
-
         let desired = stat.value + delta;
         if (desired < STAT_MIN) desired = STAT_MIN;
         if (desired > STAT_MAX) desired = STAT_MAX;
@@ -360,7 +357,6 @@ const [weapons, setWeapons] = useState([]);
         let effectiveDelta = desired - stat.value;
         if (effectiveDelta === 0) return prevStats;
 
-        // Si on veut monter mais qu'on n'a plus assez de points
         if (effectiveDelta > 0 && effectiveDelta > statPointsPool) {
           effectiveDelta = statPointsPool;
           desired = stat.value + effectiveDelta;
@@ -377,7 +373,6 @@ const [weapons, setWeapons] = useState([]);
       return;
     }
 
-    // Mode 3d6 : simple clamp entre min / max
     setStats((prevStats) =>
       prevStats.map((stat) => {
         if (stat.id !== id) return stat;
@@ -402,7 +397,6 @@ const [weapons, setWeapons] = useState([]);
   };
 
   const handleDeleteCharacter = () => {
-    // Reset complet de la fiche
     setStats(INITIAL_STATS);
     setCharacterName("");
     setPlayerName("");
@@ -412,6 +406,7 @@ const [weapons, setWeapons] = useState([]);
     setSpecialCompetences([]);
     setProfession("");
     setInventory([]);
+    setWeapons([]);
     setPurseFer(0);
     setSkillMode("ready");
     setStatMode("3d6");
@@ -419,6 +414,11 @@ const [weapons, setWeapons] = useState([]);
     setIsCreationDone(false);
     setSheetMode("create");
     setShowCreationModal(true);
+    setPhraseGenial("");
+    setPhraseSociete("");
+    setHitPoints(20);
+    setWounds(0);
+    setArmor(0);
 
     setPortraitDataUrl(null);
     try {
@@ -454,7 +454,8 @@ const [weapons, setWeapons] = useState([]);
     purseFer,
     competences,
     specialCompetences,
-    // on NE met PAS portraitDataUrl ici pour ne pas stocker l'image dans le back
+    phraseGenial,
+    phraseSociete,
   };
 
   const handleSaveToBackend = async () => {
@@ -571,7 +572,7 @@ const [weapons, setWeapons] = useState([]);
               </div>
             </section>
 
-            {/* Colonne 2 : Caractéristiques */}
+            {/* Colonne 2 : Caracs */}
             <section className="identity-stats-column">
               <CharacterStats
                 stats={stats}
@@ -586,25 +587,20 @@ const [weapons, setWeapons] = useState([]);
               onChangeImage={handleChangePortrait}
             />
           </div>
-<div className="hp-section">
-  <HitPointsBadge
-    value={hitPoints}
-    onChange={setHitPoints}
-    size={120}
-  />
 
-  <BlessureBadge
-    value={wounds}
-    onChange={setWounds}
-    size={120}
-  />
+          
 
-  <ArmureBadge
-    value={armor}
-    onChange={setArmor}
-    size={120}
-  />
-</div>
+          {/* PV / Blessures / Armure */}
+          <div className="hp-section">
+            <HitPointsBadge
+              value={hitPoints}
+              onChange={setHitPoints}
+              size={120}
+            />
+            <BlessureBadge value={wounds} onChange={setWounds} size={120} />
+            <ArmureBadge value={armor} onChange={setArmor} size={120} />
+          </div>
+
           {/* Dice roller seulement en mode création + 3d6 */}
           {sheetMode === "create" && statMode === "3d6" && (
             <StatsDiceRoller
@@ -613,17 +609,13 @@ const [weapons, setWeapons] = useState([]);
             />
           )}
 
-          {/* Inventaire + Bourse / Compétences */}
+          {/* Layout Stats / Inventaire / Compétences */}
           <div className="stats-competences-layout">
-            {/* Colonne gauche : Inventaire + Bourse */}
+            {/* Colonne gauche : Inventaire, armes, bourse */}
             <div className="stats-column">
               <Inventory items={inventory} onChange={setInventory} />
-<WeaponList weapons={weapons} onChange={setWeapons} />
-
-              <GoldPouch
-                totalFer={purseFer}
-                onChangeTotalFer={setPurseFer}
-              />
+              <WeaponList weapons={weapons} onChange={setWeapons} />
+              <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
             </div>
 
             {/* Colonne droite : Compétences */}
@@ -643,10 +635,13 @@ const [weapons, setWeapons] = useState([]);
               />
             </div>
           </div>
-
-
-
-
+{/* 🌟 SECTION PHRASE DE SYNTHÈSE */}
+          <PhraseDeSynthese
+            phraseGenial={phraseGenial}
+            setPhraseGenial={setPhraseGenial}
+            phraseSociete={phraseSociete}
+            setPhraseSociete={setPhraseSociete}
+          />
           <CharacterXP xp={xp} onChangeXp={setXp} />
 
           <CharacterPlayer
@@ -663,23 +658,25 @@ const [weapons, setWeapons] = useState([]);
               top: 0,
             }}
           >
-<PdfCharacterSheet
-  characterName={characterName}
-  playerName={playerName}
-  age={age}
-  profession={profession}
-  stats={stats}
-  competences={competences}
-  specialCompetences={specialCompetences}
-  xp={xp}
-  purseFer={purseFer}
-  inventory={inventory}
-  weapons={weapons}    // 👈 AJOUTER ÇA
-  portraitUrl={portraitDataUrl}
-  hitPoints={hitPoints}
-  wounds={wounds}
-  armor={armor}
-/>
+            <PdfCharacterSheet
+              characterName={characterName}
+              playerName={playerName}
+              age={age}
+              profession={profession}
+              stats={stats}
+              competences={competences}
+              specialCompetences={specialCompetences}
+              xp={xp}
+              purseFer={purseFer}
+              inventory={inventory}
+              weapons={weapons}
+              portraitUrl={portraitDataUrl}
+              hitPoints={hitPoints}
+              wounds={wounds}
+              armor={armor}
+              phraseGenial={phraseGenial}
+              phraseSociete={phraseSociete}
+            />
           </div>
 
           {/* Boutons hors fiche */}
@@ -691,8 +688,6 @@ const [weapons, setWeapons] = useState([]);
             >
               Exporter la fiche en PDF
             </button>
-
-      
           </div>
 
           {/* Validation / Edition / Suppression */}
@@ -709,16 +704,16 @@ const [weapons, setWeapons] = useState([]);
                 </button>
                 <p className="creation-validate-hint">
                   Une fois validé, les caractéristiques et compétences seront
-                  verrouillées. Vous pourrez toujours gérer l&apos;inventaire
-                  et la bourse.
+                  verrouillées. Vous pourrez toujours gérer l&apos;inventaire et
+                  la bourse.
                 </p>
-                      <button
-              type="button"
-              className="btn-secondary"
-              onClick={handleSaveToBackend}
-            >
-              Envoyer au back-end
-            </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={handleSaveToBackend}
+                >
+                  Envoyer au back-end
+                </button>
               </>
             )}
 

@@ -1,0 +1,40 @@
+/* src/components/PhraseDeSynthese.css */
+
+/* section compacte */
+.phrase-synthese-section {
+  margin: 0.4rem 0;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(120, 90, 60, 0.4);
+  background: rgba(255, 252, 245, 0.6);
+    background-image: url("/parchment-bg2.jpg");
+}
+
+/* petit titre centré */
+.phrase-synthese-title {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.3rem;
+  color: #3b2a1a;
+}
+
+/* 🔥 layout FLEX pour garantir la même largeur */
+.phrase-synthese-grid {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+/* chaque PhraseBloc prend exactement la même place */
+.phrase-synthese-grid > .phrase-bloc {
+  flex: 1 1 0;
+}
+
+/* mobile : on passe en colonne */
+@media (max-width: 850px) {
+  .phrase-synthese-grid {
+    flex-direction: column;
+  }
+}
