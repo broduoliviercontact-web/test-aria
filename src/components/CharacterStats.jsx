@@ -10,15 +10,16 @@ function CharacterStats({ stats, onChangeStat, isLocked = false }) {
 
       <div className="stats-list">
         {stats.map((stat) => (
-  <Counter
-  label={stat.label}
-  value={stat.value}
-  min={stat.min}
-  max={stat.max}
-  onDecrement={() => onChangeStat(stat.id, -1)}
-  onIncrement={() => onChangeStat(stat.id, +1)}
-  isLocked={isLocked}        // 👈 ici
-/>
+          <Counter
+            key={stat.id || stat.label}
+            label={stat.label}
+            value={stat.value}
+            min={stat.min}
+            max={stat.max}
+            onDecrement={() => onChangeStat(stat.id, -1)}
+            onIncrement={() => onChangeStat(stat.id, +1)}
+            isLocked={isLocked}
+          />
         ))}
       </div>
     </section>

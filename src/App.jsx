@@ -19,7 +19,7 @@ import HitPointsBadge from "./components/HitPointsBadge";
 import BlessureBadge from "./components/BlessureBadge";
 import ArmureBadge from "./components/ArmureBadge";
 import WeaponList from "./components/WeaponList";
-import PhraseDeSynthese from "./components/PhraseDeSynthese"; // 🌟 nouveau import
+import PhraseDeSynthese from "./components/PhraseDeSynthese";
 
 // PDF
 import jsPDF from "jspdf";
@@ -526,13 +526,7 @@ function App() {
   return (
     <div className="character-page">
       <div className="app app-character">
-        <button
-          type="button"
-          className="btn-back"
-          onClick={() => setPage("home")}
-        >
-          ← Retour à l&apos;accueil
-        </button>
+        
 
         {showCreationModal && (
           <CreationModal
@@ -545,60 +539,85 @@ function App() {
         )}
 
         {/* FICHE INTERACTIVE ÉCRAN */}
-        <div ref={screenSheetRef}>
-          <h1>Fiche de personnage Aria - Pré-prod</h1>
-
-          {/* Identité + Caracs + Portrait */}
-          <div className="identity-area">
-            {/* Colonne 1 : Identité */}
-            <section className="identity-card">
-              <h2 className="identity-title">Identité</h2>
-              <div className="identity-grid">
-                <div className="identity-field">
-                  <CharacterName
-                    name={characterName}
-                    onNameChange={setCharacterName}
-                  />
-                </div>
-                <div className="identity-field">
-                  <CharacterAge age={age} onAgeChange={setAge} />
-                </div>
-                <div className="identity-field">
-                  <CharacterProfession
-                    profession={profession}
-                    onProfessionChange={setProfession}
-                  />
-                </div>
-              </div>
-            </section>
-
-            {/* Colonne 2 : Caracs */}
-            <section className="identity-stats-column">
-              <CharacterStats
-                stats={stats}
-                onChangeStat={handleChangeStat}
-                isLocked={isLocked}
-              />
-            </section>
-
-            {/* Colonne 3 : Portrait */}
-            <CharacterPortrait
-              imageUrl={portraitDataUrl}
-              onChangeImage={handleChangePortrait}
+        <div ref={screenSheetRef} className="character-sheet-container">
+          {/* En-tête */}
+          <div className="sheet-header">
+            <div className="sheet-header-line" />
+            <h1 className="sheet-header-title">
+              {characterName || "Nom du personnage"}
+            </h1>
+            <div className="sheet-header-line" />
+          </div>
+          <div className="sheet-header-ornament">
+            <img
+              src="/crown-logo.svg"
+              alt="Ornement de couronne"
+              className="sheet-header-icon"
             />
           </div>
 
-          
+          {/* ZONE HAUTE : Identité / Bourse — PV / Blessures / Armure — Portrait / Caracs */}
+          <div className="top-grid">
+            {/* Colonne gauche : Identité + Bourse */}
+            <div className="top-left">
+              <section className="identity-card">
+                <h2 className="identity-title">Identité</h2>
+                <div className="identity-grid">
+                  <div className="identity-field">
+                    <CharacterName
+                      name={characterName}
+                      onNameChange={setCharacterName}
+                    />
+                  </div>
+                  <div className="identity-field">
+                    <CharacterAge age={age} onAgeChange={setAge} />
+                  </div>
+                  <div className="identity-field">
+                    <CharacterProfession
+                      profession={profession}
+                      onProfessionChange={setProfession}
+                    />
+                  </div>
+                </div>
+              </section>
 
-          {/* PV / Blessures / Armure */}
-          <div className="hp-section">
-            <HitPointsBadge
-              value={hitPoints}
-              onChange={setHitPoints}
-              size={120}
-            />
-            <BlessureBadge value={wounds} onChange={setWounds} size={120} />
-            <ArmureBadge value={armor} onChange={setArmor} size={120} />
+              <div className="top-purse">
+                <GoldPouch
+                  totalFer={purseFer}
+                  onChangeTotalFer={setPurseFer}
+                />
+              </div>
+            </div>
+
+            {/* Colonne centrale : PV / Blessures / Armure */}
+            <div className="top-center">
+              <HitPointsBadge
+                value={hitPoints}
+                onChange={setHitPoints}
+                size={120}
+              />
+              <BlessureBadge
+                value={wounds}
+                onChange={setWounds}
+                size={120}
+              />
+              <ArmureBadge value={armor} onChange={setArmor} size={120} />
+            </div>
+
+            {/* Colonne droite : Portrait + Caractéristiques */}
+            <div className="top-right">
+              <CharacterPortrait
+                imageUrl={portraitDataUrl}
+                onChangeImage={handleChangePortrait}
+              />
+              <div className="top-stats-card">
+                <CharacterStats
+                  stats={stats}
+                  onChangeStat={handleChangeStat}
+                  isLocked={isLocked}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Dice roller seulement en mode création + 3d6 */}
@@ -609,45 +628,69 @@ function App() {
             />
           )}
 
-          {/* Layout Stats / Inventaire / Compétences */}
-          <div className="stats-competences-layout">
-            {/* Colonne gauche : Inventaire, armes, bourse */}
-            <div className="stats-column">
-              <Inventory items={inventory} onChange={setInventory} />
-              <WeaponList weapons={weapons} onChange={setWeapons} />
-              <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
-            </div>
+         {/* Sceptre qui flotte par-dessus le layout */}
+<div className="stats-competences-wrapper">
+  <div className="stats-separator-floating">
+    <img
+      src="/septre-logo.svg"
+      alt="Ornement vertical"
+      className="stats-separator-floating-icon"
+    />
+  </div>
 
-            {/* Colonne droite : Compétences */}
-            <div className="competences-column">
-              <CompetenceList
-                stats={stats}
-                mode={skillMode}
-                isLocked={isLocked}
-                onCompetencesChange={handleCompetencesChange}
-              />
-              <SpecialCompetences
-                specialCompetences={specialCompetences}
-                onChange={(next) => {
-                  if (!canEditStatsAndSkills) return;
-                  setSpecialCompetences(next);
-                }}
+  <div className="stats-competences-layout">
+    {/* Colonne gauche : Inventaire, armes, bourse */}
+    <div className="stats-column">
+      <Inventory items={inventory} onChange={setInventory} />
+      <WeaponList weapons={weapons} onChange={setWeapons} />
+      <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
+    </div>
+
+    {/* Colonne droite : Compétences */}
+    <div className="competences-column">
+      <CompetenceList
+        stats={stats}
+        mode={skillMode}
+        isLocked={isLocked}
+        onCompetencesChange={handleCompetencesChange}
+      />
+      <SpecialCompetences
+        specialCompetences={specialCompetences}
+        onChange={(next) => {
+          if (!canEditStatsAndSkills) return;
+          setSpecialCompetences(next);
+        }}
+      />
+    </div>
+  </div>
+</div>
+
+
+          {/* 🌟 SECTION PHRASE DE SYNTHÈSE + COURONNE BAS */}
+          <div className="phrase-section">
+            <PhraseDeSynthese
+              phraseGenial={phraseGenial}
+              setPhraseGenial={setPhraseGenial}
+              phraseSociete={phraseSociete}
+              setPhraseSociete={setPhraseSociete}
+            />
+            <div className="phrase-ornament">
+              <img
+                src="/couronne-logo.svg"
+                alt="Ornement de couronne"
+                className="phrase-ornament-icon"
               />
             </div>
           </div>
-{/* 🌟 SECTION PHRASE DE SYNTHÈSE */}
-          <PhraseDeSynthese
-            phraseGenial={phraseGenial}
-            setPhraseGenial={setPhraseGenial}
-            phraseSociete={phraseSociete}
-            setPhraseSociete={setPhraseSociete}
-          />
-          <CharacterXP xp={xp} onChangeXp={setXp} />
 
-          <CharacterPlayer
-            playerName={playerName}
-            onPlayerNameChange={setPlayerName}
-          />
+          {/* XP + Nom du joueur */}
+          <div className="xp-player-section">
+            <CharacterXP xp={xp} onChangeXp={setXp} />
+            <CharacterPlayer
+              playerName={playerName}
+              onPlayerNameChange={setPlayerName}
+            />
+          </div>
 
           {/* Fiche PDF cachée */}
           <div
@@ -743,6 +786,14 @@ function App() {
             </button>
           </div>
 
+<button
+          type="button"
+          className="btn-back"
+          onClick={() => setPage("home")}
+        >
+          ← Retour à l&apos;accueil
+        </button>
+        
           {/* Debug JSON */}
           <pre className="debug-json">
             {JSON.stringify(characterPayload, null, 2)}

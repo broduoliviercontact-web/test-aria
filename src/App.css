@@ -541,7 +541,7 @@ background: transparent;
 
 .identity-card {
 
-  padding: 0.1rem 0.3rem;
+  padding: 0.8rem 0.9rem;
   display: flex;
   flex-direction: column;
 
@@ -660,6 +660,203 @@ background: transparent;
   align-items: flex-start;
 }
 
-/* ===========================
-   PHRASE DE SYNTHÈSE
-   =========================== */
+.app-character {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.character-sheet-container {
+  width: 100%;
+}
+
+/* En-tête avec le grand titre + couronne */
+.sheet-header {
+  display: flex;
+  
+}
+
+.sheet-header-line {
+  flex: 1;
+  height: 2px;
+  background: rgba(120, 90, 60, 0.7);
+}
+
+.sheet-header-title {
+  font-family: "MedievalSharp", cursive;
+  font-size: 1.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--main-color);
+}
+
+.sheet-header-ornament {
+  display: flex;
+  justify-content: center;
+}
+
+.sheet-header-icon {
+  height: 60px;
+  width: auto;
+}
+
+/* Séparateur central avec le sceptre */
+.stats-separator {
+  flex: 0 0 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stats-separator-icon {
+  max-height: 180px;
+  width: auto;
+  opacity: 0.9;
+}
+
+/* Phrase de synthèse + ornement */
+.phrase-section {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.phrase-ornament {
+  display: flex;
+  justify-content: center;
+}
+
+.phrase-ornament-icon {
+  height: 80px;
+  width: auto;
+}
+
+/* XP + nom du joueur en bas */
+.xp-player-section {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Sur petits écrans, on réduit un peu les ornements */
+@media (max-width: 900px) {
+  .sheet-header-title {
+    font-size: 1.4rem;
+  }
+
+  .sheet-header-icon {
+    height: 40px;
+  }
+
+  .stats-separator {
+    display: none; /* on masque le sceptre sur mobile pour gagner de la place */
+  }
+
+  .phrase-ornament-icon {
+    height: 56px;
+  }
+}
+/* --- En-tête amélioré --- */
+.sheet-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sheet-header-line {
+  width: 70%;
+  height: 2px;
+  background: rgba(80, 60, 40, 0.8);
+  margin: 4px 0;
+}
+
+.sheet-header-icon {
+  height: 55px;
+  margin: 0.4rem auto;
+  display: block;
+}
+
+/* --- GRID PRINCIPALE HAUT --- */
+.top-grid {
+  display: grid;
+  /* colonne centrale plus étroite → cartes gauche/droite plus proches */
+  grid-template-columns: 270px 160px 270px;
+  align-items: start;
+
+  /* on réduit aussi un peu l’espace entre les colonnes */
+  column-gap: 0.9rem;
+
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* optionnel mais ça aide à bien centrer la colonne centrale */
+.top-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 180px;
+  margin: 0 auto;
+}
+
+.top-left,
+.top-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+
+
+
+.top-purse {
+  margin-top: 0.4rem;
+}
+
+.top-stats-card {
+  margin-top: 0.6rem;
+}
+
+/* Grand sceptre au-dessus du layout */
+.stats-separator-top {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin: 2.2rem 0 1rem; /* espace au-dessus du layout */
+  overflow: visible;
+}
+
+.stats-separator-top-icon {
+  height: 240px;      /* taille du sceptre */
+  width: auto;
+  opacity: 0.9;
+  position: relative;
+  top: -40px;         /* fait dépasser le sceptre vers le haut */
+  z-index: 10;        /* passe devant */
+}
+.stats-competences-wrapper {
+  position: relative;
+  margin-top: 3rem;        /* espace par rapport au haut de la fiche */
+}
+
+/* Le sceptre flotte au-dessus et descend sur les cartes */
+.stats-separator-floating {
+  position: absolute;
+  top: -70px;              /* commence un peu au-dessus du layout */
+  left: 49.90%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.stats-separator-floating-icon {
+  height: 260px;           /* ajuste la longueur du sceptre */
+  width: auto;
+  opacity: 0.95;
+}

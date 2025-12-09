@@ -74,16 +74,21 @@
 .pouch-icon-iron { background-color: #555555; border-radius: 50%; }
 
 .goldpouch-card {
-
-  padding: 0.4rem 0.6rem;
+  padding: 0.7rem 1rem;
   border: 1px solid rgba(140, 105, 70, 0.5);
-  border-radius: 22px;
+  border-radius: 18px;
   background: #fffef8;
-  width: fit-content;
   background-image: url("/parchment-bg2.jpg");
-  position: relative;        
-  max-width: 250px;   /* pour les ornements */
+  position: relative;
   overflow: visible;
+
+  /* 🔥 Harmonisation avec Identité / Portrait */
+  width: 100%;              /* prend toute la colonne (≈ 260px) */
+  box-sizing: border-box;
+  min-height: 250px;        /* ajuste si tu veux plus haut / plus bas */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* Coins décorés */
