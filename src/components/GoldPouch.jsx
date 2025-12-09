@@ -36,10 +36,10 @@ export default function GoldPouch({ totalFer, onChangeTotalFer }) {
   };
 
   const rows = [
-    { label: "or", icon: "gold", value: gold, ferValue: FER_PER_GOLD },
-    { label: "argent", icon: "silver", value: silver, ferValue: FER_PER_SILVER },
-    { label: "cuivre", icon: "copper", value: copper, ferValue: FER_PER_COPPER },
-    { label: "fer", icon: "iron", value: iron, ferValue: 1 },
+    { label: "Couronne", icon: "gold", value: gold, ferValue: FER_PER_GOLD },
+    { label: "Orbes", icon: "silver", value: silver, ferValue: FER_PER_SILVER },
+    { label: "Sceptres", icon: "copper", value: copper, ferValue: FER_PER_COPPER },
+    { label: "Rois", icon: "iron", value: iron, ferValue: 1 },
   ];
 
   return (

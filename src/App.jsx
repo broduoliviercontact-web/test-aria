@@ -275,6 +275,17 @@ function App() {
   const [hitPoints, setHitPoints] = useState(20);
   const [maxHitPoints] = useState(24); // gardé au cas où plus tard
 
+  // 🔄 PV = Endurance (max 14) en mode création
+  React.useEffect(() => {
+    if (sheetMode !== "create") return;
+
+    const enduranceStat = stats.find((s) => s.id === "endurance");
+    if (!enduranceStat) return;
+
+    const newHP = Math.min(enduranceStat.value, 14);
+    setHitPoints(newHP);
+  }, [stats, sheetMode]);
+
   // bourse (en pièces de fer)
   const [purseFer, setPurseFer] = useState(0);
 
@@ -526,8 +537,6 @@ function App() {
   return (
     <div className="character-page">
       <div className="app app-character">
-        
-
         {showCreationModal && (
           <CreationModal
             skillMode={skillMode}
@@ -593,7 +602,7 @@ function App() {
             <div className="top-center">
               <HitPointsBadge
                 value={hitPoints}
-                onChange={setHitPoints}
+                onChange={sheetMode === "create" ? undefined : setHitPoints}
                 size={120}
               />
               <BlessureBadge
@@ -628,43 +637,42 @@ function App() {
             />
           )}
 
-         {/* Sceptre qui flotte par-dessus le layout */}
-<div className="stats-competences-wrapper">
-  <div className="stats-separator-floating">
-    <img
-      src="/septre-logo.svg"
-      alt="Ornement vertical"
-      className="stats-separator-floating-icon"
-    />
-  </div>
+          {/* Sceptre qui flotte par-dessus le layout */}
+          <div className="stats-competences-wrapper">
+            <div className="stats-separator-floating">
+              <img
+                src="/septre-logo.svg"
+                alt="Ornement vertical"
+                className="stats-separator-floating-icon"
+              />
+            </div>
 
-  <div className="stats-competences-layout">
-    {/* Colonne gauche : Inventaire, armes, bourse */}
-    <div className="stats-column">
-      <Inventory items={inventory} onChange={setInventory} />
-      <WeaponList weapons={weapons} onChange={setWeapons} />
-      <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
-    </div>
+            <div className="stats-competences-layout">
+              {/* Colonne gauche : Inventaire, armes, bourse */}
+              <div className="stats-column">
+                <Inventory items={inventory} onChange={setInventory} />
+                <WeaponList weapons={weapons} onChange={setWeapons} />
+                <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
+              </div>
 
-    {/* Colonne droite : Compétences */}
-    <div className="competences-column">
-      <CompetenceList
-        stats={stats}
-        mode={skillMode}
-        isLocked={isLocked}
-        onCompetencesChange={handleCompetencesChange}
-      />
-      <SpecialCompetences
-        specialCompetences={specialCompetences}
-        onChange={(next) => {
-          if (!canEditStatsAndSkills) return;
-          setSpecialCompetences(next);
-        }}
-      />
-    </div>
-  </div>
-</div>
-
+              {/* Colonne droite : Compétences */}
+              <div className="competences-column">
+                <CompetenceList
+                  stats={stats}
+                  mode={skillMode}
+                  isLocked={isLocked}
+                  onCompetencesChange={handleCompetencesChange}
+                />
+                <SpecialCompetences
+                  specialCompetences={specialCompetences}
+                  onChange={(next) => {
+                    if (!canEditStatsAndSkills) return;
+                    setSpecialCompetences(next);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
 
           {/* 🌟 SECTION PHRASE DE SYNTHÈSE + COURONNE BAS */}
           <div className="phrase-section">
@@ -786,14 +794,14 @@ function App() {
             </button>
           </div>
 
-<button
-          type="button"
-          className="btn-back"
-          onClick={() => setPage("home")}
-        >
-          ← Retour à l&apos;accueil
-        </button>
-        
+          <button
+            type="button"
+            className="btn-back"
+            onClick={() => setPage("home")}
+          >
+            ← Retour à l&apos;accueil
+          </button>
+
           {/* Debug JSON */}
           <pre className="debug-json">
             {JSON.stringify(characterPayload, null, 2)}

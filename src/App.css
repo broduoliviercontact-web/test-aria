@@ -619,7 +619,7 @@ background: transparent;
 .stats-competences-layout {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 2rem;
   margin-top: 0.6rem;
 }
 
@@ -673,7 +673,17 @@ background: transparent;
 /* En-tête avec le grand titre + couronne */
 .sheet-header {
   display: flex;
-  
+  width: 60%;
+
+    margin: auto auto;
+
+
+
+
+
+
+
+    
 }
 
 .sheet-header-line {
@@ -684,7 +694,7 @@ background: transparent;
 
 .sheet-header-title {
   font-family: "MedievalSharp", cursive;
-  font-size: 1.8rem;
+  font-size: 1rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-align: center;
@@ -694,10 +704,12 @@ background: transparent;
 .sheet-header-ornament {
   display: flex;
   justify-content: center;
+  height: 50%;
+  
 }
 
 .sheet-header-icon {
-  height: 60px;
+  height: 1rem;
   width: auto;
 }
 
@@ -765,33 +777,35 @@ background: transparent;
   flex-direction: column;
   align-items: center;
   margin-bottom: 0.5rem;
+  
 }
 
 .sheet-header-line {
   width: 70%;
-  height: 2px;
+  height: 1px;
   background: rgba(80, 60, 40, 0.8);
-  margin: 4px 0;
 }
 
 .sheet-header-icon {
   height: 55px;
   margin: 0.4rem auto;
   display: block;
+  width: 100%;
 }
 
 /* --- GRID PRINCIPALE HAUT --- */
 .top-grid {
   display: grid;
   /* colonne centrale plus étroite → cartes gauche/droite plus proches */
-  grid-template-columns: 270px 160px 270px;
+  grid-template-columns: 280px 130px 280px;
   align-items: start;
 
   /* on réduit aussi un peu l’espace entre les colonnes */
   column-gap: 0.9rem;
 
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+
 }
 
 /* optionnel mais ça aide à bien centrer la colonne centrale */
@@ -801,6 +815,8 @@ background: transparent;
   align-items: center;
   max-width: 180px;
   margin: 0 auto;
+  gap: 1.5rem;
+    margin-top: 0.5rem;
 }
 
 .top-left,
@@ -856,7 +872,7 @@ background: transparent;
 }
 
 .stats-separator-floating-icon {
-  height: 260px;           /* ajuste la longueur du sceptre */
+  height: 300px;           /* ajuste la longueur du sceptre */
   width: auto;
   opacity: 0.95;
 }
