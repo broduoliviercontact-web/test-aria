@@ -85,7 +85,7 @@
   /* 🔥 Harmonisation avec Identité / Portrait */
   width: 100%;              /* prend toute la colonne (≈ 260px) */
   box-sizing: border-box;
-  min-height: 250px;        /* ajuste si tu veux plus haut / plus bas */
+  min-height: 254px;        /* ajuste si tu veux plus haut / plus bas */
   display: flex;
   flex-direction: column;
   justify-content: center;
