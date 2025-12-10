@@ -754,8 +754,9 @@ const handleKitConfirm = (kit, options = {}) => {
           </div>
 
           {/* ZONE HAUTE : Identité / Bourse — PV / Blessures / Armure — Portrait / Caracs */}
+                    {/* ZONE HAUTE : Identité + Portrait — PV / Blessures / Armure — Caracs + Bourse */}
           <div className="top-grid">
-            {/* Colonne gauche : Identité + Bourse */}
+            {/* Colonne gauche : Identité + Portrait */}
             <div className="top-left">
               <section className="identity-card">
                 <h2 className="identity-title">Identité</h2>
@@ -778,12 +779,11 @@ const handleKitConfirm = (kit, options = {}) => {
                 </div>
               </section>
 
-              <div className="top-purse">
-                <GoldPouch
-                  totalFer={purseFer}
-                  onChangeTotalFer={setPurseFer}
-                />
-              </div>
+              {/* Portrait déplacé ici avec l'identité */}
+              <CharacterPortrait
+                imageUrl={portraitDataUrl}
+                onChangeImage={handleChangePortrait}
+              />
             </div>
 
             {/* Colonne centrale : PV / Blessures / Armure */}
@@ -801,12 +801,8 @@ const handleKitConfirm = (kit, options = {}) => {
               <ArmureBadge value={armor} onChange={setArmor} size={120} />
             </div>
 
-            {/* Colonne droite : Portrait + Caractéristiques */}
+            {/* Colonne droite : Caractéristiques + Bourse */}
             <div className="top-right">
-              <CharacterPortrait
-                imageUrl={portraitDataUrl}
-                onChangeImage={handleChangePortrait}
-              />
               <div className="top-stats-card">
                 <CharacterStats
                   stats={stats}
@@ -821,8 +817,17 @@ const handleKitConfirm = (kit, options = {}) => {
                   </p>
                 )}
               </div>
+
+              {/* Bourse déplacée ici avec les caracs */}
+              <div className="top-purse">
+                <GoldPouch
+                  totalFer={purseFer}
+                  onChangeTotalFer={setPurseFer}
+                />
+              </div>
             </div>
           </div>
+
 
           {/* Dice roller seulement en mode création + 3d6 */}
           {sheetMode === "create" && statMode === "3d6" && (

@@ -864,16 +864,128 @@ background: transparent;
 /* Le sceptre flotte au-dessus et descend sur les cartes */
 .stats-separator-floating {
   position: absolute;
-  top: -70px;              /* commence un peu au-dessus du layout */
+  top: -68px;              /* commence un peu au-dessus du layout */
   left: 49.90%;
   transform: translateX(-50%);
   pointer-events: none;
   overflow: visible;
   z-index: 5;
+
+
+
+
+
 }
 
 .stats-separator-floating-icon {
   height: 300px;           /* ajuste la longueur du sceptre */
   width: auto;
   opacity: 0.95;
+}
+
+
+/* ===========================
+   RESPONSIVE GLOBAL
+   =========================== */
+
+/* Le bloc debug ne déborde pas sur les petits écrans */
+.debug-json {
+  overflow-x: auto;
+}
+
+/* Écrans <= 900px : tablette / petit laptop */
+@media (max-width: 900px) {
+  body {
+    align-items: flex-start;
+  }
+
+  .app {
+    margin: 1rem 0.5rem;
+    padding: 1rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .character-sheet-container {
+    width: 100%;
+  }
+
+  /* La grille du haut (Identité / PV / Portrait+Caracs) passe en une colonne */
+  .top-grid {
+    grid-template-columns: 1fr;
+    row-gap: 1rem;
+  }
+
+  .top-left,
+  .top-center,
+  .top-right {
+    width: 100%;
+  }
+
+  /* Les badges PV / Blessure / Armure se mettent plus compact */
+  .top-center {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .hp-section {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  /* Inventaire / Armes / Compétences : 2 colonnes -> 1 colonne */
+  .stats-competences-layout {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stats-column,
+  .competences-column {
+    width: 100%;
+  }
+
+  /* On enlève le grand sceptre qui flotte pour éviter les chevauchements */
+  .stats-separator-floating {
+    display: none;
+  }
+
+  .phrase-section {
+    margin-top: 1rem;
+  }
+
+  /* Un peu plus compact en bas de page */
+  .xp-player-section {
+    gap: 0.5rem;
+  }
+}
+
+/* Écrans très petits <= 600px : smartphone */
+@media (max-width: 600px) {
+  .home-root {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .hero-inner {
+    padding: 1.4rem 1.2rem;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  /* Titre de fiche un peu plus petit pour éviter de casser la ligne */
+  .sheet-header-title {
+    font-size: 1.1rem;
+  }
+
+  .sheet-header-line {
+    width: 60%;
+  }
+
+  .debug-json {
+    font-size: 0.75rem;
+  }
 }

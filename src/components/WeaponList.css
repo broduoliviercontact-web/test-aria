@@ -376,3 +376,34 @@
   flex: 1;
   line-height: 1.1;
 }
+
+/* État sélectionné dans le menu d'icônes d'armes */
+.weapon-icon-picker-item--selected {
+  background: rgba(183, 136, 70, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(120, 80, 40, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.weapon-icon-picker-item:hover .weapon-icon-picker-image {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.65));
+  transform: scale(1.05);
+}
+
+.weapon-icon-picker-item:hover .weapon-icon-picker-label {
+  color: #2b1a0a;
+}
+.weapon-icon-picker-item:hover {
+  background: rgba(183, 136, 70, 0.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(140, 100, 60, 0.8);
+}
+
+.weapon-icon-picker-item,
+.weapon-icon-picker-image {
+  transition: 
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease,
+    filter 0.15s ease;
+}

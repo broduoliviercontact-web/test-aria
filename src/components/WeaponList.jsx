@@ -79,26 +79,34 @@ export default function WeaponList({ weapons, onChange }) {
 
               {!isValidated && isPickerOpen && (
                 <div className="weapon-icon-picker">
-                  {sortedWeaponIcons.map((icon) => (
-                    <button
-                      key={icon.id}
-                      type="button"
-                      className="weapon-icon-picker-item"
-                      onClick={() => {
-                        updateWeapon(index, "icon", icon.url);
-                        setOpenPickerIndex(null);
-                      }}
-                    >
-                      <img
-                        src={icon.url}
-                        alt={icon.label}
-                        className="weapon-icon-picker-image"
-                      />
-                      <span className="weapon-icon-picker-label">
-                        {icon.label}
-                      </span>
-                    </button>
-                  ))}
+                  {sortedWeaponIcons.map((icon) => {
+  const isSelected = icon.url === (weapon.icon || defaultIcon);
+
+  return (
+    <button
+      key={icon.id}
+      type="button"
+      className={
+        "weapon-icon-picker-item" +
+        (isSelected ? " weapon-icon-picker-item--selected" : "")
+      }
+      onClick={() => {
+        updateWeapon(index, "icon", icon.url);
+        setOpenPickerIndex(null);
+      }}
+    >
+      <img
+        src={icon.url}
+        alt={icon.label}
+        className="weapon-icon-picker-image"
+      />
+      <span className="weapon-icon-picker-label">
+        {icon.label}
+      </span>
+    </button>
+  );
+})}
+
                 </div>
               )}
             </div>

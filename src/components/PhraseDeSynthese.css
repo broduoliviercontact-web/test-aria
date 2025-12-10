@@ -7,7 +7,7 @@
   border-radius: 6px;
   border: 1px solid rgba(120, 90, 60, 0.4);
   background: rgba(255, 252, 245, 0.6);
-    background-image: url("/parchment-bg2.jpg");
+  background-image: url("/parchment-bg2.jpg");
 }
 
 /* petit titre centré */
@@ -20,21 +20,22 @@
   color: #3b2a1a;
 }
 
-/* 🔥 layout FLEX pour garantir la même largeur */
+/* 🔥 layout GRID pour avoir toujours la même largeur */
 .phrase-synthese-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 colonnes égales */
   gap: 0.5rem;
   align-items: flex-start;
 }
 
 /* chaque PhraseBloc prend exactement la même place */
 .phrase-synthese-grid > .phrase-bloc {
-  flex: 1 1 0;
+  min-width: 0; /* évite qu'un titre long casse la grille */
 }
 
-/* mobile : on passe en colonne */
+/* mobile : on passe en une seule colonne, pleine largeur */
 @media (max-width: 850px) {
   .phrase-synthese-grid {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 }
