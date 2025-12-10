@@ -21,6 +21,7 @@ import ArmureBadge from "./components/ArmureBadge";
 import WeaponList from "./components/WeaponList";
 import PhraseDeSynthese from "./components/PhraseDeSynthese";
 import EquipmentKitModal from "./components/EquipmentKitModal";
+import { applyEquipmentKit } from "./utils/kitUtils";
 
 // PDF
 import jsPDF from "jspdf";
@@ -356,29 +357,142 @@ const [selectedKit, setSelectedKit] = useState(null);
     }
   }, []);
 
+ // petit parseur pour "Collets (3)" ou "Fioles (x5)"
+// Petit parseur pour "Collets (3)" ou "Cataplasmes (x5)"
+const parseKitItem = (rawLabel) => {
+  const [firstChoice] = rawLabel.split(" ou "); // ex : "Fioles (x5) ou Sablier" -> "Fioles (x5)"
 
-const handleKitConfirm = (kit) => {
+  const regex = /\((x?\d+)\)/i; // "3" ou "x5"
+  const match = firstChoice.match(regex);
+
+  let quantity = 1;
+  let name = firstChoice.trim();
+
+  if (match) {
+    const raw = match[1]; // "3" ou "x5"
+    if (raw.toLowerCase().startsWith("x")) {
+      quantity = parseInt(raw.slice(1), 10);
+    } else {
+      quantity = parseInt(raw, 10);
+    }
+    name = firstChoice.replace(match[0], "").trim();
+  }
+
+  return { name, quantity };
+};
+
+const handleKitConfirm = (kit, options = {}) => {
   if (!kit) return;
 
   setSelectedKit(kit);
   setIsKitModalOpen(false);
 
+  // 1) INVENTAIRE
   setInventory((prev) => {
-    // Optionnel : si tu veux qu’un seul kit soit pris en compte,
-    // on enlève d’éventuels anciens objets "fromKit".
     const cleaned = prev.filter((item) => !item.fromKit);
+    let updated = [...cleaned];
 
     const now = Date.now();
 
-    const kitItems = kit.content.map((label, index) => ({
-      id: `kit-${kit.id}-${index}-${now}`,
-      name: label,      // 🔴 ICI : on remplit bien "name"
-      quantity: 1,      // 🔴 ICI : quantité par défaut
-      fromKit: true,    // pour savoir que ça vient d’un kit si besoin
-    }));
+    kit.content.forEach((label) => {
+      // Cas spécial : ligne d'armes du COMBATTANT -> pas dans l'inventaire
+      if (kit.id === "combattant" && label.includes("Arme à une main")) {
+        return;
+      }
 
-    return [...cleaned, ...kitItems];
+      // Cas spécial : ligne "Fioles (x5) ou Sablier" de l'ÉRUDIT
+      if (kit.id === "erudit" && label.includes("Fioles (x5) ou Sablier")) {
+        let name;
+        let quantity;
+
+        if (options.eruditChoice === "fioles") {
+          name = "Fioles";
+          quantity = 5;
+        } else if (options.eruditChoice === "sablier") {
+          name = "Sablier";
+          quantity = 1;
+        } else {
+          // sécurité : si pas de choix, on ne met rien
+          return;
+        }
+
+        const existingIndex = updated.findIndex(
+          (item) => item.fromKit && item.name === name
+        );
+
+        if (existingIndex !== -1) {
+          const existing = updated[existingIndex];
+          updated[existingIndex] = {
+            ...existing,
+            quantity: (existing.quantity || 0) + quantity,
+          };
+        } else {
+          updated.push({
+            id: `kit-${kit.id}-${name}-${now}-${Math.random()
+              .toString(16)
+              .slice(2)}`,
+            name,
+            quantity,
+            fromKit: true,
+          });
+        }
+
+        return;
+      }
+
+      // Cas standard : parse "(3)" / "(x5)" etc.
+      const { name, quantity } = parseKitItem(label);
+
+      const existingIndex = updated.findIndex(
+        (item) => item.fromKit && item.name === name
+      );
+
+      if (existingIndex !== -1) {
+        const existing = updated[existingIndex];
+        updated[existingIndex] = {
+          ...existing,
+          quantity: (existing.quantity || 0) + quantity,
+        };
+      } else {
+        updated.push({
+          id: `kit-${kit.id}-${name}-${now}-${Math.random()
+            .toString(16)
+            .slice(2)}`,
+          name,
+          quantity,
+          fromKit: true,
+        });
+      }
+    });
+
+    return updated;
   });
+
+  // 2) ARMES pour le COMBATTANT
+  if (kit.id === "combattant" && options.combattantWeaponChoice) {
+    setWeapons((prevWeapons) => {
+      const baseWeapon = {
+        icon: "",
+        name: "",
+        damage: "",
+        validated: false,
+      };
+
+      if (options.combattantWeaponChoice === "twoOneHand") {
+        return [
+          ...prevWeapons,
+          { ...baseWeapon, name: "Arme à une main" },
+          { ...baseWeapon, name: "Arme à une main" },
+        ];
+      }
+
+      if (options.combattantWeaponChoice === "twoHand") {
+        return [...prevWeapons, { ...baseWeapon, name: "Arme à deux mains" }];
+      }
+
+      return prevWeapons;
+    });
+  }
 };
 
 
@@ -729,6 +843,9 @@ const handleKitConfirm = (kit) => {
             <div className="stats-competences-layout">
               {/* Colonne gauche : Inventaire, armes, bourse */}
        <div className="stats-column">
+  
+
+  <Inventory items={inventory} onChange={setInventory} />
   {sheetMode === "create" && !selectedKit && (
     <button
       type="button"
@@ -738,8 +855,6 @@ const handleKitConfirm = (kit) => {
       Choisir un kit d’équipement
     </button>
   )}
-
-  <Inventory items={inventory} onChange={setInventory} />
   <WeaponList weapons={weapons} onChange={setWeapons} />
 
 </div>

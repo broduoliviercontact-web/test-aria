@@ -1,4 +1,9 @@
 /* src/components/equipmentKitModal.css */
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,700");
+
+/* ===========================
+   MODAL
+   =========================== */
 
 .kit-modal-backdrop {
   position: fixed;
@@ -13,7 +18,7 @@
 .kit-modal {
   background: #fdfaf4;
   border-radius: 10px;
-  max-width: 900px;
+  max-width: 960px;
   width: 95%;
   max-height: 90vh;
   display: flex;
@@ -21,6 +26,9 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
   overflow: hidden;
+  font-family: "Open Sans", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+    background-image: url("/parchment-bg2.jpg");
 }
 
 .kit-modal-header {
@@ -35,7 +43,8 @@
   font-size: 1.4rem;
 }
 
-.kit-modal-close {
+.kit-modal-close,
+.kit-modal-close-btn {
   border: none;
   background: transparent;
   font-size: 1.2rem;
@@ -47,60 +56,7 @@
   overflow-y: auto;
 }
 
-.kit-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1rem;
-}
-
-.kit-card {
-  background: #f3e9d9;
-  border-radius: 8px;
-  padding: 0.75rem 0.9rem;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: transform 0.1s ease, border-color 0.1s ease,
-    box-shadow 0.1s ease;
-}
-
-.kit-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.kit-card-selected {
-  border-color: #b8860b;
-  box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.25);
-}
-
-.kit-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 0.3rem;
-}
-
-.kit-card-header h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.kit-cost {
-  font-size: 0.85rem;
-  font-weight: bold;
-}
-
-.kit-content-title {
-  margin: 0.25rem 0;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-.kit-content-list {
-  margin: 0;
-  padding-left: 1.1rem;
-  font-size: 0.8rem;
-}
+/* Pied de modale */
 
 .kit-modal-footer {
   display: flex;
@@ -119,8 +75,8 @@
 }
 
 .kit-primary-btn {
-  background: #b8860b;
-  color: white;
+  background: #b78846;
+  color: #fff;
 }
 
 .kit-primary-btn:disabled {
@@ -130,4 +86,240 @@
 
 .kit-secondary-btn {
   background: #e0d2bd;
+  color: #3a2a16;
+}
+
+/* ===========================
+   GRILLE DE KITS
+   =========================== */
+
+.kit-list {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2rem;
+  column-gap: 1.2rem;
+  align-items: flex-start;
+}
+
+/* ===========================
+   CARTE EXTÉRIEURE (cadre 1)
+   =========================== */
+
+.kit-card {
+  position: relative;
+  flex: 1 1 260px;
+  max-width: 320px;
+  padding: 5px;
+  border: 2px solid #b78846;
+  background-color: #05050c;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* Coins extérieurs : carrés + points */
+
+.kit-card-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #b78846;
+  background: #000;
+  font-size: 10px;
+  line-height: 9px;
+  text-align: center;
+  color: #b78846;
+}
+
+/* top-left */
+.kit-card-corner--tl {
+  top: 5px;
+  left: 5px;
+}
+
+/* top-right */
+.kit-card-corner--tr {
+  top: 5px;
+  right: 5px;
+}
+
+/* bottom-left */
+.kit-card-corner--bl {
+  bottom: 5px;
+  left: 5px;
+}
+
+/* bottom-right */
+.kit-card-corner--br {
+  bottom: 5px;
+  right: 5px;
+}
+
+/* Hover / sélection */
+
+.kit-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.8);
+}
+
+.kit-card--selected,
+.kit-card-selected {
+  box-shadow:
+    0 0 0 2px rgba(255, 215, 128, 0.9),
+    0 16px 30px rgba(0, 0, 0, 0.9);
+}
+
+/* ===========================
+   CARTE INTÉRIEURE (cadre 2)
+   =========================== */
+
+.kit-card-inner {
+  border: 2px solid #b78846;
+  padding: 18px 22px 16px;
+  background: #36332d;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ===========================
+   CONTENU DE LA CARTE
+   =========================== */
+
+.kit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+
+.kit-card-title,
+.kit-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.kit-card-cost,
+.kit-cost {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f7d38a;
+}
+
+/* Ligne dorée sous le titre */
+
+.kit-card-body {
+  border-top: 2px solid #b78846;
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+  flex: 1;
+}
+
+/* Liste des objets */
+
+.kit-card-items,
+.kit-content-list {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+  font-size: 0.9rem;
+}
+
+.kit-card-item + .kit-card-item,
+.kit-content-list li + li {
+  margin-top: 0.2rem;
+}
+
+/* ===========================
+   OPTIONS SPÉCIALES (combattant / érudit)
+   =========================== */
+
+.kit-card-options {
+  margin-top: 0.9rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed rgba(183, 136, 70, 0.7);
+  font-size: 0.85rem;
+}
+
+.kit-card-options-label {
+  margin: 0 0 0.35rem 0;
+  font-weight: 600;
+}
+
+/* Ligne texte - switch - texte */
+
+.kit-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.kit-switch-label {
+  font-size: 0.8rem;
+}
+
+/* Switch type "puck" */
+
+.kit-mode-switch {
+  position: relative;
+  width: 52px;
+  height: 22px;
+  border-radius: 999px;
+  padding: 0;
+  border: none;
+  background: #333;
+  cursor: pointer;
+}
+
+.kit-mode-switch:focus {
+  outline: none;
+}
+
+.kit-mode-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #f8f8f8;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: transform 0.18s ease-out;
+}
+
+/* Position gauche (valeur 1) */
+.kit-mode-switch--left .kit-mode-switch-thumb {
+  transform: translateX(0);
+}
+
+/* Position droite (valeur 2) */
+.kit-mode-switch--right .kit-mode-switch-thumb {
+  transform: translateX(28px);
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 640px) {
+  .kit-modal {
+    padding: 1rem;
+  }
+
+  .kit-card-inner {
+    padding: 14px 16px 12px;
+  }
+
+  .kit-card-title,
+  .kit-card-header h3 {
+    font-size: 1rem;
+  }
+
+  .kit-card-items,
+  .kit-content-list {
+    font-size: 0.85rem;
+  }
 }

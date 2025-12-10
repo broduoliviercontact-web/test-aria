@@ -36,11 +36,12 @@
 /* Ligne d’inventaire */
 
 .inventory-row {
-  display: grid;
+  display: flex;
   grid-template-columns: 1fr 70px 32px;
   gap: 0.4rem;
   align-items: center;
   margin-bottom: 0.3rem;
+
 }
 
 /* Champs */
@@ -53,6 +54,7 @@
   border: 1px solid rgba(120, 90, 60, 0.8);
   background: rgba(255, 252, 242, 0.9);
   font-family: inherit;
+
 }
 
 .inventory-name {
@@ -61,6 +63,7 @@
 
 .inventory-qty {
   text-align: right;
+  max-width: 25px;
 }
 
 /* Bouton supprimer */
@@ -75,6 +78,7 @@
   font-size: 0.9rem;
   line-height: 1;
   box-shadow: 0 1px 0 rgba(60, 20, 10, 0.5);
+  
 }
 
 .inventory-delete:hover {
