@@ -22,6 +22,7 @@ import WeaponList from "./components/WeaponList";
 import PhraseDeSynthese from "./components/PhraseDeSynthese";
 import EquipmentKitModal from "./components/EquipmentKitModal";
 import { applyEquipmentKit } from "./utils/kitUtils";
+import AlchemyPotions from "./components/AlchemyPotions";
 
 // PDF
 import jsPDF from "jspdf";
@@ -119,6 +120,8 @@ function CreationModal({
   statMode,
   onChangeStatMode,
   onClose,
+    isAlchemist,
+  onChangeIsAlchemist,
 }) {
   const isCustomSkills = skillMode === "custom";
   const isPointBuy = statMode === "point-buy";
@@ -193,6 +196,17 @@ function CreationModal({
         </p>
 
         <h3>Mode de calcul des compétences</h3>
+        <h3>Alchimie</h3>
+        <p>Ce personnage pratique-t-il l&apos;alchimie (création de potions) ?</p>
+        <label style={{ fontSize: "0.85rem", marginTop: "0.25rem" }}>
+          <input
+            type="checkbox"
+            checked={isAlchemist}
+            onChange={(e) => onChangeIsAlchemist(e.target.checked)}
+            style={{ marginRight: "0.4rem" }}
+          />
+          Activer la carte d&apos;alchimie (gestion des potions)
+        </label>
 
         <div className="mode-switch">
           <span className={`mode-label ${!isCustomSkills ? "active" : ""}`}>
@@ -285,6 +299,11 @@ function App() {
 
 const [isKitModalOpen, setIsKitModalOpen] = useState(false);
 const [selectedKit, setSelectedKit] = useState(null);
+
+// 🔮 Alchimie
+const [isAlchemist, setIsAlchemist] = useState(false);
+const [alchemyPotions, setAlchemyPotions] = useState([]);
+
 // Quand on valide un kit d'équipement
   const handleConfirmKit = (kit) => {
     if (!kit) return;
@@ -616,7 +635,8 @@ const handleKitConfirm = (kit, options = {}) => {
     setHitPoints(20);
     setWounds(0);
     setArmor(0);
-
+setIsAlchemist(false);
+setAlchemyPotions([]);
     setPortraitDataUrl(null);
     try {
       localStorage.removeItem("aria-portrait");
@@ -645,7 +665,8 @@ const handleKitConfirm = (kit, options = {}) => {
     statMode,
     statPointsPool,
     skillMode,
-
+isAlchemist,
+alchemyPotions,
     isCreationDone,
     xp,
     inventory,
@@ -732,6 +753,9 @@ const handleKitConfirm = (kit, options = {}) => {
             statMode={statMode}
             onChangeStatMode={handleChangeStatMode}
             onClose={() => setShowCreationModal(false)}
+               isAlchemist={isAlchemist}
+    onChangeIsAlchemist={setIsAlchemist}
+            
           />
         )}
 
@@ -869,21 +893,32 @@ const handleKitConfirm = (kit, options = {}) => {
 
 
               {/* Colonne droite : Compétences */}
-              <div className="competences-column">
-                <CompetenceList
-                  stats={stats}
-                  mode={skillMode}
-                  isLocked={isLocked}
-                  onCompetencesChange={handleCompetencesChange}
-                />
-                <SpecialCompetences
-                  specialCompetences={specialCompetences}
-                  onChange={(next) => {
-                    if (!canEditStatsAndSkills) return;
-                    setSpecialCompetences(next);
-                  }}
-                />
-              </div>
+<div className="competences-column">
+  <CompetenceList
+    stats={stats}
+    mode={skillMode}
+    isLocked={isLocked}
+    onCompetencesChange={handleCompetencesChange}
+  />
+  <SpecialCompetences
+    specialCompetences={specialCompetences}
+    onChange={(next) => {
+      if (!canEditStatsAndSkills) return;
+      setSpecialCompetences(next);
+    }}
+  />
+
+  {isAlchemist && (
+    <AlchemyPotions
+      potions={alchemyPotions}
+      onChange={(next) => {
+        if (!canEditStatsAndSkills) return;
+        setAlchemyPotions(next);
+      }}
+    />
+  )}
+</div>
+
             </div>
           </div>
 
