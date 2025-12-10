@@ -11,6 +11,8 @@
   background-image: url("/parchment-bg2.jpg");
   width: 100%;
   box-sizing: border-box;
+    position: relative;
+  z-index: 10; 
 }
 
 .weapon-title {
@@ -103,7 +105,15 @@
   align-items: center;
   gap: 0.15rem;
   color: black;
+  position: relative; 
 }
+.weapon-icon-button {
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
 
 .weapon-icon-frame {
   width: 56px;
@@ -315,4 +325,54 @@
     flex-direction: row;
     align-self: flex-end;
   }
+}
+
+.weapon-icon-picker {
+  position: absolute;
+  top: 70px;
+  left: 0;              /* ✅ ancré sous le bord gauche du médaillon */
+  transform: none; 
+  z-index: 999; /* 🔥 très haut pour passer au-dessus du phrase bloc */
+  background: rgba(249, 243, 229, 0.98);
+  border: 1px solid rgba(120, 90, 60, 0.9);
+  border-radius: 10px;
+  padding: 0.4rem 0.5rem;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.4);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);   
+  gap: 0.25rem 0.45rem;
+  min-width: 330px;
+}
+
+
+.weapon-icon-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.25rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.7rem;
+  text-align: left;
+  color: #3a2412;
+}
+
+.weapon-icon-picker-item:hover {
+  background: rgba(183, 136, 70, 0.18);
+}
+
+.weapon-icon-picker-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  background-color: black;
+}
+
+.weapon-icon-picker-label {
+  flex: 1;
+  line-height: 1.1;
 }
