@@ -16,86 +16,126 @@
 /* Titre */
 
 .inventory-title {
-  margin: 0 0 0.4rem;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #3a2412;
   font-family: "MedievalSharp", "Georgia", serif;
-  color: #4a311e;
 }
 
-/* Texte “vide” */
+/* Message vide */
 
 .inventory-empty {
-  margin: 0.2rem 0 0.6rem;
-  font-size: 0.85rem;
   font-style: italic;
-  color: #6a4a2a;
+  font-size: 0.9rem;
+  color: #7a5a34;
+  margin: 0.2rem 0 0.4rem;
 }
 
 /* Ligne d’inventaire */
 
 .inventory-row {
   display: flex;
-  grid-template-columns: 1fr 70px 32px;
-  gap: 0.4rem;
   align-items: center;
-  margin-bottom: 0.3rem;
-
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
 }
 
-/* Champs */
+/* Cellule icône */
 
-.inventory-name,
-.inventory-qty {
-  font-size: 0.9rem;
-  padding: 0.25rem 0.35rem;
-  border-radius: 6px;
-  border: 1px solid rgba(120, 90, 60, 0.8);
-  background: rgba(255, 252, 242, 0.9);
-  font-family: inherit;
-
+.inventory-icon-cell {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.inventory-item-icon {
+  max-width: 24px;
+  max-height: 24px;
+  object-fit: contain;
+  opacity: 0.9;
+ background-color: black;
+}
+
+/* Champ nom d’objet */
 
 .inventory-name {
-  width: 100%;
+  flex: 1;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid rgba(125, 90, 52, 0.9);
+  background: rgba(255, 252, 244, 0.96);
+  font-size: 0.95rem;
+  color: #2e1d0f;
+  font-family: "Georgia", "Times New Roman", serif;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
+/* Champ quantité – bien lisible */
+
 .inventory-qty {
-  text-align: right;
-  max-width: 25px;
+  width: 3.2rem;
+  min-width: 3.2rem;
+  padding: 0.2rem 0.2rem;
+  border-radius: 8px;
+  border: 1px solid rgba(125, 90, 52, 0.95);
+  background: rgba(255, 252, 244, 0.98);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: #2b1405;
+  font-family: "Georgia", "Times New Roman", serif;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* enlever les flèches du input number */
+
+.inventory-qty::-webkit-outer-spin-button,
+.inventory-qty::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inventory-qty[type="number"] {
+  -moz-appearance: textfield;
 }
 
 /* Bouton supprimer */
 
 .inventory-delete {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
   border: none;
-  border-radius: 6px;
-  background: rgba(120, 40, 30, 0.9);
+  background: #7b2a20;
   color: #fdf3df;
-  cursor: pointer;
-  padding: 0.15rem 0;
   font-size: 0.9rem;
-  line-height: 1;
-  box-shadow: 0 1px 0 rgba(60, 20, 10, 0.5);
-  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 0 #3f140f;
+  cursor: pointer;
 }
 
 .inventory-delete:hover {
-  background: rgba(150, 50, 40, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #3f140f;
 }
 
 /* Bouton ajouter */
 
 .inventory-add {
-  margin-top: 0.4rem;
-  border: none;
-  border-radius: 999px;
+  margin-top: 0.5rem;
   padding: 0.3rem 0.9rem;
   font-size: 0.9rem;
   cursor: pointer;
   background: #8b4513;
   color: #fdf3df;
+  border-radius: 999px;
+  border: none;
   box-shadow: 0 2px 0 #4e2607;
   font-family: "MedievalSharp", "Georgia", serif;
   letter-spacing: 0.05em;
@@ -104,4 +144,104 @@
 .inventory-add:hover {
   transform: translateY(-1px);
   box-shadow: 0 3px 0 #4e2607;
+}
+
+
+
+/* cellule d'icône : maintenant relative pour le menu déroulant */
+.inventory-icon-cell {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* 🔹 important pour positionner le menu */
+
+}
+
+/* bouton qui contient l’icône */
+.inventory-icon-button {
+  width: 28px;
+  height: 28px;
+
+  border: 1px solid rgba(125, 90, 52, 0.9);
+  background: rgba(255, 252, 244, 0.95);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+   background-color: black;
+}
+
+.inventory-icon-button:hover {
+  box-shadow: 0 0 0 2px rgba(125, 90, 52, 0.25);
+}
+
+.inventory-item-icon {
+
+  max-width: 24px;
+  max-height: 24px;
+
+  object-fit: contain;
+  background-color: black;
+}
+
+/* petit ? quand aucune icône choisie */
+.inventory-icon-placeholder {
+  font-size: 0.9rem;
+  color: #7a5a34;
+}
+
+/* menu déroulant d’icônes */
+
+.inventory-icon-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  z-index: 20;
+  background: rgba(249, 243, 229, 0.98);
+  border: 1px solid rgba(111, 77, 45, 0.8);
+  border-radius: 8px;
+  padding: 0.4rem;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.4);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  min-width: 280px;
+}
+
+/* chaque entrée du menu */
+
+.inventory-icon-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.2rem 0.25rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.7rem;
+  text-align: left;
+  color: #3a2412;
+}
+
+.inventory-icon-menu-item:hover {
+  background: rgba(183, 136, 70, 0.16);
+}
+
+.inventory-icon-menu-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  background-color: black;
+}
+
+.inventory-icon-menu-label {
+  flex: 1;
+  line-height: 1.1;
 }

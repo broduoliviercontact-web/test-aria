@@ -645,9 +645,11 @@ const handleKitConfirm = (kit, options = {}) => {
     statMode,
     statPointsPool,
     skillMode,
+
     isCreationDone,
     xp,
     inventory,
+    weapons,
     purseFer,
     competences,
     specialCompetences,
