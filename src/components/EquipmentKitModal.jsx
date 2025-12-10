@@ -1,12 +1,41 @@
-// src/components/EquipmentKitModal.jsx
 import React, { useState } from "react";
 import { EQUIPMENT_KITS } from "../data/equipmentKits";
 import "./equipmentKitModal.css";
 
+/* ===========================
+   IMPORT DES ICONES
+   =========================== */
+import diplomateIcon from "./assets/kits/diplomate.svg";
+import croyantIcon from "./assets/kits/croyant.svg";
+import aventurierIcon from "./assets/kits/aventurier.svg";
+import voleurIcon from "./assets/kits/voleur.svg";
+import gourmetIcon from "./assets/kits/gourmet.svg";
+import voyageurIcon from "./assets/kits/voyageur.svg";
+import combattantIcon from "./assets/kits/combattant.svg";
+import eruditIcon from "./assets/kits/erudit.svg";
+
+const KIT_ICONS = {
+  diplomate: diplomateIcon,
+  croyant: croyantIcon,
+  combattant: combattantIcon,
+  aventurier: aventurierIcon,
+  voleur: voleurIcon,
+  gourmet: gourmetIcon,
+  voyageur: voyageurIcon,
+  
+  erudit: eruditIcon,
+};
+
+/* ===========================
+   COMPONENT
+   =========================== */
+
 const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
   const [selectedKitId, setSelectedKitId] = useState(initialKitId || null);
-  const [combattantWeaponChoice, setCombattantWeaponChoice] = useState(null); // "twoOneHand" | "twoHand"
-  const [eruditChoice, setEruditChoice] = useState(null); // "fioles" | "sablier"
+
+  // Choix spéciaux
+  const [combattantWeaponChoice, setCombattantWeaponChoice] = useState(null);
+  const [eruditChoice, setEruditChoice] = useState(null);
 
   if (!isOpen) return null;
 
@@ -31,123 +60,153 @@ const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
   return (
     <div className="kit-modal-backdrop">
       <div className="kit-modal">
+        {/* HEADER */}
         <div className="kit-modal-header">
-          <h2 className="kit-modal-title">Choisir un kit d&apos;équipement</h2>
+          <h2>Choisir un kit d&apos;équipement</h2>
           <button className="kit-modal-close-btn" onClick={onClose}>
             ✕
           </button>
         </div>
 
+        {/* BODY */}
         <div className="kit-modal-body">
           <div className="kit-list">
             {EQUIPMENT_KITS.map((kit) => {
-  const isSelected = kit.id === selectedKitId;
-  const isCombattantKit = kit.id === "combattant";
-  const isEruditKit = kit.id === "erudit";
+              const isSelected = kit.id === selectedKitId;
 
-  return (
-    <div
-      key={kit.id}
-      className={
-        "kit-card" + (isSelected ? " kit-card--selected" : "")
-      }
-      onClick={() => setSelectedKitId(kit.id)}
-    >
-      {/* 🔹 4 coins décoratifs */}
-      <span className="kit-card-corner kit-card-corner--tl">•</span>
-      <span className="kit-card-corner kit-card-corner--tr">•</span>
-      <span className="kit-card-corner kit-card-corner--bl">•</span>
-      <span className="kit-card-corner kit-card-corner--br">•</span>
-
-      <div className="kit-card-inner">
-        <div className="kit-card-header">
-          <div className="kit-card-title">{kit.name}</div>
-          <div className="kit-card-cost">{kit.cost} or</div>
-        </div>
-
-        <div className="kit-card-body">
-          <ul className="kit-card-items">
-            {kit.content.map((item, index) => (
-              <li key={index} className="kit-card-item">
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          {/* tes options spéciales (combattant / érudit) ici */}
-          {isCombattantKit && (
-            <div
-              className="kit-card-options"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <p className="kit-card-options-label">
-                Configuration des armes :
-              </p>
-              <div className="kit-switch-row">
-                <span className="kit-switch-label">2 armes à une main</span>
-                <button
-                  type="button"
+              return (
+                <div
+                  key={kit.id}
                   className={
-                    "kit-mode-switch" +
-                    (combattantWeaponChoice === "twoHand"
-                      ? " kit-mode-switch--right"
-                      : " kit-mode-switch--left")
+                    "kit-card" + (isSelected ? " kit-card--selected" : "")
                   }
-                  onClick={() => {
-                    setSelectedKitId("combattant");
-                    setCombattantWeaponChoice((prev) =>
-                      prev === "twoHand" ? "twoOneHand" : "twoHand"
-                    );
-                  }}
+                  onClick={() => setSelectedKitId(kit.id)}
                 >
-                  <span className="kit-mode-switch-thumb" />
-                </button>
-                <span className="kit-switch-label">1 arme à deux mains</span>
-              </div>
-            </div>
-          )}
+                  {/* 4 coins décoratifs */}
+                  <span className="kit-card-corner kit-card-corner--tl">•</span>
+                  <span className="kit-card-corner kit-card-corner--tr">•</span>
+                  <span className="kit-card-corner kit-card-corner--bl">•</span>
+                  <span className="kit-card-corner kit-card-corner--br">•</span>
 
-          {isEruditKit && (
-            <div
-              className="kit-card-options"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <p className="kit-card-options-label">
-                Choix de l&apos;objet :
-              </p>
-              <div className="kit-switch-row">
-                <span className="kit-switch-label">Fioles (x5)</span>
-                <button
-                  type="button"
-                  className={
-                    "kit-mode-switch" +
-                    (eruditChoice === "sablier"
-                      ? " kit-mode-switch--right"
-                      : " kit-mode-switch--left")
-                  }
-                  onClick={() => {
-                    setSelectedKitId("erudit");
-                    setEruditChoice((prev) =>
-                      prev === "sablier" ? "fioles" : "sablier"
-                    );
-                  }}
-                >
-                  <span className="kit-mode-switch-thumb" />
-                </button>
-                <span className="kit-switch-label">Sablier</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-})}
+                  <div className="kit-card-inner">
+                    {/* HEADER DE LA CARTE */}
+                    <div className="kit-card-header">
+                      <div className="kit-card-header-left">
+                        {KIT_ICONS[kit.id] && (
+                          <img
+                            src={KIT_ICONS[kit.id]}
+                            alt={`${kit.name} icon`}
+                            className="kit-card-icon"
+                          />
+                        )}
+                        <h3 className="kit-card-title">{kit.name}</h3>
+                      </div>
 
+                      <div className="kit-card-cost">{kit.cost} or</div>
+                    </div>
 
+                    {/* CONTENU */}
+                    <div className="kit-card-body">
+                      <ul className="kit-card-items">
+                        {kit.content.map((item, index) => (
+                          <li key={index} className="kit-card-item">
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* =======================
+                          OPTIONS : COMBATTANT
+                         ======================= */}
+                      {kit.id === "combattant" && (
+                        <div
+                          className="kit-card-options"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <p className="kit-card-options-label">
+                            Configuration des armes :
+                          </p>
+
+                          <div className="kit-switch-row">
+                            <span className="kit-switch-label">
+                              2 armes à une main
+                            </span>
+
+                            <button
+                              type="button"
+                              className={
+                                "kit-mode-switch" +
+                                (combattantWeaponChoice === "twoHand"
+                                  ? " kit-mode-switch--right"
+                                  : " kit-mode-switch--left")
+                              }
+                              onClick={() => {
+                                setSelectedKitId("combattant");
+                                setCombattantWeaponChoice((prev) =>
+                                  prev === "twoHand"
+                                    ? "twoOneHand"
+                                    : "twoHand"
+                                );
+                              }}
+                            >
+                              <span className="kit-mode-switch-thumb" />
+                            </button>
+
+                            <span className="kit-switch-label">
+                              1 arme à deux mains
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* =======================
+                          OPTIONS : ÉRUDIT
+                         ======================= */}
+                      {kit.id === "erudit" && (
+                        <div
+                          className="kit-card-options"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <p className="kit-card-options-label">
+                            Choix de l&apos;objet :
+                          </p>
+
+                          <div className="kit-switch-row">
+                            <span className="kit-switch-label">
+                              Fioles (x5)
+                            </span>
+
+                            <button
+                              type="button"
+                              className={
+                                "kit-mode-switch" +
+                                (eruditChoice === "sablier"
+                                  ? " kit-mode-switch--right"
+                                  : " kit-mode-switch--left")
+                              }
+                              onClick={() => {
+                                setSelectedKitId("erudit");
+                                setEruditChoice((prev) =>
+                                  prev === "sablier" ? "fioles" : "sablier"
+                                );
+                              }}
+                            >
+                              <span className="kit-mode-switch-thumb" />
+                            </button>
+
+                            <span className="kit-switch-label">Sablier</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
+        {/* FOOTER */}
         <div className="kit-modal-footer">
           <button className="kit-secondary-btn" onClick={onClose}>
             Annuler

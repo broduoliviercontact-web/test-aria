@@ -116,6 +116,7 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.55);
   color: #ffffff;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
+
 }
 
 /* Coins extérieurs : carrés + points */
@@ -165,9 +166,11 @@
 
 .kit-card--selected,
 .kit-card-selected {
+  border: 5px solid #1b1b1b;
   box-shadow:
-    0 0 0 2px rgba(255, 215, 128, 0.9),
-    0 16px 30px rgba(0, 0, 0, 0.9);
+  
+    0 0 0 2px rgba(86, 86, 86, 0.9),
+    16px 16px 30px rgba(0, 0, 0, 0.9);
 }
 
 /* ===========================
@@ -181,6 +184,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+    background-image: url("/parchment-bg2.jpg");
+      color: black;
 }
 
 /* ===========================
@@ -192,6 +197,7 @@
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 0.4rem;
+  
 }
 
 .kit-card-title,
@@ -199,6 +205,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
+
 }
 
 .kit-card-cost,
@@ -219,13 +226,20 @@
 
 /* Liste des objets */
 
-.kit-card-items,
+.kit-card-items {
+  list-style: disc;
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+
 .kit-content-list {
   list-style: none;
   margin: 0;
   padding-left: 0;
   font-size: 0.9rem;
 }
+
 
 .kit-card-item + .kit-card-item,
 .kit-content-list li + li {
@@ -270,13 +284,18 @@
   border-radius: 999px;
   padding: 0;
   border: none;
-  background: #333;
+  background: #000000;
   cursor: pointer;
 }
 
 .kit-mode-switch:focus {
   outline: none;
 }
+.kit-switch-label button {
+  color : black;
+  background-color: black;
+}
+
 
 .kit-mode-switch-thumb {
   position: absolute;
@@ -320,6 +339,28 @@
 
   .kit-card-items,
   .kit-content-list {
-    font-size: 0.85rem;
+    font-size: 0.60rem;
   }
+}
+
+/* ===== Icônes des kits ===== */
+
+.kit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kit-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kit-card-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: block;
+  color: white;
 }
