@@ -642,10 +642,11 @@ const [portraitDataUrl, setPortraitDataUrl] = useState(() => {
   );
 
 const handleChangePortrait = useCallback((dataUrl) => {
-  setPortraitDataUrl(dataUrl || "");
+  const value = dataUrl || "";
+  setPortraitDataUrl(value);
   try {
-    if (dataUrl) {
-      localStorage.setItem("aria-portrait-url", dataUrl);
+    if (value) {
+      localStorage.setItem("aria-portrait-url", value);
     } else {
       localStorage.removeItem("aria-portrait-url");
     }
@@ -908,7 +909,7 @@ const handleDeleteCharacter = () => {
   // Portrait
   setPortraitDataUrl(null);
 try {
-  localStorage.removeItem("aria-portrait-url");
+   localStorage.removeItem("aria-portrait-url");
 } catch {
   // ignore
 }
@@ -967,77 +968,8 @@ const handleSaveToBackend = async (redirectToMyCharacters = false) => {
   // ... le reste ne change pas
 };
 
-  const handleLoadCharacterFromBackend = async (id) => {
-    if (!user) {
-      alert(
-        "Il faut être connecté pour charger un personnage sauvegardé sur le serveur."
-      );
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}/characters/${id}`, {
-        credentials: "include",
-      });
-
-      let data = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
-
-      if (!res.ok) {
-        console.error("❌ Erreur API GET /characters/:id :", data);
-        alert(
-          (data && data.message) ||
-            "Erreur en récupérant le personnage depuis le serveur."
-        );
-        return;
-      }
-
-      const ch = data || {};
-
-      setCharacterName(ch.name || "");
-      setPlayerName(ch.player || "");
-      setAge(
-        typeof ch.age === "number" && !Number.isNaN(ch.age) ? String(ch.age) : ""
-      );
-      setProfession(ch.profession || "");
-
-      setStats(
-        Array.isArray(ch.stats) && ch.stats.length > 0 ? ch.stats : INITIAL_STATS
-      );
-
-      setStatMode(ch.statMode || "3d6");
-      setStatPointsPool(
-        typeof ch.statPointsPool === "number" ? ch.statPointsPool : 0
-      );
-      setSkillMode(ch.skillMode || "ready");
-
-      setIsCreationDone(
-        typeof ch.isCreationDone === "boolean" ? ch.isCreationDone : false
-      );
-
-      setXp(typeof ch.xp === "number" ? ch.xp : 0);
-
-      setInventory(Array.isArray(ch.inventory) ? ch.inventory : []);
-      setWeapons(Array.isArray(ch.weapons) ? ch.weapons : []);
-      setPurseFer(typeof ch.purseFer === "number" ? ch.purseFer : 0);
-
-      setCompetences(Array.isArray(ch.competences) ? ch.competences : []);
-      setSpecialCompetences(
-        Array.isArray(ch.specialCompetences) ? ch.specialCompetences : []
-      );
-
-      setPhraseGenial(ch.phraseGenial || "");
-      setPhraseSociete(ch.phraseSociete || ch.phraseSocieter || "");
-      
-// ... après setPhraseSociete(...) et la partie alchimie / meta
-
-// Portrait depuis le back (dataURL)
-c// Portrait : maintenant on stocke une URL simple
-const portraitFromBackend = ch.portraitUrl || "";
+// Portrait : maintenant on stocke une URL simple (string)
+const portraitFromBackend = ch.portrait || "";
 setPortraitDataUrl(portraitFromBackend);
 
 try {
@@ -1049,35 +981,6 @@ try {
 } catch {
   // ignore
 }
-
-
-      if (ch.alchemy) {
-        setIsAlchemist(!!ch.alchemy.enabled);
-        setAlchemyPotions(
-          Array.isArray(ch.alchemy.potions) ? ch.alchemy.potions : []
-        );
-      } else {
-        setIsAlchemist(!!ch.isAlchemist);
-        setAlchemyPotions(
-          Array.isArray(ch.alchemyPotions) ? ch.alchemyPotions : []
-        );
-      }
-
-      if (ch.meta && ch.meta.sheetMode) {
-        setSheetMode(ch.meta.sheetMode);
-      } else if (ch.meta && ch.meta.status === "validated") {
-        setSheetMode("validated");
-      } else {
-        setSheetMode("edit");
-      }
-
-      setShowCreationModal(false);
-      setPage("character");
-    } catch (err) {
-      console.error("❌ Erreur réseau load character :", err);
-      alert("Erreur réseau en chargeant le personnage depuis le serveur.");
-    }
-  };
 
   const handleExportPdf = async () => {
     if (!pdfSheetRef.current) return;
