@@ -507,15 +507,14 @@ function App() {
   const [phraseGenial, setPhraseGenial] = useState("");
   const [phraseSociete, setPhraseSociete] = useState("");
 
-const [portraitDataUrl, setPortraitDataUrl] = useState(() => {
-  if (typeof window === "undefined") return "";
-  try {
-    return localStorage.getItem("aria-portrait-url") || "";
-  } catch {
-    return "";
-  }
-});
-
+  const [portraitDataUrl, setPortraitDataUrl] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return localStorage.getItem("aria-portrait-url") || "";
+    } catch {
+      return "";
+    }
+  });
 
   const [sheetMode, setSheetMode] = useState("create"); // "create" | "validated" | "edit"
 
@@ -641,19 +640,19 @@ const [portraitDataUrl, setPortraitDataUrl] = useState(() => {
     [canEditStatsAndSkills]
   );
 
-const handleChangePortrait = useCallback((dataUrl) => {
-  const value = dataUrl || "";
-  setPortraitDataUrl(value);
-  try {
-    if (value) {
-      localStorage.setItem("aria-portrait-url", value);
-    } else {
-      localStorage.removeItem("aria-portrait-url");
+  const handleChangePortrait = useCallback((value) => {
+    const finalValue = value || "";
+    setPortraitDataUrl(finalValue);
+    try {
+      if (finalValue) {
+        localStorage.setItem("aria-portrait-url", finalValue);
+      } else {
+        localStorage.removeItem("aria-portrait-url");
+      }
+    } catch (e) {
+      console.warn("Impossible de stocker le portrait dans localStorage", e);
     }
-  } catch (e) {
-    console.warn("Impossible de stocker le portrait dans localStorage", e);
-  }
-}, []);
+  }, []);
 
   const parseKitItem = (rawLabel) => {
     const [firstChoice] = rawLabel.split(" ou ");
@@ -876,44 +875,44 @@ const handleChangePortrait = useCallback((dataUrl) => {
     setSheetMode("edit");
   };
 
-const handleDeleteCharacter = () => {
-  setStats(INITIAL_STATS);
-  setCharacterName("");
-  setPlayerName("");
-  setAge("");
-  setXp(0);
-  setCompetences([]);
-  setSpecialCompetences([]);
-  setProfession("");
-  setInventory([]);
-  setWeapons([]);
-  setPurseFer(0);
-  setSkillMode("ready");
-  setStatMode("3d6");
-  setStatPointsPool(0);
-  setIsCreationDone(false);
-  setSheetMode("create");
-  setShowCreationModal(true);
-  setPhraseGenial("");
-  setPhraseSociete("");
-  setHitPoints(20);
-  setWounds(0);
-  setArmor(0);
-  setIsAlchemist(false);
-  setAlchemyPotions([]);
+  const handleDeleteCharacter = () => {
+    setStats(INITIAL_STATS);
+    setCharacterName("");
+    setPlayerName("");
+    setAge("");
+    setXp(0);
+    setCompetences([]);
+    setSpecialCompetences([]);
+    setProfession("");
+    setInventory([]);
+    setWeapons([]);
+    setPurseFer(0);
+    setSkillMode("ready");
+    setStatMode("3d6");
+    setStatPointsPool(0);
+    setIsCreationDone(false);
+    setSheetMode("create");
+    setShowCreationModal(true);
+    setPhraseGenial("");
+    setPhraseSociete("");
+    setHitPoints(20);
+    setWounds(0);
+    setArmor(0);
+    setIsAlchemist(false);
+    setAlchemyPotions([]);
 
-  // 🔧 IMPORTANT : on réinitialise le kit d'équipement
-  setSelectedKit(null);
-  setIsKitModalOpen(false);
+    // reset kit
+    setSelectedKit(null);
+    setIsKitModalOpen(false);
 
-  // Portrait
-  setPortraitDataUrl(null);
-try {
-   localStorage.removeItem("aria-portrait-url");
-} catch {
-  // ignore
-}
-};
+    // portrait
+    setPortraitDataUrl("");
+    try {
+      localStorage.removeItem("aria-portrait-url");
+    } catch {
+      // ignore
+    }
+  };
 
   const characterPayload = {
     meta: {
@@ -944,43 +943,172 @@ try {
     specialCompetences,
     phraseGenial,
     phraseSociete,
-      portrait: portraitDataUrl,
+    portrait: portraitDataUrl,
   };
 
-const handleSaveToBackend = async (redirectToMyCharacters = false) => {
-  if (!user) {
-    alert(
-      "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
-    );
-    return;
-  }
+  const handleSaveToBackend = async (redirectToMyCharacters = false) => {
+    if (!user) {
+      alert(
+        "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
+      );
+      return;
+    }
 
-  if (!characterName.trim()) {
-    alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
-    return;
-  }
+    if (!characterName.trim()) {
+      alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
+      return;
+    }
 
-  const payloadForBackend = {
-    ...characterPayload,
-    user: user._id || user.id,
+    const payloadForBackend = {
+      ...characterPayload,
+      user: user._id || user.id,
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/characters`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payloadForBackend),
+      });
+
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      if (!res.ok) {
+        console.error("❌ Erreur API /characters :", data);
+        alert(
+          (data && data.message) ||
+            "Erreur lors de la sauvegarde du personnage sur le serveur."
+        );
+        return;
+      }
+
+      if (redirectToMyCharacters) {
+        setPage("my-characters");
+      } else {
+        alert("Personnage sauvegardé sur le serveur !");
+      }
+    } catch (err) {
+      console.error("❌ Erreur réseau /characters :", err);
+      alert("Erreur réseau lors de la sauvegarde du personnage.");
+    }
   };
 
-  // ... le reste ne change pas
-};
+  const handleLoadCharacterFromBackend = async (id) => {
+    if (!user) {
+      alert(
+        "Il faut être connecté pour charger un personnage sauvegardé sur le serveur."
+      );
+      return;
+    }
 
-// Portrait : maintenant on stocke une URL simple (string)
-const portraitFromBackend = ch.portrait || "";
-setPortraitDataUrl(portraitFromBackend);
+    try {
+      const res = await fetch(`${API_URL}/characters/${id}`, {
+        credentials: "include",
+      });
 
-try {
-  if (portraitFromBackend) {
-    localStorage.setItem("aria-portrait-url", portraitFromBackend);
-  } else {
-    localStorage.removeItem("aria-portrait-url");
-  }
-} catch {
-  // ignore
-}
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      if (!res.ok) {
+        console.error("❌ Erreur API GET /characters/:id :", data);
+        alert(
+          (data && data.message) ||
+            "Erreur en récupérant le personnage depuis le serveur."
+        );
+        return;
+      }
+
+      const ch = data || {};
+
+      setCharacterName(ch.name || "");
+      setPlayerName(ch.player || "");
+      setAge(
+        typeof ch.age === "number" && !Number.isNaN(ch.age)
+          ? String(ch.age)
+          : ""
+      );
+      setProfession(ch.profession || "");
+
+      setStats(
+        Array.isArray(ch.stats) && ch.stats.length > 0 ? ch.stats : INITIAL_STATS
+      );
+
+      setStatMode(ch.statMode || "3d6");
+      setStatPointsPool(
+        typeof ch.statPointsPool === "number" ? ch.statPointsPool : 0
+      );
+      setSkillMode(ch.skillMode || "ready");
+
+      setIsCreationDone(
+        typeof ch.isCreationDone === "boolean" ? ch.isCreationDone : false
+      );
+
+      setXp(typeof ch.xp === "number" ? ch.xp : 0);
+
+      setInventory(Array.isArray(ch.inventory) ? ch.inventory : []);
+      setWeapons(Array.isArray(ch.weapons) ? ch.weapons : []);
+      setPurseFer(typeof ch.purseFer === "number" ? ch.purseFer : 0);
+
+      setCompetences(Array.isArray(ch.competences) ? ch.competences : []);
+      setSpecialCompetences(
+        Array.isArray(ch.specialCompetences) ? ch.specialCompetences : []
+      );
+
+      setPhraseGenial(ch.phraseGenial || "");
+      setPhraseSociete(ch.phraseSociete || ch.phraseSocieter || "");
+
+      // Portrait : simple string (URL ou dataURL)
+      const portraitFromBackend = ch.portrait || "";
+      setPortraitDataUrl(portraitFromBackend);
+      try {
+        if (portraitFromBackend) {
+          localStorage.setItem("aria-portrait-url", portraitFromBackend);
+        } else {
+          localStorage.removeItem("aria-portrait-url");
+        }
+      } catch {
+        // ignore
+      }
+
+      if (ch.alchemy) {
+        setIsAlchemist(!!ch.alchemy.enabled);
+        setAlchemyPotions(
+          Array.isArray(ch.alchemy.potions) ? ch.alchemy.potions : []
+        );
+      } else {
+        setIsAlchemist(!!ch.isAlchemist);
+        setAlchemyPotions(
+          Array.isArray(ch.alchemyPotions) ? ch.alchemyPotions : []
+        );
+      }
+
+      if (ch.meta && ch.meta.sheetMode) {
+        setSheetMode(ch.meta.sheetMode);
+      } else if (ch.meta && ch.meta.status === "validated") {
+        setSheetMode("validated");
+      } else {
+        setSheetMode("edit");
+      }
+
+      setShowCreationModal(false);
+      setPage("character");
+    } catch (err) {
+      console.error("❌ Erreur réseau load character :", err);
+      alert("Erreur réseau en chargeant le personnage depuis le serveur.");
+    }
+  };
 
   const handleExportPdf = async () => {
     if (!pdfSheetRef.current) return;
@@ -1165,7 +1293,7 @@ try {
                 {sheetMode === "create" && statMode === "point-buy" && (
                   <p className="stat-points-info">
                     Points à répartir restants :{" "}
-                    <strong>{statPointsPool}</strong>
+                      <strong>{statPointsPool}</strong>
                   </p>
                 )}
               </div>
