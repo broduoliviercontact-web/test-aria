@@ -64,84 +64,91 @@ function AlchemyPotions({ potions, onChange }) {
 
       <div className="alchemy-table">
         <div className="alchemy-header row">
-          <span className="col-name">Potion</span>
-          <span className="col-effect">Effet</span>
-          <span className="col-difficulty">Diff.</span>
-          <span className="col-qty">Qté</span>
-          <span className="col-delete" />
-        </div>
+  <span className="alchemy-col-name">Potion</span>
+  <span className="alchemy-col-effect">Effet</span>
+  <span className="alchemy-col-difficulty">Diff.</span>
+  <span className="alchemy-col-qty">Qté</span>
+  <span className="alchemy-col-delete" />
+</div>
 
-        {rows.map((row, index) => {
-          const isReal = index < realRows.length;
 
-          return (
-            <div key={row.id || index} className="alchemy-row row">
-              {/* Nom */}
-              <input
-                type="text"
-                className="alchemy-input name-input"
-                value={row.name}
-                placeholder="Nom de la potion"
-                onChange={(e) =>
-                  handleFieldChange(index, "name", e.target.value)
-                }
-              />
+ {rows.map((row, index) => {
+  const isReal = index < realRows.length;
 
-              {/* Effet */}
-              <input
-                type="text"
-                className="alchemy-input effect-input"
-                value={row.effect}
-                placeholder="Effet principal"
-                onChange={(e) =>
-                  handleFieldChange(index, "effect", e.target.value)
-                }
-              />
+  return (
 
-              {/* Difficulté */}
-              <div className="difficulty-wrapper">
-                <input
-                  type="number"
-                  className="alchemy-input difficulty-input"
-                  value={row.difficulty}
-                  min={0}
-                  max={100}
-                  placeholder="0"
-                  onChange={(e) =>
-                    handleFieldChange(index, "difficulty", e.target.value)
-                  }
-                />
-                <span className="difficulty-suffix">%</span>
-              </div>
+    
+    <div key={row.id || index} className="alchemy-row row">
+      {/* Nom */}
+      
+      <input
+        type="text"
+        className="alchemy-input name-input"
+        value={row.name}
+        placeholder="Nom de la potion"
+        onChange={(e) =>
+          handleFieldChange(index, "name", e.target.value)
+        }
+      />
 
-              {/* Quantité */}
-              <input
-                type="number"
-                className="alchemy-input qty-input"
-                value={row.quantity}
-                min={0}
-                placeholder="0"
-                onChange={(e) =>
-                  handleFieldChange(index, "quantity", e.target.value)
-                }
-              />
+      
 
-              {/* Delete */}
-              {isReal ? (
-                <button
-                  type="button"
-                  className="delete-potion-btn"
-                  onClick={() => handleDeleteRow(index)}
-                  aria-label="Supprimer cette potion"
-                >
-                  ✕
-                </button>
-              ) : (
-                <span className="col-delete" />
-              )}
-            </div>
-          );
-        })}
+      {/* Effet */}
+      <textarea
+        className="alchemy-input effect-input"
+        value={row.effect}
+        placeholder="Effet principal"
+        rows={2}
+        onChange={(e) =>
+          handleFieldChange(index, "effect", e.target.value)
+        }
+      />
+
+      {/* Difficulté */}
+      <div className="difficulty-wrapper">
+        <input
+          type="text"
+          className="alchemy-input difficulty-input"
+          value={row.difficulty}
+          min={0}
+          max={100}
+          placeholder="0"
+          onChange={(e) =>
+            handleFieldChange(index, "difficulty", e.target.value)
+          }
+        />
+        <span className="difficulty-suffix">%</span>
+      </div>
+
+      {/* Quantité */}
+      <input
+        type="text"
+        className="alchemy-input qty-input"
+        value={row.quantity}
+        min={0}
+        placeholder="0"
+        onChange={(e) =>
+          handleFieldChange(index, "quantity", e.target.value)
+        }
+      />
+
+      {/* Delete */}
+      {isReal ? (
+        <button
+          type="button"
+          className="delete-potion-btn"
+          onClick={() => handleDeleteRow(index)}
+          aria-label="Supprimer cette potion"
+        >
+          ✕
+        </button>
+      ) : (
+        <span className="col-delete" />
+      )}
+    </div>
+  );
+})}
+
       </div>
 
       <div className="alchemy-actions">

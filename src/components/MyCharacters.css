@@ -1,0 +1,138 @@
+.my-characters-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: radial-gradient(ellipse at top, #1f2937 0, #020617 60%);
+  color: #f5f0e6;
+}
+
+.app-my-characters {
+  width: 100%;
+  max-width: 900px;
+}
+
+.my-characters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.my-characters-header h1 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.my-characters-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.my-characters-text {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.my-characters-error {
+  margin: 0.75rem 0 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #7f1d1d;
+  color: #fee2e2;
+  font-size: 0.9rem;
+}
+
+.my-characters-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.my-characters-item {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.my-characters-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.my-characters-title-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.my-characters-title-block strong {
+  font-size: 1rem;
+}
+
+.my-characters-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-start;
+  font-size: 0.8rem;
+}
+
+.my-characters-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Portrait dans la liste */
+.my-characters-portrait {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  border: 1px solid rgba(15, 23, 42, 0.8);
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.4);
+}
+
+/* Badges réutilisent la classe .badge déjà dans App.css
+   mais on ajuste un peu si besoin */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.badge-success {
+  border-color: rgba(22, 163, 74, 0.7);
+  background: rgba(22, 163, 74, 0.15);
+  color: #bbf7d0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .my-characters-item {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .my-characters-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

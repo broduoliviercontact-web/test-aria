@@ -96,9 +96,12 @@ body {
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
-  align-items: center;
+  align-items: flex-start;    /* ← au lieu de center */
   justify-content: center;
   z-index: 100;
+
+  padding: 1.5rem 0;          /* espace en haut et en bas */
+  overflow-y: auto;           /* ← le fond devient scrollable */
 }
 
 .creation-modal {
@@ -112,10 +115,14 @@ body {
     0 0 0 1px rgba(120, 90, 60, 0.4);
   border: 1px solid rgba(140, 105, 70, 0.8);
   color: #2f2115;
-    display: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+
+  /* 🔽 AJOUT IMPORTANT POUR LE SMARTPHONE */
+  max-height: calc(100vh - 3rem); /* ne dépasse pas l'écran */
+  overflow-y: auto;               /* scroll à l'intérieur si besoin */
 }
 
 .creation-modal h2 {

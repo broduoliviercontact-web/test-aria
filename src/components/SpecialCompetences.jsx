@@ -65,7 +65,7 @@ function SpecialCompetences({ specialCompetences, onChange }) {
 
       <div className="special-competences-table">
         <div className="special-header row">
-          <span className="col-name">Compétence</span>
+          <span className="special-col-name">Compétence</span>
           <span className="col-link">Lien</span>
           <span className="col-score">Score</span>
           <span className="col-delete" />
@@ -78,7 +78,7 @@ function SpecialCompetences({ specialCompetences, onChange }) {
             <div key={row.id || index} className="special-row row">
               <input
                 type="text"
-                className="special-input name-input"
+                className="special-input special-name-input"
                 value={row.name}
                 placeholder="Nom de la compétence"
                 onChange={(e) =>
@@ -87,7 +87,7 @@ function SpecialCompetences({ specialCompetences, onChange }) {
               />
               <input
                 type="text"
-                className="special-input link-input"
+                className="special-input special-link-input"
                 value={row.link}
                 placeholder="FOR/DEX"
                 onChange={(e) =>
@@ -96,8 +96,8 @@ function SpecialCompetences({ specialCompetences, onChange }) {
               />
               <div className="score-wrapper">
                 <input
-                  type="number"
-                  className="special-input score-input"
+                  type="text"
+                  className="special-input special-score-input"
                   value={row.score}
                   min={0}
                   max={100}

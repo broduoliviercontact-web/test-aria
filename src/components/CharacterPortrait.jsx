@@ -1,20 +1,14 @@
 // src/components/CharacterPortrait.jsx
-import React from "react";
-import "./CharacterPortrait.css"; // si tu veux une CSS séparée
+import React, { useState } from "react";
+import "./CharacterPortrait.css";
 
 function CharacterPortrait({ imageUrl, onChangeImage }) {
-  const handleFileChange = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const [urlInput, setUrlInput] = useState("");
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result;
-      if (typeof result === "string" && onChangeImage) {
-        onChangeImage(result); // data URL
-      }
-    };
-    reader.readAsDataURL(file);
+  const applyUrl = () => {
+    if (!urlInput) return;
+    onChangeImage(urlInput.trim());
+    setUrlInput("");
   };
 
   return (
@@ -30,20 +24,28 @@ function CharacterPortrait({ imageUrl, onChangeImage }) {
           />
         ) : (
           <div className="portrait-placeholder">
-            Aucun portrait
+            Aucun portrait<br />
+            Colle une URL Google Drive / Imgur / Web
           </div>
         )}
       </div>
 
-      <label className="portrait-upload-btn">
-        Choisir une image
-        <input
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={handleFileChange}
-        />
-      </label>
+      {/* Champ URL */}
+      <input
+        type="text"
+        className="portrait-url-input"
+        placeholder="https://lien-vers-votre-image..."
+        value={urlInput}
+        onChange={(e) => setUrlInput(e.target.value)}
+      />
+
+      <button
+        type="button"
+        className="portrait-upload-btn"
+        onClick={applyUrl}
+      >
+        Charger depuis une URL
+      </button>
     </section>
   );
 }

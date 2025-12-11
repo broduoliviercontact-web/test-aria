@@ -1,7 +1,7 @@
 /* src/components/SpecialCompetences.css */
 
 .special-competences {
-  padding: 0.5rem 0.5rem;
+  padding: 0.2rem 0.2rem;
   border-radius: 10px;
   border: 1px solid rgba(120, 90, 60, 0.8);
   box-shadow: 0 1px 0 #e0d2b8, 0 3px 6px rgba(0, 0, 0, 0.12);
@@ -21,25 +21,53 @@
   padding-top: 0.25rem;
 }
 
-/* 4 colonnes : nom / lien / score / delete */
-.special-header,
-.special-row {
+/* ===========================
+   ENTÊTE
+   =========================== */
+
+.special-header {
   display: grid;
   grid-template-columns: 3fr 1.2fr 1fr auto;
   align-items: center;
   gap: 0.3rem;
   font-size: 0.8rem;
-}
-
-.special-header {
   font-weight: 600;
   margin-bottom: 0.2rem;
   color: #4a321f;
 }
 
+.special-col-name {
+  text-align: left;
+}
+
+.col-link {
+  text-align: center;
+  font-size: 1rem;
+  color: #000000;
+}
+
+.col-score {
+  text-align: left;
+}
+
+/* ===========================
+   LIGNES
+   =========================== */
+
+.special-row {
+  display: grid;
+  grid-template-columns: 4fr 1.5fr 0.1fr auto;
+  grid-template-areas: "name link score delete";
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+}
+
 .special-row + .special-row {
   margin-top: 0.15rem;
 }
+
+/* Inputs généraux */
 
 .special-input {
   font-size: 0.8rem;
@@ -48,29 +76,39 @@
   border: 1px solid rgba(140, 105, 70, 0.7);
   background: #fdf7ea;
   color: #2f2115;
+  box-sizing: border-box;
 }
 
-.name-input {
+/* Colonne "Compétence" */
+
+.special-name-input {
+  grid-area: name;
   width: 100%;
 }
 
-.link-input {
+/* Colonne "Lien" */
+
+.special-link-input {
+  grid-area: link;
   width: 100%;
   text-align: center;
 }
 
+/* Colonne "Score" */
+
 .score-wrapper {
+  grid-area: score;
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-self: flex-start;
 }
-
-.score-input {
-  width: 3.2rem;
+.special-score-input {
+  width: 2.4rem;        /* ← plus petit qu’avant */
+  font-size: 0.75rem;   /* texte un peu réduit */
   text-align: right;
-  padding-right: 1.1rem;
+  padding: 0.1rem 0.9rem 0.1rem 0.3rem; /* compact */
 }
-
 .score-suffix {
   position: absolute;
   right: 0.25rem;
@@ -78,7 +116,26 @@
   color: #6a4a2f;
 }
 
-/* actions en bas (bouton +) */
+/* Colonne delete */
+
+.delete-special-btn {
+  grid-area: delete;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #8a3b34;
+  padding: 0.1rem 0.25rem;
+  justify-self: flex-end;
+}
+
+.delete-special-btn:hover {
+  color: #b03228;
+}
+
+/* ===========================
+   ACTIONS EN BAS
+   =========================== */
 
 .special-actions {
   margin-top: 0.4rem;
@@ -110,24 +167,4 @@
 .add-special-btn:active {
   background: #e2cfa8;
   transform: translateY(1px);
-}
-
-/* bouton suppression */
-
-.delete-special-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: #8a3b34;
-  padding: 0.1rem 0.25rem;
-}
-
-.delete-special-btn:hover {
-  color: #b03228;
-}
-.col-link {
-  text-align: center;
-  font-size: 1rem;
-  color: #000000;
 }
