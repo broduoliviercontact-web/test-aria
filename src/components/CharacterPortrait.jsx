@@ -31,13 +31,12 @@ function CharacterPortrait({ imageUrl, onChangeImage }) {
       </div>
 
       {/* Champ URL */}
-      <input
-        type="text"
-        className="portrait-url-input"
-        placeholder="https://lien-vers-votre-image..."
-        value={urlInput}
-        onChange={(e) => setUrlInput(e.target.value)}
-      />
+  <input
+  type="text"
+  placeholder="URL de l'image (Google Drive / autre)"
+  value={imageUrl || ""}
+  onChange={(e) => onChangeImage(e.target.value)}
+/>
 
       <button
         type="button"

@@ -507,14 +507,15 @@ function App() {
   const [phraseGenial, setPhraseGenial] = useState("");
   const [phraseSociete, setPhraseSociete] = useState("");
 
-  const [portraitDataUrl, setPortraitDataUrl] = useState(() => {
-    if (typeof window === "undefined") return null;
-    try {
-      return localStorage.getItem("aria-portrait") || null;
-    } catch {
-      return null;
-    }
-  });
+const [portraitDataUrl, setPortraitDataUrl] = useState(() => {
+  if (typeof window === "undefined") return "";
+  try {
+    return localStorage.getItem("aria-portrait-url") || "";
+  } catch {
+    return "";
+  }
+});
+
 
   const [sheetMode, setSheetMode] = useState("create"); // "create" | "validated" | "edit"
 
@@ -640,14 +641,18 @@ function App() {
     [canEditStatsAndSkills]
   );
 
-  const handleChangePortrait = useCallback((dataUrl) => {
-    setPortraitDataUrl(dataUrl);
-    try {
-      localStorage.setItem("aria-portrait", dataUrl);
-    } catch (e) {
-      console.warn("Impossible de stocker le portrait dans localStorage", e);
+const handleChangePortrait = useCallback((dataUrl) => {
+  setPortraitDataUrl(dataUrl || "");
+  try {
+    if (dataUrl) {
+      localStorage.setItem("aria-portrait-url", dataUrl);
+    } else {
+      localStorage.removeItem("aria-portrait-url");
     }
-  }, []);
+  } catch (e) {
+    console.warn("Impossible de stocker le portrait dans localStorage", e);
+  }
+}, []);
 
   const parseKitItem = (rawLabel) => {
     const [firstChoice] = rawLabel.split(" ou ");
@@ -870,38 +875,44 @@ function App() {
     setSheetMode("edit");
   };
 
-  const handleDeleteCharacter = () => {
-    setStats(INITIAL_STATS);
-    setCharacterName("");
-    setPlayerName("");
-    setAge("");
-    setXp(0);
-    setCompetences([]);
-    setSpecialCompetences([]);
-    setProfession("");
-    setInventory([]);
-    setWeapons([]);
-    setPurseFer(0);
-    setSkillMode("ready");
-    setStatMode("3d6");
-    setStatPointsPool(0);
-    setIsCreationDone(false);
-    setSheetMode("create");
-    setShowCreationModal(true);
-    setPhraseGenial("");
-    setPhraseSociete("");
-    setHitPoints(20);
-    setWounds(0);
-    setArmor(0);
-    setIsAlchemist(false);
-    setAlchemyPotions([]);
-    setPortraitDataUrl(null);
-    try {
-      localStorage.removeItem("aria-portrait");
-    } catch {
-      // ignore
-    }
-  };
+const handleDeleteCharacter = () => {
+  setStats(INITIAL_STATS);
+  setCharacterName("");
+  setPlayerName("");
+  setAge("");
+  setXp(0);
+  setCompetences([]);
+  setSpecialCompetences([]);
+  setProfession("");
+  setInventory([]);
+  setWeapons([]);
+  setPurseFer(0);
+  setSkillMode("ready");
+  setStatMode("3d6");
+  setStatPointsPool(0);
+  setIsCreationDone(false);
+  setSheetMode("create");
+  setShowCreationModal(true);
+  setPhraseGenial("");
+  setPhraseSociete("");
+  setHitPoints(20);
+  setWounds(0);
+  setArmor(0);
+  setIsAlchemist(false);
+  setAlchemyPotions([]);
+
+  // 🔧 IMPORTANT : on réinitialise le kit d'équipement
+  setSelectedKit(null);
+  setIsKitModalOpen(false);
+
+  // Portrait
+  setPortraitDataUrl(null);
+try {
+  localStorage.removeItem("aria-portrait-url");
+} catch {
+  // ignore
+}
+};
 
   const characterPayload = {
     meta: {
@@ -935,54 +946,26 @@ function App() {
       portrait: portraitDataUrl,
   };
 
-  const handleSaveToBackend = async (redirectToMyCharacters = false) => {
-    if (!user) {
-      alert(
-        "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
-      );
-      return;
-    }
+const handleSaveToBackend = async (redirectToMyCharacters = false) => {
+  if (!user) {
+    alert(
+      "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
+    );
+    return;
+  }
 
-    const payloadForBackend = {
-      ...characterPayload,
-      user: user._id || user.id,
-    };
+  if (!characterName.trim()) {
+    alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
+    return;
+  }
 
-    try {
-      const response = await fetch(`${API_URL}/characters`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payloadForBackend),
-      });
-
-      let data = null;
-      try {
-        data = await response.json();
-      } catch {
-        data = null;
-      }
-
-      if (!response.ok) {
-        console.error("❌ Erreur API /characters :", data);
-        alert(
-          (data && data.message) ||
-            "Erreur en sauvegardant le personnage sur le serveur."
-        );
-        return;
-      }
-
-      console.log("✅ Personnage enregistré :", data);
-      alert("Personnage enregistré sur ton compte !");
-
-      if (redirectToMyCharacters) {
-        setPage("my-characters");
-      }
-    } catch (error) {
-      console.error("❌ Erreur réseau en envoyant au back :", error);
-      alert("Erreur réseau en envoyant le personnage au back-end");
-    }
+  const payloadForBackend = {
+    ...characterPayload,
+    user: user._id || user.id,
   };
+
+  // ... le reste ne change pas
+};
 
   const handleLoadCharacterFromBackend = async (id) => {
     if (!user) {
@@ -1053,18 +1036,20 @@ function App() {
 // ... après setPhraseSociete(...) et la partie alchimie / meta
 
 // Portrait depuis le back (dataURL)
-const portraitFromBackend = ch.portrait || null;
+c// Portrait : maintenant on stocke une URL simple
+const portraitFromBackend = ch.portraitUrl || "";
 setPortraitDataUrl(portraitFromBackend);
 
 try {
   if (portraitFromBackend) {
-    localStorage.setItem("aria-portrait", portraitFromBackend);
+    localStorage.setItem("aria-portrait-url", portraitFromBackend);
   } else {
-    localStorage.removeItem("aria-portrait");
+    localStorage.removeItem("aria-portrait-url");
   }
 } catch {
-  // ignore si localStorage indispo
+  // ignore
 }
+
 
       if (ch.alchemy) {
         setIsAlchemist(!!ch.alchemy.enabled);
