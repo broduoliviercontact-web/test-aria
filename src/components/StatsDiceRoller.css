@@ -1,14 +1,9 @@
-/* ============================================
-   StatsDiceRoller.css — Style complet
-   ============================================ */
-
 .stats-dice-roller {
   margin: 0.75rem 0 1rem;
   padding: 0.85rem 1rem;
   border-radius: 12px;
   border: 1px solid rgba(78, 60, 42, 0.5);
-  background: rgba(249, 243, 229, 0.9);
-  background-image: url("/parchment-bg2.jpg");
+  background: rgba(255, 254, 253, 0);
   background-size: cover;
   background-position: center;
   box-shadow:
@@ -21,10 +16,46 @@
   color: #4a311e;
 }
 
-/* ============================================
-   Bouton principal "Lancer une nouvelle série"
-   ============================================ */
+/* Header */
+.stats-dice-roller__header {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+  align-items: center;
+  
+}
 
+.stats-dice-roller__switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* ✅ toolbar du Dice3D dans le header */
+.stats-dice-roller__diceToolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.stats-dice-roller__color {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.stats-dice-roller__colorLabel {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* Bouton principal */
 .dice-button {
   border: none;
   border-radius: 999px;
@@ -54,10 +85,6 @@
   cursor: default;
 }
 
-/* ============================================
-   Description "Vous pouvez lancer jusqu’à…"
-   ============================================ */
-
 .dice-hint {
   margin: 0.6rem 0 0.4rem;
   font-size: 0.9rem;
@@ -65,10 +92,25 @@
   align-self: stretch;
 }
 
-/* ============================================
-   Liste des séries de jets (Jet 1, Jet 2…)
-   ============================================ */
+/* Zone 3D */
+.stats-dice-roller__threeDPanel {
+  width: 100%;
+  margin-top: 0.75rem;
+}
 
+.stats-dice-roller__currentStat {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Force canvas full width */
+.stats-dice-roller .dice3d,
+.stats-dice-roller .dice3d__canvas {
+  width: 100%;
+}
+
+/* Séries */
 .dice-series-list {
   width: 100%;
   margin-top: 0.4rem;
@@ -77,7 +119,6 @@
   gap: 0.4rem;
 }
 
-/* Carte pour une série */
 .dice-series {
   padding: 0.35rem 0.55rem;
   border-radius: 8px;
@@ -92,7 +133,6 @@
   border-color: rgba(140, 105, 70, 0.9);
 }
 
-/* Header : Jet X — Total */
 .dice-series-header {
   display: flex;
   justify-content: space-between;
@@ -110,7 +150,6 @@
   font-weight: 600;
 }
 
-/* Liste Force:Dexterité… */
 .dice-series-stats-line {
   display: flex;
   flex-wrap: wrap;
@@ -119,10 +158,9 @@
 }
 
 .dice-series-stat {
-  white-space: nowrap;
+  opacity: 0.9;
 }
 
-/* Bouton "Utiliser ce jet" */
 .dice-series-choose {
   border: none;
   border-radius: 999px;
@@ -134,35 +172,18 @@
   box-shadow: 0 2px 0 rgba(80, 55, 35, 0.8);
 }
 
-.dice-series-choose:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 0 rgba(80, 55, 35, 0.8);
-}
-
-.dice-series-choose:disabled {
-  background: rgba(160, 160, 160, 0.8);
-  box-shadow: 0 1px 0 rgba(80, 80, 80, 0.6);
-  cursor: default;
-}
-
-/* ============================================
-   Résultat détaillé (dés géants)
-   ============================================ */
-
+/* Résultats détaillés */
 .dice-results {
   width: 100%;
   margin-top: 0.8rem;
   border-top: 1px solid rgba(140, 105, 70, 0.6);
   padding-top: 0.6rem;
-  
 }
 
-/* Une ligne par caractéristique */
 .dice-row {
   display: flex;
   align-items: center;
   margin-bottom: 0.3rem;
-  
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.35);
@@ -171,15 +192,12 @@
 }
 
 .dice-stat-label {
-  font-size: 0.8rem;
-  color: #4a321f;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
   min-width: 110px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
-/* Dés affichés (🞅 🞅 🞅 …) */
 .dice-symbols {
   display: flex;
   gap: 0.25rem;
@@ -187,33 +205,81 @@
   font-size: 1.8rem;
 }
 
-/* Total final (gros chiffre) */
 .dice-total {
   margin-left: auto;
   font-size: 1.4rem;
   font-weight: 700;
 }
 
-/* ============================================
-   Responsive
-   ============================================ */
 
-@media (max-width: 768px) {
-  .stats-dice-roller {
-    padding: 0.7rem 0.7rem;
-  }
 
-  .dice-row {
-    flex-wrap: wrap;
-  }
+/* ✅ Checkbox style (inspiré UIverse) */
+.ui-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  user-select: none;
+  cursor: pointer;
+}
 
-  .dice-symbols {
-    margin-left: 0.5rem;
-    font-size: 1.6rem;
-  }
+.ui-checkbox__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
 
-  .dice-total {
-    margin-left: 0;
-    margin-top: 0.2rem;
-  }
+.ui-checkbox__box {
+  width: 20px;
+  height: 20px;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.95);
+
+  /* look “heavy” */
+  background: rgba(35, 25, 15, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.65);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.45),
+    0 2px 0 rgba(0, 0, 0, 0.55);
+  transition: transform 120ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.ui-checkbox__tick {
+  width: 18px;
+  height: 18px;
+  transform: scale(0.2);
+  opacity: 0;
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+.ui-checkbox__label {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0.95;
+}
+
+.ui-checkbox:hover .ui-checkbox__box {
+  transform: translateY(-1px);
+}
+
+.ui-checkbox__input:focus-visible + .ui-checkbox__box {
+  outline: 2px solid rgba(210, 180, 120, 0.75);
+  outline-offset: 3px;
+}
+
+.ui-checkbox__input:checked + .ui-checkbox__box {
+  background: rgba(139, 69, 19, 0.95);
+  border-color: rgba(0, 0, 0, 0.85);
+}
+
+.ui-checkbox__input:checked + .ui-checkbox__box .ui-checkbox__tick {
+  opacity: 1;
+  transform: scale(1);
+}
+.stats-dice-roller__switchRow {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* ou flex-start si tu le veux à gauche */
+  margin-top: 0.25rem;
 }

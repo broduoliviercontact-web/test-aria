@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import "./Dice3D.css";
 
 function loadOnce(id, src) {
   return new Promise((resolve, reject) => {
@@ -45,13 +52,13 @@ function makeAnalogPalette(count, baseHue) {
   const colors = [];
   for (let i = 0; i < count; i++) {
     const hue = baseHue - spread + step * i;
-  const light = 28 + (i % 2 === 0 ? 4 : 0);
-colors.push(makeHsl(hue, 55, light));
+    const light = 26 + (i % 2 === 0 ? 4 : 0);
+    colors.push(makeHsl(hue, 55, light));
   }
   return colors;
 }
 
-// ✅ IMPORTANT : on remplace le material du dé (texture regenerée)
+// ✅ IMPORTANT : on remplace le material (car la couleur est baked dans la texture)
 function applyColorsToDice(dices, mode) {
   if (!Array.isArray(dices) || dices.length === 0) return;
   if (!window.DICE?.make_material_for_type) return;
@@ -70,8 +77,7 @@ function applyColorsToDice(dices, mode) {
       dice.material.needsUpdate = true;
     });
   } else {
-   const color = makeHsl(baseHue, 55, 32);
-
+    const color = makeHsl(baseHue, 55, 32);
     dices.forEach((dice) => {
       dice.material = window.DICE.make_material_for_type(
         dice.dice_type,
@@ -83,13 +89,31 @@ function applyColorsToDice(dices, mode) {
   }
 }
 
-export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
+const Dice3D = forwardRef(function Dice3D(
+  {
+    notation = "3d6",
+    height = 240,
+    onRoll,
+    hideToolbar = false,
+    colorMode: controlledColorMode, // optionnel (contrôlé par parent)
+    onChangeColorMode, // optionnel
+  },
+  ref
+) {
   const containerRef = useRef(null);
   const boxRef = useRef(null);
 
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
-  const [colorMode, setColorMode] = useState("solid"); // "solid" | "gradient"
+
+  // si non contrôlé, on garde un state interne
+  const [localColorMode, setLocalColorMode] = useState("solid");
+  const colorMode = controlledColorMode ?? localColorMode;
+
+  const setColorMode = (mode) => {
+    if (onChangeColorMode) onChangeColorMode(mode);
+    else setLocalColorMode(mode);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -97,6 +121,7 @@ export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
     async function init() {
       try {
         setError("");
+
         const base = import.meta.env.BASE_URL || "/";
         const url = (p) =>
           `${base.replace(/\/$/, "/")}${p.replace(/^\//, "")}`;
@@ -164,38 +189,38 @@ export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    roll,
+    isReady: () => ready,
+  }));
+
   return (
-  <div className="dice3d">
-    <div
-      ref={containerRef}
-      className="dice3d__canvas"
-      style={{ height }}
-    />
-    <div className="dice3d__toolbar">
-      <button type="button" className="btn-primary" onClick={roll} disabled={!ready}>
-        {ready ? `🎲 Lancer ${notation} (3D)` : "Chargement des dés 3D…"}
-      </button>
+    <div className="dice3d">
+      {!hideToolbar && (
+        <div className="dice3d__toolbar">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={roll}
+            disabled={!ready}
+          >
+            {ready ? `🎲 Lancer ${notation} (3D)` : "Chargement des dés 3D…"}
+          </button>
 
-      <div className="dice3d__mode">
-        <span className="dice3d__modeLabel">Couleur :</span>
-        <button
-          type="button"
-          className={colorMode === "solid" ? "btn-primary" : "btn-secondary"}
-          onClick={() => setColorMode("solid")}
-        >
-          Harmonieux
-        </button>
-        <button
-          type="button"
-          className={colorMode === "gradient" ? "btn-primary" : "btn-secondary"}
-          onClick={() => setColorMode("gradient")}
-        >
-          Dégradé
-        </button>
-      </div>
+ 
 
-      {error ? <div className="dice3d__error">{error}</div> : null}
+          {error ? <div className="dice3d__error">{error}</div> : null}
+        </div>
+      )}
+
+      <div ref={containerRef} className="dice3d__canvas" style={{ height }} />
+
+      {/* Si toolbar cachée, on garde quand même l’erreur visible (sous le canvas) */}
+      {hideToolbar && error ? (
+        <div className="dice3d__error dice3d__error--below">{error}</div>
+      ) : null}
     </div>
-  </div>
-);
-}
+  );
+});
+
+export default Dice3D;

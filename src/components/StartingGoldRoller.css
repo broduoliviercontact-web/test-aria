@@ -2,17 +2,16 @@
   margin-top: 0.75rem;
   padding: 0.75rem 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.25);
-  background: rgba(255,255,255,0.22);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.22);
 }
 
-.starting-gold-roller__top {
+/* Switch row */
+.starting-gold-roller__switchRow {
+  width: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.4rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
 .starting-gold-roller__switch {
@@ -21,32 +20,46 @@
   gap: 0.5rem;
 }
 
+/* Hint */
 .starting-gold-roller__hint {
-  margin: 0 0 0.6rem;
+  margin: 0.6rem 0 0.4rem;
   opacity: 0.9;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
+/* 3D Dice */
 .starting-gold-roller__dice3d {
   margin-top: 0.35rem;
 }
 
+/* Locked message */
+.starting-gold-roller__locked {
+  margin-top: 0.5rem;
+  text-align: center;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+/* Result */
 .starting-gold-roller__list {
   margin-top: 0.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .starting-gold-roller__roll {
-  text-align: left;
-  padding: 0.4rem 0.6rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.35);
-  background: rgba(255,255,255,0.4);
-  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.4);
+  cursor: default;
 }
 
 .starting-gold-roller__roll.is-selected {
-  background: rgba(210,180,120,0.35);
-  border-color: rgba(0,0,0,0.6);
+  background: rgba(210, 180, 120, 0.35);
+  border-color: rgba(0, 0, 0, 0.6);
 }

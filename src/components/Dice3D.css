@@ -2,18 +2,44 @@
   width: 100%;
 }
 
+/* Toolbar au-dessus, tout sur une ligne */
+.dice3d__toolbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.dice3d__mode {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.dice3d__modeLabel {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-right: 0.2rem;
+}
+
+.dice3d__error {
+  font-size: 0.9rem;
+  color: #ffb4b4;
+  opacity: 0.95;
+}
+
+.dice3d__error--below {
+  margin-top: 0.4rem;
+}
+
 .dice3d__canvas {
   width: 100%;
   border-radius: 12px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dice3d__toolbar {
-  margin-top: 0.5rem;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
 }
