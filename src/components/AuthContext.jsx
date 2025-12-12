@@ -1,24 +1,16 @@
-// src/AuthContext.jsx
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null); // { id, email, displayName }
-  const [loading, setLoading] = useState(true); // chargement initial /auth/me
+  const [loading, setLoading] = useState(true); // chargement initial
   const [error, setError] = useState(null);
 
-  // Au chargement : vérifier si on a déjà un cookie valide
+  // Au chargement de l'app : vérifier si l'utilisateur est déjà connecté
   useEffect(() => {
-    let isMounted = true;
-
     async function fetchMe() {
       try {
         setLoading(true);
@@ -26,76 +18,101 @@ export function AuthProvider({ children }) {
 
         const res = await fetch(`${API_URL}/auth/me`, {
           method: "GET",
-          credentials: "include", // <--- IMPORTANT pour le cookie JWT
+          credentials: "include", // 🔑 important pour envoyer le cookie
         });
 
         if (!res.ok) {
-          // Pas connecté ou token invalide
-          if (isMounted) setUser(null);
+          setUser(null);
           return;
         }
 
         const data = await res.json();
-        if (isMounted) setUser(data);
+        // data = { email, displayName, _id } (selon ton back)
+        setUser({
+          id: data._id || data.id,
+          email: data.email,
+          displayName: data.displayName,
+        });
       } catch (err) {
-        if (isMounted) {
-          console.error("Erreur /auth/me :", err);
-          setUser(null);
-        }
+        console.error("Erreur /auth/me :", err);
+        setUser(null);
       } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
     }
 
     fetchMe();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
-  async function login({ email, password }) {
-    setError(null);
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      const message = data && data.message ? data.message : "Erreur de connexion";
-      setError(message);
-      throw new Error(message);
-    }
-
-    setUser(data); // { id, email, displayName }
-    return data;
-  }
-
+  // 👉 Inscription
   async function register({ email, password, displayName }) {
-    setError(null);
-    const res = await fetch(`${API_URL}/auth/register`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, displayName }),
-    });
+    try {
+      setError(null);
 
-    const data = await res.json();
+      const res = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // 🔑 pour recevoir le cookie
+        body: JSON.stringify({ email, password, displayName }),
+      });
 
-    if (!res.ok) {
-      const message = data && data.message ? data.message : "Erreur d'inscription";
-      setError(message);
-      throw new Error(message);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Erreur d'inscription");
+      }
+
+      const data = await res.json();
+
+      setUser({
+        id: data.id,
+        email: data.email,
+        displayName: data.displayName,
+      });
+      return true;
+    } catch (err) {
+      console.error("Erreur register :", err);
+      setError(err.message);
+      return false;
     }
-
-    setUser(data);
-    return data;
   }
 
+  // 👉 Connexion
+  async function login({ email, password }) {
+    try {
+      setError(null);
+
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // 🔑 pour recevoir le cookie
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Identifiants invalides");
+      }
+
+      const data = await res.json();
+
+      setUser({
+        id: data.id,
+        email: data.email,
+        displayName: data.displayName,
+      });
+      return true;
+    } catch (err) {
+      console.error("Erreur login :", err);
+      setError(err.message);
+      return false;
+    }
+  }
+
+  // 👉 Déconnexion
   async function logout() {
     try {
       await fetch(`${API_URL}/auth/logout`, {
@@ -103,9 +120,10 @@ export function AuthProvider({ children }) {
         credentials: "include",
       });
     } catch (err) {
-      console.warn("Erreur /auth/logout :", err);
+      console.error("Erreur logout :", err);
+    } finally {
+      setUser(null);
     }
-    setUser(null);
   }
 
   const value = {
@@ -124,7 +142,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth doit être utilisé à l'intérieur de <AuthProvider>");
+    throw new Error("useAuth doit être utilisé dans <AuthProvider>");
   }
   return ctx;
 }

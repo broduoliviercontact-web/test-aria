@@ -959,9 +959,10 @@ function App() {
       return;
     }
 
+    // 👉 On envoie uniquement les données de personnage.
+    // Le backend déduira l'utilisateur à partir du token (cookie JWT).
     const payloadForBackend = {
       ...characterPayload,
-      user: user._id || user.id,
     };
 
     try {
@@ -1293,7 +1294,7 @@ function App() {
                 {sheetMode === "create" && statMode === "point-buy" && (
                   <p className="stat-points-info">
                     Points à répartir restants :{" "}
-                      <strong>{statPointsPool}</strong>
+                    <strong>{statPointsPool}</strong>
                   </p>
                 )}
               </div>
@@ -1375,7 +1376,7 @@ function App() {
               <img
                 src="/couronne-logo.svg"
                 alt="Ornement de couronne"
-                className="phrase-ornement-icon"
+                className="phrase-ornament-icon"
               />
             </div>
           </div>
