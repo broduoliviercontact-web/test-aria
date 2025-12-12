@@ -22,6 +22,7 @@ import WeaponList from "./components/WeaponList";
 import PhraseDeSynthese from "./components/PhraseDeSynthese";
 import EquipmentKitModal from "./components/EquipmentKitModal";
 import AlchemyPotions from "./components/AlchemyPotions";
+import StartingGoldRoller from "./components/StartingGoldRoller";
 
 // PDF
 import jsPDF from "jspdf";
@@ -1147,7 +1148,11 @@ function App() {
               </section>
 
               <div className="top-purse">
-                <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
+             <GoldPouch
+  totalFer={purseFer}
+  onChangeTotalFer={setPurseFer}
+  showStartingGold={!showCreationModal}
+/>
               </div>
             </div>
 
@@ -1189,7 +1194,11 @@ function App() {
               }}
             />
           )}
-
+{!showCreationModal && statsRolled && purseFer === 0 && (
+  <StartingGoldRoller
+    onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
+  />
+)}
           {/* Sceptre qui flotte */}
           <div className="stats-competences-wrapper">
             <div className="stats-separator-floating">

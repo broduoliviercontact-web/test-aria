@@ -70,7 +70,8 @@ function applyColorsToDice(dices, mode) {
       dice.material.needsUpdate = true;
     });
   } else {
-    const color = makeHsl(baseHue, 85, 55);
+   const color = makeHsl(baseHue, 55, 32);
+
     dices.forEach((dice) => {
       dice.material = window.DICE.make_material_for_type(
         dice.dice_type,
@@ -164,54 +165,37 @@ export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
   };
 
   return (
-    <div>
-      <div
-        ref={containerRef}
-        style={{
-          width: "100%",
-          height,
-          borderRadius: "12px",
-          background: "rgba(0,0,0,0.25)",
-          border: "1px solid rgba(255,255,255,0.2)",
-          overflow: "hidden",
-        }}
-      />
+  <div className="dice3d">
+    <div
+      ref={containerRef}
+      className="dice3d__canvas"
+      style={{ height }}
+    />
+    <div className="dice3d__toolbar">
+      <button type="button" className="btn-primary" onClick={roll} disabled={!ready}>
+        {ready ? `🎲 Lancer ${notation} (3D)` : "Chargement des dés 3D…"}
+      </button>
 
-      <div
-        style={{
-          marginTop: "0.5rem",
-          display: "flex",
-          gap: "0.5rem",
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        <button type="button" className="btn-primary" onClick={roll} disabled={!ready}>
-          {ready ? `🎲 Lancer ${notation} (3D)` : "Chargement des dés 3D…"}
+      <div className="dice3d__mode">
+        <span className="dice3d__modeLabel">Couleur :</span>
+        <button
+          type="button"
+          className={colorMode === "solid" ? "btn-primary" : "btn-secondary"}
+          onClick={() => setColorMode("solid")}
+        >
+          Harmonieux
         </button>
-
-        <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
-          <span style={{ fontSize: "0.9rem", opacity: 0.85 }}>Couleur :</span>
-          <button
-            type="button"
-            className={colorMode === "solid" ? "btn-primary" : "btn-secondary"}
-            onClick={() => setColorMode("solid")}
-          >
-            Harmonieux
-          </button>
-          <button
-            type="button"
-            className={colorMode === "gradient" ? "btn-primary" : "btn-secondary"}
-            onClick={() => setColorMode("gradient")}
-          >
-            Dégradé
-          </button>
-        </div>
-
-        {error ? (
-          <div style={{ color: "#ffb4b4", fontSize: "0.9rem" }}>{error}</div>
-        ) : null}
+        <button
+          type="button"
+          className={colorMode === "gradient" ? "btn-primary" : "btn-secondary"}
+          onClick={() => setColorMode("gradient")}
+        >
+          Dégradé
+        </button>
       </div>
+
+      {error ? <div className="dice3d__error">{error}</div> : null}
     </div>
-  );
+  </div>
+);
 }

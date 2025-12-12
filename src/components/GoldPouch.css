@@ -202,3 +202,58 @@
 .pouch-popup button:hover {
   background: #f0f0f0;
 }
+
+
+.goldpouch-starting {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.6rem 0.6rem;
+  border: 1px dashed rgba(0,0,0,0.5);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.35);
+}
+
+.goldpouch-starting__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.goldpouch-starting__switch {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.goldpouch-starting__hint {
+  margin: 0 0 0.5rem;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.goldpouch-starting__dice3d {
+  margin-top: 0.25rem;
+}
+
+.goldpouch-starting__list {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.goldpouch-starting__roll {
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.6);
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+
+.goldpouch-starting__roll.is-selected {
+  background: rgba(210,180,120,0.45);
+  border-color: rgba(0,0,0,0.9);
+}

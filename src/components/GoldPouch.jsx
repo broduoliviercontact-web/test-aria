@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./GoldPouch.css";   // ⬅⬅⬅ ajouter ça
+import Dice3D from "./Dice3D";
 
 const FER_PER_COPPER = 10;
 const FER_PER_SILVER = 100;
@@ -18,7 +19,7 @@ function breakdown(totalFer) {
   return { gold, silver, copper, iron };
 }
 
-export default function GoldPouch({ totalFer, onChangeTotalFer }) {
+export default function GoldPouch({ totalFer, onChangeTotalFer,showStartingGold = false }) {
   const { gold, silver, copper, iron } = breakdown(totalFer);
   const [activeField, setActiveField] = useState(null);
   const [highlight, setHighlight] = useState(null); // {label, type: "plus"|"minus"}
@@ -45,6 +46,7 @@ export default function GoldPouch({ totalFer, onChangeTotalFer }) {
   return (
     <section className="goldpouch-card">
       <h2 className="goldpouch-title">Bourse</h2>
+  {/* Jet déplacé ailleurs (zone jets) */}
 
       {rows.map((row) => {
         const isHighlighted = highlight?.label === row.label;
@@ -99,4 +101,176 @@ export default function GoldPouch({ totalFer, onChangeTotalFer }) {
       })}
     </section>
   );
+}
+
+function StartingGoldBlock({ onConfirm }) {
+  const [use3D, setUse3D] = useState(false);
+  const [rolls, setRolls] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const addClassic = () => {
+    const v = Math.floor(Math.random() * 10) + 1; // d10
+    const id = (rolls[rolls.length - 1]?.id || 0) + 1;
+    const r = { id, value: v };
+    setRolls((p) => [...p, r]);
+    setSelectedId(id);
+  };
+
+  const handle3DRoll = ({ total, rolls: arr }) => {
+    const v =
+      typeof total === "number"
+        ? total
+        : Array.isArray(arr) && arr.length
+        ? arr.reduce((s, x) => s + x, 0)
+        : 1;
+    const id = (rolls[rolls.length - 1]?.id || 0) + 1;
+    const r = { id, value: v };
+    setRolls((p) => [...p, r]);
+    setSelectedId(id);
+  };
+
+  const selected = rolls.find((r) => r.id === selectedId) || null;
+
+  return (
+    <div className="goldpouch-starting">
+      <div className="goldpouch-starting__top">
+        <label className="goldpouch-starting__switch">
+          <input
+            type="checkbox"
+            checked={use3D}
+            onChange={(e) => setUse3D(e.target.checked)}
+          />
+          Dés 3D
+        </label>
+
+        <button
+          type="button"
+          className="btn-primary"
+          disabled={!selected}
+          onClick={() => onConfirm(selected.value)}
+          title={!selected ? "Fais un jet puis sélectionne-le." : ""}
+        >
+          Confirmer {selected ? `(${selected.value} couronnes)` : ""}
+        </button>
+      </div>
+
+      <p className="goldpouch-starting__hint">
+        Bourse de départ : <strong>1d10 Couronnes</strong>
+      </p>
+
+      {!use3D ? (
+        <button type="button" className="btn-secondary" onClick={addClassic}>
+          Lancer 1d10
+        </button>
+      ) : (
+        <div className="goldpouch-starting__dice3d">
+          <Dice3D notation="d10" height={200} onRoll={handle3DRoll} />
+        </div>
+      )}
+
+      {rolls.length > 0 && (
+        <div className="goldpouch-starting__list">
+          {rolls.map((r, i) => (
+            <button
+              key={r.id}
+              type="button"
+              className={
+                "goldpouch-starting__roll" +
+                (r.id === selectedId ? " is-selected" : "")
+              }
+              onClick={() => setSelectedId(r.id)}
+            >
+              Jet {i + 1} : <strong>{r.value}</strong>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+function StartingGoldBlock({ onConfirm }) {
+  const [use3D, setUse3D] = useState(false);
+  const [rolls, setRolls] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const addClassic = () => {
+    const v = Math.floor(Math.random() * 10) + 1; // d10
+    const id = (rolls[rolls.length - 1]?.id || 0) + 1;
+    const r = { id, value: v };
+    setRolls((p) => [...p, r]);
+    setSelectedId(id);
+  };
+
+  const handle3DRoll = ({ total, rolls: arr }) => {
+    const v =
+      typeof total === "number"
+        ? total
+        : Array.isArray(arr) && arr.length
+        ? arr.reduce((s, x) => s + x, 0)
+        : 1;
+
+    const id = (rolls[rolls.length - 1]?.id || 0) + 1;
+    const r = { id, value: v };
+    setRolls((p) => [...p, r]);
+    setSelectedId(id);
+  };
+
+  const selected = rolls.find((r) => r.id === selectedId) || null;
+
+  return (
+    <div className="goldpouch-starting">
+      <div className="goldpouch-starting__top">
+        <label className="goldpouch-starting__switch">
+          <input
+            type="checkbox"
+            checked={use3D}
+            onChange={(e) => setUse3D(e.target.checked)}
+          />
+          Dés 3D
+        </label>
+
+        <button
+          type="button"
+          className="btn-primary"
+          disabled={!selected}
+          onClick={() => onConfirm(selected.value)}
+          title={!selected ? "Fais un jet puis sélectionne-le." : ""}
+        >
+          Confirmer {selected ? `(${selected.value} couronnes)` : ""}
+        </button>
+      </div>
+
+      <p className="goldpouch-starting__hint">
+        Bourse de départ : <strong>1d10 Couronnes</strong>
+      </p>
+
+      {!use3D ? (
+        <button type="button" className="btn-secondary" onClick={addClassic}>
+          Lancer 1d10
+        </button>
+      ) : (
+        <div className="goldpouch-starting__dice3d">
+          <Dice3D notation="d10" height={200} onRoll={handle3DRoll} />
+        </div>
+      )}
+
+      {rolls.length > 0 && (
+        <div className="goldpouch-starting__list">
+          {rolls.map((r, i) => (
+            <button
+              key={r.id}
+              type="button"
+              className={
+                "goldpouch-starting__roll" +
+                (r.id === selectedId ? " is-selected" : "")
+              }
+              onClick={() => setSelectedId(r.id)}
+            >
+              Jet {i + 1} : <strong>{r.value}</strong>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 }
