@@ -4,6 +4,9 @@
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.25);
   background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Switch row */
@@ -19,7 +22,9 @@
   align-items: center;
   gap: 0.5rem;
 }
-
+.dice-button {
+  justify-content: center;
+}
 /* Hint */
 .starting-gold-roller__hint {
   margin: 0.6rem 0 0.4rem;

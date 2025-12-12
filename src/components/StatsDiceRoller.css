@@ -68,6 +68,7 @@
   font-family: "MedievalSharp", "Georgia", serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  display: flex;
 }
 
 .dice-button:hover:not(:disabled) {

@@ -18,7 +18,7 @@ import survieIcon from "./assets/inventory/survie-aventure.svg";
 import valeurIcon from "./assets/inventory/valeur-commerce.svg";
 import outilsIcon from "./assets/inventory/outils-artisanat.svg";
 
-// Nouvelles catégories
+// Autres catégories
 import clesIcon from "./assets/inventory/cles-serrures.svg";
 import cartesIcon from "./assets/inventory/cartes-navigation.svg";
 import musicIcon from "./assets/inventory/music.svg";
@@ -28,12 +28,16 @@ import animauxIcon from "./assets/inventory/animaux-montures.svg";
 import poisonsIcon from "./assets/inventory/poisons-substancesdangereuses.svg";
 import rituelsIcon from "./assets/inventory/rituels-occulte.svg";
 
-// Dernier pack ajouté
 import factionsIcon from "./assets/inventory/factions-organisations.svg";
 import minesIcon from "./assets/inventory/mines.svg";
 import forgeIcon from "./assets/inventory/forge.svg";
 import machineIcon from "./assets/inventory/machine.svg";
 import natureIcon from "./assets/inventory/nature-plantes.svg";
+
+// ✅ Ajouts
+import bijouIcon from "./assets/inventory/bijou.svg";
+import soinIcon from "./assets/inventory/soin-medecin.svg";
+import piegeSurvieIcon from "./assets/inventory/survie.svg";
 
 /* ===========================
    TABLE DE MAPPING ICONS
@@ -66,6 +70,11 @@ const INVENTORY_CATEGORY_ICONS = {
   forge: forgeIcon,
   machine: machineIcon,
   nature: natureIcon,
+
+  // ✅ nouveaux
+  bijou: bijouIcon,
+  soin: soinIcon,
+  pieges: piegeSurvieIcon,
 };
 
 /* ===========================
@@ -99,6 +108,11 @@ const INVENTORY_CATEGORY_LABELS = {
   forge: "Forge & Métallurgie",
   machine: "Machines & Ingénierie",
   nature: "Nature & Plantes",
+
+  // ✅ nouveaux
+  bijou: "Bijoux & Pierres précieuses",
+  soin: "Médicaments & Soins",
+  pieges: "Pièges & Survie",
 };
 
 /* ===========================
@@ -109,48 +123,139 @@ function getCategoryFromName(name) {
   if (!name) return null;
   const n = name.toLowerCase();
 
-  // --- Nouvelles catégories ---
-  if (n.match(/clé|cle|serrure|cadenas|verrou|crochetage|passe-partout/)) return "cles";
+  /* 🔥 PRIORITÉS ABSOLUES 🔥 */
 
-  if (n.match(/carte|plan|navigation|itinéraire|itineraire|boussole/)) return "cartes";
+  // 🎭 Déguisement → toujours Vêtements
+  if (n.match(/d[ée]guisement|postiche|costume/)) return "vetements";
 
-  if (n.match(/luth|fl[uû]te|tambour|instrument|musique|dés|des|jeu/)) return "musique";
+  // 🎟️ Laisser-passer → toujours Factions
+  if (
+    n.match(
+      /laisser[- ]?passer|laissez[- ]?passer|pass[- ]?pass|autorisation|permis/
+    )
+  )
+    return "factions";
 
-  if (n.match(/forge|forgeron|acier|métallurgie|lingot|tenaille|enclume/)) return "forge";
+  // 💎 Bijoux → catégorie Bijou
+  if (
+    n.match(
+      /bijou|bijoux|bague|anneau|collier|pendentif|bracelet|broche|gemme|joyau/
+    )
+  )
+    return "bijou";
 
-  if (n.match(/mines?|minerai|roche|pierre|gemme|cristal|charbon/)) return "mines";
+  // 🩹 Soins / Médicaments (avant alchimie)
+  if (
+    n.match(
+      /soin|m[ée]dicament|medicament|m[ée]decin|medecin|bandage|pansement|compresse|onguent|baume|pommade|antiseptique|cataplasme|cataplasmes|trousse|pharmacie|kit de soin|premiers secours/
+    )
+  )
+    return "soin";
 
-  if (n.match(/machine|engin|m[ée]canisme|rouage|engrenage|automate/)) return "machine";
+  // 🪤 Pièges / Survie (collets etc.)
+  if (
+    n.match(
+      /pi[eè]ge|pi[eè]ges|collet|collets|trappe|lacet|lacets|fil de fer|hame[cç]on|app[aâ]t|piege/
+    )
+  )
+    return "pieges";
 
+  /* ===========================
+     RÈGLES “KITS” (plus complètes)
+     =========================== */
+
+  // Clés / crochetage
+  if (
+    n.match(
+      /clé|cle|serrure|cadenas|verrou|crochetage|outils de crochetage|passe-partout/
+    )
+  )
+    return "cles";
+
+  // Cartes / navigation
+  if (n.match(/carte|plan|navigation|itinéraire|itineraire|boussole/))
+    return "cartes";
+
+  // Musique / jeux
+  if (n.match(/luth|fl[uû]te|tambour|instrument|musique|dés|des|jeu/))
+    return "musique";
+
+  // Forge / mines / machine
+  if (
+    n.match(
+      /forge|forgeron|acier|métallurgie|metal|métal|lingot|tenaille|enclume/
+    )
+  )
+    return "forge";
+  if (n.match(/mines?|minerai|roche|pierre|cristal|charbon/)) return "mines";
+  if (n.match(/machine|engin|m[ée]canisme|rouage|engrenage|automate/))
+    return "machine";
+
+  // Trophées / nature / poisons / rituels / factions
   if (n.match(/trophée|trophee|souvenir|dent|griffe|peau|os/)) return "trophees";
-
-  if (n.match(/herbe|plante|fleur|champignon|racine|[ée]corce|feuille/)) return "nature";
-
-  if (n.match(/poison|toxine|venin|fumigène|fumigene|dangereux/)) return "poisons";
-
+  if (n.match(/herbe|plante|fleur|champignon|racine|[ée]corce|feuille/))
+    return "nature";
+  if (n.match(/poison|toxine|venin|fumigène|fumigene|dangereux/))
+    return "poisons";
   if (n.match(/rituel|cercle magique|encens|bougie|pentacle/)) return "rituels";
+  if (n.match(/insigne|blason|emblème|embleme|guilde|ordre|famille|noble/))
+    return "factions";
 
-  if (n.match(/insigne|blason|emblème|guilde|ordre|famille|noble/)) return "factions";
+  // Nourriture / cuisine
+  if (
+    n.match(
+      /ration|rations|pain|viande|nourriture|bouteille|vin|gourde|épice|epice|aromate|couverts?|marmite|écuelle|ecuelle|timbale/
+    )
+  )
+    return "nourriture";
 
-  // --- Catégories existantes ---
-  if (n.match(/ration|pain|viande|nourriture|bouteille|vin|gourde|épice|epice/)) return "nourriture";
+  // Survie (tente etc.)
+  if (
+    n.match(
+      /tente|couverture|lanterne|torche|corde|hamac|couchage|sac de couchage|briquet/
+    )
+  )
+    return "survie";
 
-  if (n.match(/potion|fiole|fioles|cataplasme|herbe|eau-de-vie|eau de vie/)) return "alchimie";
+  // Alchimie
+  if (n.match(/potion|fiole|fioles|eau-de-vie|eau de vie/)) return "alchimie";
 
-  if (n.match(/parchemin|papier|feuille|livre|grimoire|plume|encre|journal|notes/)) return "ecriture";
+  // Écriture / papeterie
+  if (
+    n.match(
+      /cire [àa] cacheter|cachet|sceau|feuille|feuilles|papier|parchemin|plume|plume d['’]oie|encre|pot d['’]encre|journal|notes/
+    )
+  )
+    return "ecriture";
 
-  if (n.match(/sac|sacoche|malle|bourse|gibecière|gibeciere|escarcelle|timbale|écuelle|ecuelle/))
+  // Contenants / bagagerie
+  if (
+    n.match(
+      /sac|sacoche|malle|bourse|gibecière|gibeciere|escarcelle|coffret|bo[îi]te|etui|étui/
+    )
+  )
     return "contenants";
 
-  if (n.match(/armure|bouclier|casque|plastron|cotte de mailles/)) return "armures";
+  // Armures
+  if (n.match(/armure|bouclier|casque|plastron|cotte de mailles/))
+    return "armures";
 
-  if (n.match(/icône|icone|relique|amulette|talisman|divin|prière|priere/)) return "magiques";
+  // Magique / religieux
+  if (
+    n.match(
+      /icône|icone|relique|amulette|talisman|divin|divine|prière|priere|statuette|pieuse|anneau de prière/
+    )
+  )
+    return "magiques";
 
-  if (n.match(/d[ée]guisement|foulard|cape|robe|manteau|costume/)) return "vetements";
+  // Vêtements
+  if (n.match(/foulard|cape|robe|manteau/)) return "vetements";
 
-  if (n.match(/tente|couverture|lanterne|torche|corde|hamac|couchage/)) return "survie";
+  // Outils / artisanat
+  if (n.match(/pierre [àa] aiguiser|aiguiser|outil|outils/)) return "outils";
 
-  if (n.match(/bijou|bijoux|or|pi[eè]ce|verroterie|gemme|joyau/)) return "valeur";
+  // Valeur
+  if (n.match(/or|pi[eè]ce|verroterie/)) return "valeur";
 
   return "materiel";
 }
@@ -190,7 +295,6 @@ export default function Inventory({ items, onChange }) {
   };
 
   const handleAddItem = () => onChange([...items, createEmptyItem()]);
-
   const handleRemoveItem = (id) => onChange(items.filter((i) => i.id !== id));
 
   const toggleIconPicker = (id) =>
@@ -205,8 +309,9 @@ export default function Inventory({ items, onChange }) {
       )}
 
       {items.map((item) => {
-        const auto = getCategoryFromName(item.name);
-        const category = item.category || auto;
+        // ✅ priorité à l’auto-détection : si ça matche, ça écrase item.category
+        const autoCategory = getCategoryFromName(item.name);
+        const category = autoCategory || item.category;
         const icon = INVENTORY_CATEGORY_ICONS[category];
         const isOpen = openIconPickerId === item.id;
 
@@ -229,28 +334,26 @@ export default function Inventory({ items, onChange }) {
               {/* Menu déroulant */}
               {isOpen && (
                 <div className="inventory-icon-menu">
-                  {Object.entries(INVENTORY_CATEGORY_ICONS).map(
-                    ([key, src]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        className="inventory-icon-menu-item"
-                        onClick={() => {
-                          handleCategoryChange(item.id, key);
-                          setOpenIconPickerId(null);
-                        }}
-                      >
-                        <img
-                          src={src}
-                          alt={key}
-                          className="inventory-icon-menu-image"
-                        />
-                        <span className="inventory-icon-menu-label">
-                          {INVENTORY_CATEGORY_LABELS[key]}
-                        </span>
-                      </button>
-                    )
-                  )}
+                  {Object.entries(INVENTORY_CATEGORY_ICONS).map(([key, src]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className="inventory-icon-menu-item"
+                      onClick={() => {
+                        handleCategoryChange(item.id, key);
+                        setOpenIconPickerId(null);
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt={key}
+                        className="inventory-icon-menu-image"
+                      />
+                      <span className="inventory-icon-menu-label">
+                        {INVENTORY_CATEGORY_LABELS[key]}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

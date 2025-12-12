@@ -35,9 +35,10 @@
 /* Ligne type grid (header + lignes) */
 .row {
   display: grid;
-  grid-template-columns: 2fr 0.6fr 0.9fr;
+  grid-template-columns: 2fr 0.6fr 0.1fr;
   align-items: center;
   padding: 0.25rem 0.5rem;
+  gap : 5px
 }
 
 .competence-header {
@@ -88,8 +89,9 @@
 
 .col-score {
   text-align: right;
-  padding-right: 0.25rem;
+  padding-right: 0.4rem;
   font-variant-numeric: tabular-nums;
+  
 }
 
 /* 🫧 Bulle de description (sous la ligne) */
