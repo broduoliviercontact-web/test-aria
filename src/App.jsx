@@ -1343,7 +1343,7 @@ function App() {
           />
 
           {/* Debug JSON */}
-          <pre className="debug-json">{JSON.stringify(characterPayload, null, 2)}</pre>
+          {/* <pre className="debug-json">{JSON.stringify(characterPayload, null, 2)}</pre> */}
         </div>
       </div>
     </div>

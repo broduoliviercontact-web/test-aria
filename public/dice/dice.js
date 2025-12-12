@@ -859,10 +859,61 @@ const DICE = (function() {
         audio.play();
         audio.onended = () => {
           audio.remove();
+
+
+
         };
     }
+    // ============================
+    // 🎨 PUBLIC: create material with colors
+    // ============================
+    that.make_material_for_type = function(dice_type, diceColor, labelColor) {
+        var prevDice = vars.dice_color;
+        var prevLabel = vars.label_color;
+
+        if (diceColor) vars.dice_color = diceColor;
+        if (labelColor) vars.label_color = labelColor;
+
+        function marginFor(type) {
+            if (type === 'd6') return 0.9;
+            if (type === 'd8') return 1.4;
+            if (type === 'd9') return 1.0;
+            if (type === 'd10') return 1.0;
+            if (type === 'd12') return 1.0;
+            if (type === 'd20') return 1.2;
+            if (type === 'd100') return 1.5;
+            return 1.0;
+        }
+
+        var mat;
+        if (dice_type === 'd4') {
+            mat = new THREE.MeshFaceMaterial(
+                create_d4_materials(vars.scale / 2, vars.scale * 2, CONSTS.d4_labels[0])
+            );
+        } else if (dice_type === 'd100') {
+            mat = new THREE.MeshFaceMaterial(
+                create_dice_materials(CONSTS.standart_d100_dice_face_labels, vars.scale / 2, marginFor(dice_type))
+            );
+        } else {
+            mat = new THREE.MeshFaceMaterial(
+                create_dice_materials(CONSTS.standart_d20_dice_face_labels, vars.scale / 2, marginFor(dice_type))
+            );
+        }
+
+        vars.dice_color = prevDice;
+        vars.label_color = prevLabel;
+
+        return mat;
+    };
 
     return that;
 }());
+
+
+// //////////////////
+
+
+
+
 
 window.DICE = DICE;

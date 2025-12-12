@@ -6,7 +6,11 @@ function loadOnce(id, src) {
     if (existing) {
       if (existing.dataset.loaded === "true") return resolve();
       existing.addEventListener("load", resolve, { once: true });
-      existing.addEventListener("error", () => reject(new Error(`Failed: ${src}`)), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error(`Failed: ${src}`)),
+        { once: true }
+      );
       return;
     }
 
@@ -26,12 +30,65 @@ function loadOnce(id, src) {
   });
 }
 
+// 🎨 Couleurs harmonieuses : palette analogue autour d’une teinte
+function makeHsl(h, s = 55, l = 32) {
+  const hh = ((h % 360) + 360) % 360;
+  return `hsl(${hh} ${s}% ${l}%)`;
+}
+function randomBaseHue() {
+  return Math.floor(Math.random() * 360);
+}
+function makeAnalogPalette(count, baseHue) {
+  if (count <= 1) return [makeHsl(baseHue)];
+  const spread = 28;
+  const step = (spread * 2) / (count - 1);
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    const hue = baseHue - spread + step * i;
+  const light = 28 + (i % 2 === 0 ? 4 : 0);
+colors.push(makeHsl(hue, 55, light));
+  }
+  return colors;
+}
+
+// ✅ IMPORTANT : on remplace le material du dé (texture regenerée)
+function applyColorsToDice(dices, mode) {
+  if (!Array.isArray(dices) || dices.length === 0) return;
+  if (!window.DICE?.make_material_for_type) return;
+
+  const baseHue = randomBaseHue();
+
+  if (mode === "gradient") {
+    const palette = makeAnalogPalette(dices.length, baseHue);
+    dices.forEach((dice, idx) => {
+      const color = palette[idx];
+      dice.material = window.DICE.make_material_for_type(
+        dice.dice_type,
+        color,
+        "#f5f0e6"
+      );
+      dice.material.needsUpdate = true;
+    });
+  } else {
+    const color = makeHsl(baseHue, 85, 55);
+    dices.forEach((dice) => {
+      dice.material = window.DICE.make_material_for_type(
+        dice.dice_type,
+        color,
+        "#f5f0e6"
+      );
+      dice.material.needsUpdate = true;
+    });
+  }
+}
+
 export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
   const containerRef = useRef(null);
   const boxRef = useRef(null);
 
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
+  const [colorMode, setColorMode] = useState("solid"); // "solid" | "gradient"
 
   useEffect(() => {
     let cancelled = false;
@@ -39,17 +96,17 @@ export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
     async function init() {
       try {
         setError("");
-
         const base = import.meta.env.BASE_URL || "/";
-        const url = (p) => `${base.replace(/\/$/, "/")}${p.replace(/^\//, "")}`;
+        const url = (p) =>
+          `${base.replace(/\/$/, "/")}${p.replace(/^\//, "")}`;
 
-        // IMPORTANT : ordre
         await loadOnce("three-js", url("dice/libs/three.min.js"));
         await loadOnce("cannon-js", url("dice/libs/cannon.min.js"));
         await loadOnce("teal-js", url("dice/libs/teal.js"));
         await loadOnce("dice-js", url("dice/dice.js"));
 
-        if (!window.DICE) throw new Error("window.DICE introuvable après chargement.");
+        if (!window.DICE)
+          throw new Error("window.DICE introuvable après chargement.");
 
         if (!cancelled) setReady(true);
       } catch (e) {
@@ -83,16 +140,27 @@ export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
     const box = boxRef.current;
     if (!box) return;
 
-    box.setDice(notation);
-    box.start_throw(null, (notationObj) => {
-      const rolls = Array.isArray(notationObj?.result) ? notationObj.result : [];
-      const total =
-        typeof notationObj?.resultTotal === "number"
-          ? notationObj.resultTotal
-          : rolls.reduce((a, b) => a + b, 0);
+    try {
+      box.setDice(notation);
 
-      onRoll?.({ total, rolls });
-    });
+      box.start_throw(null, (notationObj) => {
+        const rolls = Array.isArray(notationObj?.result)
+          ? notationObj.result
+          : [];
+        const total =
+          typeof notationObj?.resultTotal === "number"
+            ? notationObj.resultTotal
+            : rolls.reduce((a, b) => a + b, 0);
+
+        onRoll?.({ total, rolls });
+      });
+
+      // ✅ après start_throw, box.dices existe
+      applyColorsToDice(box.dices, colorMode);
+    } catch (e) {
+      console.error(e);
+      setError("Erreur pendant le lancer 3D.");
+    }
   };
 
   return (
@@ -108,14 +176,40 @@ export default function Dice3D({ notation = "3d6", height = 240, onRoll }) {
           overflow: "hidden",
         }}
       />
-      <div style={{ marginTop: "0.5rem" }}>
+
+      <div
+        style={{
+          marginTop: "0.5rem",
+          display: "flex",
+          gap: "0.5rem",
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
         <button type="button" className="btn-primary" onClick={roll} disabled={!ready}>
           {ready ? `🎲 Lancer ${notation} (3D)` : "Chargement des dés 3D…"}
         </button>
+
+        <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+          <span style={{ fontSize: "0.9rem", opacity: 0.85 }}>Couleur :</span>
+          <button
+            type="button"
+            className={colorMode === "solid" ? "btn-primary" : "btn-secondary"}
+            onClick={() => setColorMode("solid")}
+          >
+            Harmonieux
+          </button>
+          <button
+            type="button"
+            className={colorMode === "gradient" ? "btn-primary" : "btn-secondary"}
+            onClick={() => setColorMode("gradient")}
+          >
+            Dégradé
+          </button>
+        </div>
+
         {error ? (
-          <div style={{ color: "#ffb4b4", marginTop: "0.25rem", fontSize: "0.9rem" }}>
-            {error}
-          </div>
+          <div style={{ color: "#ffb4b4", fontSize: "0.9rem" }}>{error}</div>
         ) : null}
       </div>
     </div>
