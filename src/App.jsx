@@ -107,157 +107,109 @@ function HomeAuthPanel({
       </p>
 
       {loading ? (
-        <p>Vérification de ta connexion...</p>
-      ) : user ? (
-        <div
-          style={{
-            marginTop: "0.75rem",
-            padding: "0.75rem 1rem",
-            borderRadius: "0.75rem",
-            background: "rgba(15, 118, 110, 0.12)",
-            border: "1px solid rgba(15, 118, 110, 0.4)",
-          }}
-        >
-          <p style={{ margin: 0, marginBottom: "0.25rem" }}>
-            Connecté en tant que{" "}
-            <strong>{user.displayName || user.email}</strong>.
-          </p>
-          <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.8 }}>
-            Tes personnages pourront être sauvegardés sur ton compte.
-          </p>
-          <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}>
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={onLogout}
-            >
-              Se déconnecter
-            </button>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={onGoToMyCharacters}
-            >
-              Mes personnages
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div
-          style={{
-            marginTop: "0.75rem",
-            padding: "0.75rem 1rem",
-            borderRadius: "0.75rem",
-            background: "rgba(31, 41, 55, 0.07)",
-            border: "1px solid rgba(31, 41, 55, 0.25)",
-          }}
-        >
-          <div
-            style={{
-              marginBottom: "0.75rem",
-              display: "flex",
-              gap: "0.5rem",
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setMode("login")}
-              className={mode === "login" ? "btn-primary" : "btn-secondary"}
-            >
-              Connexion
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("register")}
-              className={mode === "register" ? "btn-primary" : "btn-secondary"}
-            >
-              Inscription
-            </button>
-          </div>
+  <p className="auth-loading-text">Vérification de ta connexion...</p>
+) : user ? (
+  <div className="auth-connected-panel">
+    <p className="auth-connected-text">
+      Connecté en tant que{" "}
+      <strong>{user.displayName || user.email}</strong>.
+    </p>
+    <p className="auth-connected-subtext">
+      Tes personnages pourront être sauvegardés sur ton compte.
+    </p>
+    <div className="auth-connected-actions">
+      <button
+        type="button"
+        className="btn-secondary"
+        onClick={onLogout}
+      >
+        Se déconnecter
+      </button>
+      <button
+        type="button"
+        className="btn-primary"
+        onClick={onGoToMyCharacters}
+      >
+        Mes personnages
+      </button>
+    </div>
+  </div>
+) : (
+  <div className="auth-anonymous-panel">
+    <div className="auth-mode-switch">
+      <button
+        type="button"
+        onClick={() => setMode("login")}
+        className={
+          mode === "login" ? "btn-primary auth-mode-btn" : "btn-secondary auth-mode-btn"
+        }
+      >
+        Connexion
+      </button>
+      <button
+        type="button"
+        onClick={() => setMode("register")}
+        className={
+          mode === "register" ? "btn-primary auth-mode-btn" : "btn-secondary auth-mode-btn"
+        }
+      >
+        Inscription
+      </button>
+    </div>
 
-          <form onSubmit={handleSubmit}>
-            {mode === "register" && (
-              <div style={{ marginBottom: "0.5rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.85rem",
-                    marginBottom: "0.15rem",
-                  }}
-                >
-                  Pseudo (nom affiché)
-                </label>
-                <input
-                  type="text"
-                  name="displayName"
-                  value={form.displayName}
-                  onChange={handleChange}
-                  style={{ width: "100%", padding: "0.4rem 0.5rem" }}
-                />
-              </div>
-            )}
-
-            <div style={{ marginBottom: "0.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.85rem",
-                  marginBottom: "0.15rem",
-                }}
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                style={{ width: "100%", padding: "0.4rem 0.5rem" }}
-                required
-              />
-            </div>
-
-            <div style={{ marginBottom: "0.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.85rem",
-                  marginBottom: "0.15rem",
-                }}
-              >
-                Mot de passe
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                style={{ width: "100%", padding: "0.4rem 0.5rem" }}
-                required
-              />
-            </div>
-
-            {error && (
-              <div
-                style={{
-                  marginBottom: "0.5rem",
-                  padding: "0.4rem 0.6rem",
-                  borderRadius: "0.5rem",
-                  background: "#b91c1c",
-                  color: "white",
-                  fontSize: "0.85rem",
-                }}
-              >
-                {error}
-              </div>
-            )}
-
-            <button type="submit" className="btn-primary">
-              {mode === "login" ? "Se connecter" : "Créer mon compte"}
-            </button>
-          </form>
+    <form onSubmit={handleSubmit} className="auth-form-inline">
+      {mode === "register" && (
+        <div className="auth-field">
+          <label className="auth-field-label">
+            Pseudo (nom affiché)
+          </label>
+          <input
+            type="text"
+            name="displayName"
+            value={form.displayName}
+            onChange={handleChange}
+            className="auth-field-input"
+          />
         </div>
       )}
+
+      <div className="auth-field">
+        <label className="auth-field-label">Email</label>
+        <input
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          className="auth-field-input"
+          required
+        />
+      </div>
+
+      <div className="auth-field">
+        <label className="auth-field-label">Mot de passe</label>
+        <input
+          type="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          className="auth-field-input"
+          required
+        />
+      </div>
+
+      {error && (
+        <div className="auth-error-banner">
+          {error}
+        </div>
+      )}
+
+      <button type="submit" className="btn-primary">
+        {mode === "login" ? "Se connecter" : "Créer mon compte"}
+      </button>
+    </form>
+  </div>
+)}
+
     </section>
   );
 }
@@ -270,7 +222,7 @@ function Home({ onStart, onGoToMyCharacters, auth }) {
   const { user, loading, error, login, register, logout, setError } = auth;
 
   return (
-    <div className="home-page">
+    <div className="home-page app-home">
       <div className="home-root">
         <header className="home-header">
           <img
