@@ -342,7 +342,7 @@ body {
   margin: 0 auto;
   color: #000000;
   font-family: "Georgia", "Times New Roman", serif;
-    background-image: url("/aria-background.webp");
+ 
 }
 
 .home-page {
@@ -351,9 +351,7 @@ body {
   justify-content: center;
   align-items: stretch;
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+ 
 }
 
 .home-root {
