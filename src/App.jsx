@@ -45,7 +45,7 @@ const INITIAL_STATS = [
   { id: "charisme", label: "Charisme", value: 10, min: 0, max: 20 },
 ];
 
-// Règles de point-buy (60 points au total)
+// Règles de point-buy (60 points au total) (chez toi c’est 84 total - 4*6 = 60)
 const STAT_TOTAL_POINTS = 84;
 const STAT_MIN = 4;
 const STAT_MAX = 18;
@@ -107,109 +107,102 @@ function HomeAuthPanel({
       </p>
 
       {loading ? (
-  <p className="auth-loading-text">Vérification de ta connexion...</p>
-) : user ? (
-  <div className="auth-connected-panel">
-    <p className="auth-connected-text">
-      Connecté en tant que{" "}
-      <strong>{user.displayName || user.email}</strong>.
-    </p>
-    <p className="auth-connected-subtext">
-      Tes personnages pourront être sauvegardés sur ton compte.
-    </p>
-    <div className="auth-connected-actions">
-      <button
-        type="button"
-        className="btn-secondary"
-        onClick={onLogout}
-      >
-        Se déconnecter
-      </button>
-      <button
-        type="button"
-        className="btn-primary"
-        onClick={onGoToMyCharacters}
-      >
-        Mes personnages
-      </button>
-    </div>
-  </div>
-) : (
-  <div className="auth-anonymous-panel">
-    <div className="auth-mode-switch">
-      <button
-        type="button"
-        onClick={() => setMode("login")}
-        className={
-          mode === "login" ? "btn-primary auth-mode-btn" : "btn-secondary auth-mode-btn"
-        }
-      >
-        Connexion
-      </button>
-      <button
-        type="button"
-        onClick={() => setMode("register")}
-        className={
-          mode === "register" ? "btn-primary auth-mode-btn" : "btn-secondary auth-mode-btn"
-        }
-      >
-        Inscription
-      </button>
-    </div>
+        <p className="auth-loading-text">Vérification de ta connexion...</p>
+      ) : user ? (
+        <div className="auth-connected-panel">
+          <p className="auth-connected-text">
+            Connecté en tant que{" "}
+            <strong>{user.displayName || user.email}</strong>.
+          </p>
+          <p className="auth-connected-subtext">
+            Tes personnages pourront être sauvegardés sur ton compte.
+          </p>
+          <div className="auth-connected-actions">
+            <button type="button" className="btn-secondary" onClick={onLogout}>
+              Se déconnecter
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={onGoToMyCharacters}
+            >
+              Mes personnages
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="auth-anonymous-panel">
+          <div className="auth-mode-switch">
+            <button
+              type="button"
+              onClick={() => setMode("login")}
+              className={
+                mode === "login"
+                  ? "btn-primary auth-mode-btn"
+                  : "btn-secondary auth-mode-btn"
+              }
+            >
+              Connexion
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("register")}
+              className={
+                mode === "register"
+                  ? "btn-primary auth-mode-btn"
+                  : "btn-secondary auth-mode-btn"
+              }
+            >
+              Inscription
+            </button>
+          </div>
 
-    <form onSubmit={handleSubmit} className="auth-form-inline">
-      {mode === "register" && (
-        <div className="auth-field">
-          <label className="auth-field-label">
-            Pseudo (nom affiché)
-          </label>
-          <input
-            type="text"
-            name="displayName"
-            value={form.displayName}
-            onChange={handleChange}
-            className="auth-field-input"
-          />
+          <form onSubmit={handleSubmit} className="auth-form-inline">
+            {mode === "register" && (
+              <div className="auth-field">
+                <label className="auth-field-label">Pseudo (nom affiché)</label>
+                <input
+                  type="text"
+                  name="displayName"
+                  value={form.displayName}
+                  onChange={handleChange}
+                  className="auth-field-input"
+                />
+              </div>
+            )}
+
+            <div className="auth-field">
+              <label className="auth-field-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className="auth-field-input"
+                required
+              />
+            </div>
+
+            <div className="auth-field">
+              <label className="auth-field-label">Mot de passe</label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                className="auth-field-input"
+                required
+              />
+            </div>
+
+            {error && <div className="auth-error-banner">{error}</div>}
+
+            <button type="submit" className="btn-primary">
+              {mode === "login" ? "Se connecter" : "Créer mon compte"}
+            </button>
+          </form>
         </div>
       )}
-
-      <div className="auth-field">
-        <label className="auth-field-label">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          className="auth-field-input"
-          required
-        />
-      </div>
-
-      <div className="auth-field">
-        <label className="auth-field-label">Mot de passe</label>
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          className="auth-field-input"
-          required
-        />
-      </div>
-
-      {error && (
-        <div className="auth-error-banner">
-          {error}
-        </div>
-      )}
-
-      <button type="submit" className="btn-primary">
-        {mode === "login" ? "Se connecter" : "Créer mon compte"}
-      </button>
-    </form>
-  </div>
-)}
-
     </section>
   );
 }
@@ -225,11 +218,7 @@ function Home({ onStart, onGoToMyCharacters, auth }) {
     <div className="home-page app-home">
       <div className="home-root">
         <header className="home-header">
-          <img
-            src="/Aria_logo.webp"
-            alt="Logo Aria"
-            className="home-logo-img"
-          />
+          <img src="/Aria_logo.webp" alt="Logo Aria" className="home-logo-img" />
           <div className="home-logo">Fiche de personnage Aria</div>
           <p className="home-subtitle">
             Crée, gère et imprime ta fiche de personnage comme sur la fiche
@@ -248,11 +237,7 @@ function Home({ onStart, onGoToMyCharacters, auth }) {
               </p>
 
               <div className="hero-actions">
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={onStart}
-                >
+                <button type="button" className="btn-primary" onClick={onStart}>
                   Créer un personnage
                 </button>
                 {user && (
@@ -268,7 +253,6 @@ function Home({ onStart, onGoToMyCharacters, auth }) {
             </div>
           </section>
 
-          {/* 🔐 Formulaire d'auth sous le hero */}
           <HomeAuthPanel
             user={user}
             loading={loading}
@@ -293,14 +277,14 @@ function Home({ onStart, onGoToMyCharacters, auth }) {
               <li>
                 Choisis les modes de création (compétences & caractéristiques).
               </li>
-              <li>Lance les dés ou répartis tes points.</li>
               <li>
-                Valide ton personnage pour verrouiller les caracs &
-                compétences.
+                En mode <strong>3d6</strong> : tu choisis un jet et ensuite la
+                zone de dés disparaît.
               </li>
               <li>
-                Gère ton inventaire, ta bourse, l’XP et exporte la fiche en PDF.
+                Choisis ton <strong>kit d’équipement</strong> (une seule fois).
               </li>
+              <li>Gère ton inventaire et exporte ta fiche en PDF.</li>
             </ul>
           </section>
         </main>
@@ -353,9 +337,7 @@ function CreationModal({
             compétences.
           </li>
           <li>
-            Quand tout est bon, cliquez sur{" "}
-            <strong>“Valider la création du personnage”</strong>. Les jets de
-            dés seront alors figés pour cette fiche.
+            Ensuite, <strong>vous sauvegardez</strong> (pas besoin de valider).
           </li>
         </ol>
 
@@ -468,25 +450,17 @@ function App() {
     }
   });
 
-  const [sheetMode, setSheetMode] = useState("create"); // "create" | "validated" | "edit"
-
   const [showCreationModal, setShowCreationModal] = useState(true);
-  const [isCreationDone, setIsCreationDone] = useState(false);
 
   const [skillMode, setSkillMode] = useState("ready"); // "ready" | "custom"
   const [statMode, setStatMode] = useState("3d6"); // "3d6" | "point-buy"
   const [statPointsPool, setStatPointsPool] = useState(0);
 
-  ////
-const [currentCharacterId, setCurrentCharacterId] = useState(null);
+  // 🔁 id du perso courant (pour PUT au lieu de POST)
+  const [currentCharacterId, setCurrentCharacterId] = useState(null);
 
-
-  const isLocked = sheetMode === "validated";
-  const isStatsLockedForUi =
-    sheetMode === "validated" || (sheetMode === "create" && statMode === "3d6");
-
-  const canEditStatsAndSkills = sheetMode !== "validated";
-  const canValidate = sheetMode !== "validated";
+  // ✅ one-shot: dés (3d6) → disparaît dès qu’on applique un jet
+  const [statsRolled, setStatsRolled] = useState(false);
 
   const [competences, setCompetences] = useState([]);
   const [specialCompetences, setSpecialCompetences] = useState([]);
@@ -500,11 +474,19 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
   const [maxHitPoints] = useState(24);
 
   const [isKitModalOpen, setIsKitModalOpen] = useState(false);
-  const [selectedKit, setSelectedKit] = useState(null);
+  const [selectedKit, setSelectedKit] = useState(null); // si non-null → le bouton kit disparaît
 
   const [isAlchemist, setIsAlchemist] = useState(false);
   const [alchemyPotions, setAlchemyPotions] = useState([]);
 
+  const [purseFer, setPurseFer] = useState(0);
+
+  const screenSheetRef = useRef(null);
+  const pdfSheetRef = useRef(null);
+
+  const isStatsLockedForUi = statMode === "3d6"; // en 3d6: pas de +/- sur les stats
+
+  // Alchimie: ajoute compétences/potions de base quand activée
   useEffect(() => {
     if (!isAlchemist) return;
 
@@ -564,37 +546,23 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
         "Bien secouer avant utilisation. Lancer la potion dans un endroit éloigné et être prêt pour une grosse explosion."
       );
 
-      ensurePotion(
-        "Passe-Muraille de Karloff",
-        "Dissout tout, sauf le verre."
-      );
+      ensurePotion("Passe-Muraille de Karloff", "Dissout tout, sauf le verre.");
 
       return updated;
     });
   }, [isAlchemist]);
 
+  // PV = Endurance (cap 14) — logique existante chez toi
   useEffect(() => {
-    if (sheetMode !== "create") return;
-
     const enduranceStat = stats.find((s) => s.id === "endurance");
     if (!enduranceStat) return;
-
     const newHP = Math.min(enduranceStat.value, 14);
     setHitPoints(newHP);
-  }, [stats, sheetMode]);
+  }, [stats]);
 
-  const [purseFer, setPurseFer] = useState(0);
-
-  const screenSheetRef = useRef(null);
-  const pdfSheetRef = useRef(null);
-
-  const handleCompetencesChange = useCallback(
-    (next) => {
-      if (!canEditStatsAndSkills) return;
-      setCompetences(next);
-    },
-    [canEditStatsAndSkills]
-  );
+  const handleCompetencesChange = useCallback((next) => {
+    setCompetences(next);
+  }, []);
 
   const handleChangePortrait = useCallback((value) => {
     const finalValue = value || "";
@@ -620,11 +588,8 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
 
     if (match) {
       const raw = match[1];
-      if (raw.toLowerCase().startsWith("x")) {
-        quantity = parseInt(raw.slice(1), 10);
-      } else {
-        quantity = parseInt(raw, 10);
-      }
+      if (raw.toLowerCase().startsWith("x")) quantity = parseInt(raw.slice(1), 10);
+      else quantity = parseInt(raw, 10);
       name = firstChoice.replace(match[0], "").trim();
     }
 
@@ -640,7 +605,6 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
     setInventory((prev) => {
       const cleaned = prev.filter((item) => !item.fromKit);
       let updated = [...cleaned];
-
       const now = Date.now();
 
       kit.content.forEach((label) => {
@@ -682,7 +646,6 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
               fromKit: true,
             });
           }
-
           return;
         }
 
@@ -715,12 +678,7 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
 
     if (kit.id === "combattant" && options.combattantWeaponChoice) {
       setWeapons((prevWeapons) => {
-        const baseWeapon = {
-          icon: "",
-          name: "",
-          damage: "",
-          validated: false,
-        };
+        const baseWeapon = { icon: "", name: "", damage: "", validated: false };
 
         if (options.combattantWeaponChoice === "twoOneHand") {
           return [
@@ -731,10 +689,7 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
         }
 
         if (options.combattantWeaponChoice === "twoHand") {
-          return [
-            ...prevWeapons,
-            { ...baseWeapon, name: "Arme à deux mains" },
-          ];
+          return [...prevWeapons, { ...baseWeapon, name: "Arme à deux mains" }];
         }
 
         return prevWeapons;
@@ -742,13 +697,13 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
     }
   };
 
-  const handleChangeSkillMode = (mode) => {
-    setSkillMode(mode);
-  };
+  const handleChangeSkillMode = (mode) => setSkillMode(mode);
 
   const handleChangeStatMode = (mode) => {
     setStatMode(mode);
-    setIsCreationDone(false);
+
+    // important : si on repasse en 3d6, on veut revoir le roller
+    setStatsRolled(false);
 
     if (mode === "point-buy") {
       const count = INITIAL_STATS.length;
@@ -779,8 +734,6 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
   };
 
   const handleChangeStat = (id, delta) => {
-    if (!canEditStatsAndSkills) return;
-
     if (statMode === "point-buy") {
       setStats((prevStats) => {
         const index = prevStats.findIndex((s) => s.id === id);
@@ -806,29 +759,11 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
         setStatPointsPool((pool) => pool - effectiveDelta);
         return updatedStats;
       });
-
       return;
     }
 
-    setStats((prevStats) =>
-      prevStats.map((stat) => {
-        if (stat.id !== id) return stat;
-        const min = stat.min ?? 0;
-        const max = stat.max ?? 20;
-        const newValue = stat.value + delta;
-        const clampedValue = Math.max(min, Math.min(max, newValue));
-        return { ...stat, value: clampedValue };
-      })
-    );
-  };
-
-  const handleValidateCreation = () => {
-    setIsCreationDone(true);
-    setSheetMode("validated");
-  };
-
-  const handleEnterEditMode = () => {
-    setSheetMode("edit");
+    // mode 3d6 : on ne modifie pas à la main
+    return;
   };
 
   const handleDeleteCharacter = () => {
@@ -846,8 +781,6 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
     setSkillMode("ready");
     setStatMode("3d6");
     setStatPointsPool(0);
-    setIsCreationDone(false);
-    setSheetMode("create");
     setShowCreationModal(true);
     setPhraseGenial("");
     setPhraseSociete("");
@@ -857,10 +790,14 @@ const [currentCharacterId, setCurrentCharacterId] = useState(null);
     setIsAlchemist(false);
     setAlchemyPotions([]);
 
-    // reset kit
+    // reset kit + id
     setSelectedKit(null);
     setIsKitModalOpen(false);
-setCurrentCharacterId(null); 
+    setCurrentCharacterId(null);
+
+    // reset dés
+    setStatsRolled(false);
+
     // portrait
     setPortraitDataUrl("");
     try {
@@ -872,13 +809,7 @@ setCurrentCharacterId(null);
 
   const characterPayload = {
     meta: {
-      status:
-        sheetMode === "validated"
-          ? "validated"
-          : sheetMode === "edit"
-          ? "editing"
-          : "draft",
-      sheetMode,
+      status: "draft",
     },
     player: playerName,
     name: characterName,
@@ -890,7 +821,6 @@ setCurrentCharacterId(null);
     skillMode,
     isAlchemist,
     alchemyPotions,
-    isCreationDone,
     xp,
     inventory,
     weapons,
@@ -902,79 +832,71 @@ setCurrentCharacterId(null);
     portrait: portraitDataUrl,
   };
 
-const handleSaveToBackend = async (redirectToMyCharacters = false) => {
-  if (!user) {
-    alert(
-      "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
-    );
-    return;
-  }
-
-  if (!characterName.trim()) {
-    alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
-    return;
-  }
-
-  const payloadForBackend = {
-    ...characterPayload,
-  };
-
-  try {
-    let res;
-    let data = null;
-
-    if (currentCharacterId) {
-      // 🔁 UPDATE d'un perso existant
-      res = await fetch(`${API_URL}/characters/${currentCharacterId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payloadForBackend),
-      });
-    } else {
-      // ✨ Création d'un nouveau perso
-      res = await fetch(`${API_URL}/characters`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payloadForBackend),
-      });
-    }
-
-    try {
-      data = await res.json();
-    } catch {
-      data = null;
-    }
-
-    if (!res.ok) {
-      console.error("❌ Erreur API /characters :", data);
+  const handleSaveToBackend = async (redirectToMyCharacters = false) => {
+    if (!user) {
       alert(
-        (data && data.message) ||
-          "Erreur lors de la sauvegarde du personnage sur le serveur."
+        "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
       );
       return;
     }
 
-    // Si on vient de créer un perso, on récupère son id pour les futurs updates
-    if (!currentCharacterId && data && (data._id || data.id)) {
-      setCurrentCharacterId(data._id || data.id);
+    if (!characterName.trim()) {
+      alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
+      return;
     }
 
-    if (redirectToMyCharacters) {
-      setPage("my-characters");
-    } else {
-      alert("Personnage sauvegardé sur le serveur !");
+    const payloadForBackend = { ...characterPayload };
+
+    try {
+      let res;
+      let data = null;
+
+      if (currentCharacterId) {
+        res = await fetch(`${API_URL}/characters/${currentCharacterId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payloadForBackend),
+        });
+      } else {
+        res = await fetch(`${API_URL}/characters`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payloadForBackend),
+        });
+      }
+
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      if (!res.ok) {
+        console.error("❌ Erreur API /characters :", data);
+        alert(
+          (data && data.message) ||
+            "Erreur lors de la sauvegarde du personnage sur le serveur."
+        );
+        return;
+      }
+
+      // après POST : on garde l'id pour les futures updates
+      if (!currentCharacterId && data && (data._id || data.id)) {
+        setCurrentCharacterId(data._id || data.id);
+      }
+
+      if (redirectToMyCharacters) {
+        setPage("my-characters");
+      } else {
+        alert("Personnage sauvegardé sur le serveur !");
+      }
+    } catch (err) {
+      console.error("❌ Erreur réseau /characters :", err);
+      alert("Erreur réseau lors de la sauvegarde du personnage.");
     }
-  } catch (err) {
-    console.error("❌ Erreur réseau /characters :", err);
-    alert("Erreur réseau lors de la sauvegarde du personnage.");
-  }
-};
+  };
 
   const handleLoadCharacterFromBackend = async (id) => {
     if (!user) {
@@ -1006,13 +928,13 @@ const handleSaveToBackend = async (redirectToMyCharacters = false) => {
       }
 
       const ch = data || {};
-setCurrentCharacterId(ch._id || ch.id || null);
+
+      setCurrentCharacterId(ch._id || ch.id || null);
+
       setCharacterName(ch.name || "");
       setPlayerName(ch.player || "");
       setAge(
-        typeof ch.age === "number" && !Number.isNaN(ch.age)
-          ? String(ch.age)
-          : ""
+        typeof ch.age === "number" && !Number.isNaN(ch.age) ? String(ch.age) : ""
       );
       setProfession(ch.profession || "");
 
@@ -1026,26 +948,22 @@ setCurrentCharacterId(ch._id || ch.id || null);
       );
       setSkillMode(ch.skillMode || "ready");
 
-      setIsCreationDone(
-        typeof ch.isCreationDone === "boolean" ? ch.isCreationDone : false
-      );
-
       setXp(typeof ch.xp === "number" ? ch.xp : 0);
 
       setInventory(Array.isArray(ch.inventory) ? ch.inventory : []);
       setWeapons(Array.isArray(ch.weapons) ? ch.weapons : []);
       setPurseFer(typeof ch.purseFer === "number" ? ch.purseFer : 0);
-const hasKitItems =
-  Array.isArray(ch.inventory) &&
-  ch.inventory.some((item) => item && item.fromKit);
 
-if (hasKitItems) {
-  // On ne connait pas forcément l'id du kit, mais on s'en fiche :
-  // le but est juste de bloquer le bouton
-  setSelectedKit(ch.kit || { id: "loaded-kit", name: "Kit existant" });
-} else {
-  setSelectedKit(null);
-}
+      // ✅ kit : si inventaire contient fromKit → bouton kit reste caché
+      const hasKitItems =
+        Array.isArray(ch.inventory) &&
+        ch.inventory.some((item) => item && item.fromKit);
+
+      if (hasKitItems) setSelectedKit(ch.kit || { id: "loaded-kit" });
+      else setSelectedKit(null);
+
+      // ✅ dés : si perso chargé en 3d6 → on cache le roller
+      setStatsRolled((ch.statMode || "3d6") === "3d6");
 
       setCompetences(Array.isArray(ch.competences) ? ch.competences : []);
       setSpecialCompetences(
@@ -1055,7 +973,6 @@ if (hasKitItems) {
       setPhraseGenial(ch.phraseGenial || "");
       setPhraseSociete(ch.phraseSociete || ch.phraseSocieter || "");
 
-      // Portrait : simple string (URL ou dataURL)
       const portraitFromBackend = ch.portrait || "";
       setPortraitDataUrl(portraitFromBackend);
       try {
@@ -1070,22 +987,12 @@ if (hasKitItems) {
 
       if (ch.alchemy) {
         setIsAlchemist(!!ch.alchemy.enabled);
-        setAlchemyPotions(
-          Array.isArray(ch.alchemy.potions) ? ch.alchemy.potions : []
-        );
+        setAlchemyPotions(Array.isArray(ch.alchemy.potions) ? ch.alchemy.potions : []);
       } else {
         setIsAlchemist(!!ch.isAlchemist);
         setAlchemyPotions(
           Array.isArray(ch.alchemyPotions) ? ch.alchemyPotions : []
         );
-      }
-
-      if (ch.meta && ch.meta.sheetMode) {
-        setSheetMode(ch.meta.sheetMode);
-      } else if (ch.meta && ch.meta.status === "validated") {
-        setSheetMode("validated");
-      } else {
-        setSheetMode("edit");
       }
 
       setShowCreationModal(false);
@@ -1112,14 +1019,8 @@ if (hasKitItems) {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const imgProps = {
-        width: canvas.width,
-        height: canvas.height,
-      };
-      const ratio = Math.min(
-        pdfWidth / imgProps.width,
-        pdfHeight / imgProps.height
-      );
+      const imgProps = { width: canvas.width, height: canvas.height };
+      const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
       const imgWidth = imgProps.width * ratio;
       const imgHeight = imgProps.height * ratio;
 
@@ -1221,9 +1122,8 @@ if (hasKitItems) {
             />
           </div>
 
-          {/* ZONE HAUTE : Identité + Bourse — PV / Blessures / Armure — Portrait + Caracs */}
+          {/* ZONE HAUTE */}
           <div className="top-grid">
-            {/* Colonne gauche : Identité + Bourse */}
             <div className="top-left">
               <section className="identity-card">
                 <h2 className="identity-title">Identité</h2>
@@ -1246,24 +1146,17 @@ if (hasKitItems) {
                 </div>
               </section>
 
-              {/* 💰 Bourse en bas à gauche */}
               <div className="top-purse">
                 <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
               </div>
             </div>
 
-            {/* Colonne centrale : PV / Blessures / Armure */}
             <div className="top-center">
-              <HitPointsBadge
-                value={hitPoints}
-                onChange={sheetMode === "create" ? undefined : setHitPoints}
-                size={120}
-              />
+              <HitPointsBadge value={hitPoints} onChange={undefined} size={120} />
               <BlessureBadge value={wounds} onChange={setWounds} size={120} />
               <ArmureBadge value={armor} onChange={setArmor} size={120} />
             </div>
 
-            {/* Colonne droite : Portrait + Caracs */}
             <div className="top-right">
               <CharacterPortrait
                 imageUrl={portraitDataUrl}
@@ -1276,7 +1169,7 @@ if (hasKitItems) {
                   onChangeStat={handleChangeStat}
                   isLocked={isStatsLockedForUi}
                 />
-                {sheetMode === "create" && statMode === "point-buy" && (
+                {statMode === "point-buy" && (
                   <p className="stat-points-info">
                     Points à répartir restants :{" "}
                     <strong>{statPointsPool}</strong>
@@ -1286,11 +1179,14 @@ if (hasKitItems) {
             </div>
           </div>
 
-          {/* Dice roller seulement en mode création + 3d6 */}
-          {sheetMode === "create" && statMode === "3d6" && (
+          {/* ✅ Dice roller : uniquement au début en 3d6, puis disparaît après application */}
+          {statMode === "3d6" && !statsRolled && (
             <StatsDiceRoller
               stats={stats}
-              onApplyStats={(newStats) => setStats(newStats)}
+              onApplyStats={(newStats) => {
+                setStats(newStats);
+                setStatsRolled(true); // ✅ disparaît après choix
+              }}
             />
           )}
 
@@ -1305,10 +1201,11 @@ if (hasKitItems) {
             </div>
 
             <div className="stats-competences-layout">
-              {/* Colonne gauche : Inventaire, armes */}
               <div className="stats-column">
                 <Inventory items={inventory} onChange={setInventory} />
-                {sheetMode === "create" && !selectedKit && (
+
+                {/* ✅ kit : visible une seule fois */}
+                {!selectedKit && (
                   <button
                     type="button"
                     className="modal-primary-btn"
@@ -1317,32 +1214,27 @@ if (hasKitItems) {
                     Choisir un kit d’équipement
                   </button>
                 )}
+
                 <WeaponList weapons={weapons} onChange={setWeapons} />
               </div>
 
-              {/* Colonne droite : Compétences */}
               <div className="competences-column">
                 <CompetenceList
                   stats={stats}
                   mode={skillMode}
-                  isLocked={isLocked}
+                  isLocked={false}
                   onCompetencesChange={handleCompetencesChange}
                 />
+
                 <SpecialCompetences
                   specialCompetences={specialCompetences}
-                  onChange={(next) => {
-                    if (!canEditStatsAndSkills) return;
-                    setSpecialCompetences(next);
-                  }}
+                  onChange={setSpecialCompetences}
                 />
 
                 {isAlchemist && (
                   <AlchemyPotions
                     potions={alchemyPotions}
-                    onChange={(next) => {
-                      if (!canEditStatsAndSkills) return;
-                      setAlchemyPotions(next);
-                    }}
+                    onChange={setAlchemyPotions}
                   />
                 )}
               </div>
@@ -1407,58 +1299,28 @@ if (hasKitItems) {
 
           {/* Boutons hors fiche */}
           <div className="export-actions" style={{ marginTop: "1rem" }}>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={handleExportPdf}
-            >
+            <button type="button" className="btn-primary" onClick={handleExportPdf}>
               Exporter la fiche en PDF
             </button>
           </div>
 
-          {/* Validation / Edition / Suppression */}
+          {/* ✅ Actions: seulement sauvegarder + supprimer */}
           <div className="creation-validate">
-            {sheetMode !== "validated" && (
-              <>
-                <button
-                  type="button"
-                  className="validate-btn"
-                  onClick={handleValidateCreation}
-                  disabled={!canValidate}
-                >
-                  Valider le personnage
-                </button>
-                <p className="creation-validate-hint">
-                  Une fois validé, les caractéristiques et compétences seront
-                  verrouillées. Vous pourrez toujours gérer l&apos;inventaire et
-                  la bourse.
-                </p>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => handleSaveToBackend(true)}
-                >
-                  Enregistrer le personnage
-                </button>
-              </>
-            )}
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => handleSaveToBackend(false)}
+            >
+              Sauvegarder le personnage
+            </button>
 
-            {sheetMode === "validated" && (
-              <>
-                <button
-                  type="button"
-                  className="validate-btn"
-                  onClick={handleEnterEditMode}
-                >
-                  Passer en mode modification
-                </button>
-                <p className="creation-validate-hint">
-                  Le personnage est verrouillé. Utilisez le mode modification
-                  pour réautoriser les changements de caractéristiques et de
-                  compétences.
-                </p>
-              </>
-            )}
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => handleSaveToBackend(true)}
+            >
+              Sauvegarder et aller à “Mes personnages”
+            </button>
 
             <button
               type="button"
@@ -1469,11 +1331,7 @@ if (hasKitItems) {
             </button>
           </div>
 
-          <button
-            type="button"
-            className="btn-back"
-            onClick={() => setPage("home")}
-          >
+          <button type="button" className="btn-back" onClick={() => setPage("home")}>
             ← Retour à l&apos;accueil
           </button>
 
@@ -1485,9 +1343,7 @@ if (hasKitItems) {
           />
 
           {/* Debug JSON */}
-          <pre className="debug-json">
-            {JSON.stringify(characterPayload, null, 2)}
-          </pre>
+          <pre className="debug-json">{JSON.stringify(characterPayload, null, 2)}</pre>
         </div>
       </div>
     </div>
