@@ -900,7 +900,7 @@ background: transparent;
 }
 
 /* Écrans <= 900px : tablette / petit laptop */
-@media (max-width: 900px) {
+@media (max-width: 600px) {
   body {
     align-items: flex-start;
   }

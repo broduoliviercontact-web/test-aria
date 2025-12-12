@@ -477,6 +477,10 @@ function App() {
   const [statMode, setStatMode] = useState("3d6"); // "3d6" | "point-buy"
   const [statPointsPool, setStatPointsPool] = useState(0);
 
+  ////
+const [currentCharacterId, setCurrentCharacterId] = useState(null);
+
+
   const isLocked = sheetMode === "validated";
   const isStatsLockedForUi =
     sheetMode === "validated" || (sheetMode === "create" && statMode === "3d6");
@@ -856,7 +860,7 @@ function App() {
     // reset kit
     setSelectedKit(null);
     setIsKitModalOpen(false);
-
+setCurrentCharacterId(null); 
     // portrait
     setPortraitDataUrl("");
     try {
@@ -898,27 +902,40 @@ function App() {
     portrait: portraitDataUrl,
   };
 
-  const handleSaveToBackend = async (redirectToMyCharacters = false) => {
-    if (!user) {
-      alert(
-        "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
-      );
-      return;
-    }
+const handleSaveToBackend = async (redirectToMyCharacters = false) => {
+  if (!user) {
+    alert(
+      "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
+    );
+    return;
+  }
 
-    if (!characterName.trim()) {
-      alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
-      return;
-    }
+  if (!characterName.trim()) {
+    alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
+    return;
+  }
 
-    // 👉 On envoie uniquement les données de personnage.
-    // Le backend déduira l'utilisateur à partir du token (cookie JWT).
-    const payloadForBackend = {
-      ...characterPayload,
-    };
+  const payloadForBackend = {
+    ...characterPayload,
+  };
 
-    try {
-      const res = await fetch(`${API_URL}/characters`, {
+  try {
+    let res;
+    let data = null;
+
+    if (currentCharacterId) {
+      // 🔁 UPDATE d'un perso existant
+      res = await fetch(`${API_URL}/characters/${currentCharacterId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payloadForBackend),
+      });
+    } else {
+      // ✨ Création d'un nouveau perso
+      res = await fetch(`${API_URL}/characters`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -926,33 +943,38 @@ function App() {
         credentials: "include",
         body: JSON.stringify(payloadForBackend),
       });
-
-      let data = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
-
-      if (!res.ok) {
-        console.error("❌ Erreur API /characters :", data);
-        alert(
-          (data && data.message) ||
-            "Erreur lors de la sauvegarde du personnage sur le serveur."
-        );
-        return;
-      }
-
-      if (redirectToMyCharacters) {
-        setPage("my-characters");
-      } else {
-        alert("Personnage sauvegardé sur le serveur !");
-      }
-    } catch (err) {
-      console.error("❌ Erreur réseau /characters :", err);
-      alert("Erreur réseau lors de la sauvegarde du personnage.");
     }
-  };
+
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+
+    if (!res.ok) {
+      console.error("❌ Erreur API /characters :", data);
+      alert(
+        (data && data.message) ||
+          "Erreur lors de la sauvegarde du personnage sur le serveur."
+      );
+      return;
+    }
+
+    // Si on vient de créer un perso, on récupère son id pour les futurs updates
+    if (!currentCharacterId && data && (data._id || data.id)) {
+      setCurrentCharacterId(data._id || data.id);
+    }
+
+    if (redirectToMyCharacters) {
+      setPage("my-characters");
+    } else {
+      alert("Personnage sauvegardé sur le serveur !");
+    }
+  } catch (err) {
+    console.error("❌ Erreur réseau /characters :", err);
+    alert("Erreur réseau lors de la sauvegarde du personnage.");
+  }
+};
 
   const handleLoadCharacterFromBackend = async (id) => {
     if (!user) {
@@ -984,7 +1006,7 @@ function App() {
       }
 
       const ch = data || {};
-
+setCurrentCharacterId(ch._id || ch.id || null);
       setCharacterName(ch.name || "");
       setPlayerName(ch.player || "");
       setAge(
@@ -1013,6 +1035,17 @@ function App() {
       setInventory(Array.isArray(ch.inventory) ? ch.inventory : []);
       setWeapons(Array.isArray(ch.weapons) ? ch.weapons : []);
       setPurseFer(typeof ch.purseFer === "number" ? ch.purseFer : 0);
+const hasKitItems =
+  Array.isArray(ch.inventory) &&
+  ch.inventory.some((item) => item && item.fromKit);
+
+if (hasKitItems) {
+  // On ne connait pas forcément l'id du kit, mais on s'en fiche :
+  // le but est juste de bloquer le bouton
+  setSelectedKit(ch.kit || { id: "loaded-kit", name: "Kit existant" });
+} else {
+  setSelectedKit(null);
+}
 
       setCompetences(Array.isArray(ch.competences) ? ch.competences : []);
       setSpecialCompetences(
