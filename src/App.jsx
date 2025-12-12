@@ -24,6 +24,9 @@ import EquipmentKitModal from "./components/EquipmentKitModal";
 import AlchemyPotions from "./components/AlchemyPotions";
 import StartingGoldRoller from "./components/StartingGoldRoller";
 
+// ✅ pour choisir une icône d'arme par défaut quand le kit Aventurier ajoute une arme
+import { weaponIcons } from "./bladeIcons";
+
 // PDF
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -487,6 +490,18 @@ function App() {
 
   const isStatsLockedForUi = statMode === "3d6"; // en 3d6: pas de +/- sur les stats
 
+  // ✅ helper: choisir une icône "arme 1 main" (sinon fallback = première icône)
+  const getDefaultOneHandWeaponIcon = useCallback(() => {
+    const list = Array.isArray(weaponIcons) ? weaponIcons : [];
+    if (list.length === 0) return "";
+
+    const preferred = list.find((icon) =>
+      /épée|epee|dague|rapiere|rapiere|sabre|arme/i.test(icon.label || "")
+    );
+
+    return preferred?.url || list[0]?.url || "";
+  }, []);
+
   // Alchimie: ajoute compétences/potions de base quand activée
   useEffect(() => {
     if (!isAlchemist) return;
@@ -603,16 +618,19 @@ function App() {
     setSelectedKit(kit);
     setIsKitModalOpen(false);
 
+    // ✅ INVENTAIRE : tous les kits sauf "arme à une main" du combattant (géré en weapons)
     setInventory((prev) => {
       const cleaned = prev.filter((item) => !item.fromKit);
       let updated = [...cleaned];
       const now = Date.now();
 
       kit.content.forEach((label) => {
+        // combattant : on ne met pas "Arme à une main" dans l’inventaire
         if (kit.id === "combattant" && label.includes("Arme à une main")) {
           return;
         }
 
+        // érudit : choix Fioles (x5) OU Sablier
         if (kit.id === "erudit" && label.includes("Fioles (x5) ou Sablier")) {
           let name;
           let quantity;
@@ -677,6 +695,16 @@ function App() {
       return updated;
     });
 
+    // ✅ WEAPONS : aventurier → ajoute 1 arme à une main directement dans weapon-list
+    if (kit.id === "aventurier") {
+      const defaultIcon = getDefaultOneHandWeaponIcon();
+      setWeapons((prevWeapons) => [
+        ...prevWeapons,
+        { icon: defaultIcon, name: "Arme à une main", damage: "", validated: false },
+      ]);
+    }
+
+    // ✅ WEAPONS : combattant → choix 2 armes 1 main OU 1 arme 2 mains
     if (kit.id === "combattant" && options.combattantWeaponChoice) {
       setWeapons((prevWeapons) => {
         const baseWeapon = { icon: "", name: "", damage: "", validated: false };
@@ -1148,11 +1176,11 @@ function App() {
               </section>
 
               <div className="top-purse">
-             <GoldPouch
-  totalFer={purseFer}
-  onChangeTotalFer={setPurseFer}
-  showStartingGold={!showCreationModal}
-/>
+                <GoldPouch
+                  totalFer={purseFer}
+                  onChangeTotalFer={setPurseFer}
+                  showStartingGold={!showCreationModal}
+                />
               </div>
             </div>
 
@@ -1176,8 +1204,7 @@ function App() {
                 />
                 {statMode === "point-buy" && (
                   <p className="stat-points-info">
-                    Points à répartir restants :{" "}
-                    <strong>{statPointsPool}</strong>
+                    Points à répartir restants : <strong>{statPointsPool}</strong>
                   </p>
                 )}
               </div>
@@ -1194,11 +1221,13 @@ function App() {
               }}
             />
           )}
-{!showCreationModal && statsRolled && purseFer === 0 && (
-  <StartingGoldRoller
-    onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
-  />
-)}
+
+          {!showCreationModal && statsRolled && purseFer === 0 && (
+            <StartingGoldRoller
+              onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
+            />
+          )}
+
           {/* Sceptre qui flotte */}
           <div className="stats-competences-wrapper">
             <div className="stats-separator-floating">

@@ -28,7 +28,7 @@
   overflow: hidden;
   font-family: "Open Sans", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-    background-image: url("/parchment-bg2.jpg");
+  background-image: url("/parchment-bg2.jpg");
 }
 
 .kit-modal-header {
@@ -116,7 +116,6 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.55);
   color: #ffffff;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
-
 }
 
 /* Coins extérieurs : carrés + points */
@@ -168,7 +167,6 @@
 .kit-card-selected {
   border: 5px solid #1b1b1b;
   box-shadow:
-  
     0 0 0 2px rgba(86, 86, 86, 0.9),
     16px 16px 30px rgba(0, 0, 0, 0.9);
 }
@@ -184,8 +182,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-    background-image: url("/parchment-bg2.jpg");
-      color: black;
+  background-image: url("/parchment-bg2.jpg");
+  color: black;
 }
 
 /* ===========================
@@ -197,7 +195,20 @@
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 0.4rem;
-  
+}
+
+.kit-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kit-card-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: block;
+  color: white;
 }
 
 .kit-card-title,
@@ -205,7 +216,6 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-
 }
 
 .kit-card-cost,
@@ -239,7 +249,6 @@
   padding-left: 0;
   font-size: 0.9rem;
 }
-
 
 .kit-card-item + .kit-card-item,
 .kit-content-list li + li {
@@ -291,11 +300,6 @@
 .kit-mode-switch:focus {
   outline: none;
 }
-.kit-switch-label button {
-  color : black;
-  background-color: black;
-}
-
 
 .kit-mode-switch-thumb {
   position: absolute;
@@ -343,24 +347,10 @@
   }
 }
 
-/* ===== Icônes des kits ===== */
-
-.kit-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.kit-card-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.kit-card-icon {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  display: block;
-  color: white;
+/* ✅ NOTE (Aventurier) */
+.kit-note {
+  margin: 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  opacity: 0.9;
 }

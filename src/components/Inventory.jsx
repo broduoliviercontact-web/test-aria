@@ -28,6 +28,7 @@ import animauxIcon from "./assets/inventory/animaux-montures.svg";
 import poisonsIcon from "./assets/inventory/poisons-substancesdangereuses.svg";
 import rituelsIcon from "./assets/inventory/rituels-occulte.svg";
 
+// Dernier pack ajouté
 import factionsIcon from "./assets/inventory/factions-organisations.svg";
 import minesIcon from "./assets/inventory/mines.svg";
 import forgeIcon from "./assets/inventory/forge.svg";
@@ -37,7 +38,7 @@ import natureIcon from "./assets/inventory/nature-plantes.svg";
 // ✅ Ajouts
 import bijouIcon from "./assets/inventory/bijou.svg";
 import soinIcon from "./assets/inventory/soin-medecin.svg";
-import piegeSurvieIcon from "./assets/inventory/survie.svg";
+import piegeSurvieIcon from "./assets/inventory/piege-survie.svg";
 
 /* ===========================
    TABLE DE MAPPING ICONS
@@ -123,28 +124,18 @@ function getCategoryFromName(name) {
   if (!name) return null;
   const n = name.toLowerCase();
 
-  /* 🔥 PRIORITÉS ABSOLUES 🔥 */
-
-  // 🎭 Déguisement → toujours Vêtements
+  // 🎭 Déguisement
   if (n.match(/d[ée]guisement|postiche|costume/)) return "vetements";
 
-  // 🎟️ Laisser-passer → toujours Factions
-  if (
-    n.match(
-      /laisser[- ]?passer|laissez[- ]?passer|pass[- ]?pass|autorisation|permis/
-    )
-  )
+  // 🎟️ Laisser-passer
+  if (n.match(/laisser[- ]?passer|laissez[- ]?passer|pass[- ]?pass|autorisation|permis/))
     return "factions";
 
-  // 💎 Bijoux → catégorie Bijou
-  if (
-    n.match(
-      /bijou|bijoux|bague|anneau|collier|pendentif|bracelet|broche|gemme|joyau/
-    )
-  )
+  // 💎 Bijoux
+  if (n.match(/bijou|bijoux|bague|anneau|collier|pendentif|bracelet|broche|gemme|joyau/))
     return "bijou";
 
-  // 🩹 Soins / Médicaments (avant alchimie)
+  // 🩹 Soins / Médicaments
   if (
     n.match(
       /soin|m[ée]dicament|medicament|m[ée]decin|medecin|bandage|pansement|compresse|onguent|baume|pommade|antiseptique|cataplasme|cataplasmes|trousse|pharmacie|kit de soin|premiers secours/
@@ -152,100 +143,56 @@ function getCategoryFromName(name) {
   )
     return "soin";
 
-  // 🪤 Pièges / Survie (collets etc.)
-  if (
-    n.match(
-      /pi[eè]ge|pi[eè]ges|collet|collets|trappe|lacet|lacets|fil de fer|hame[cç]on|app[aâ]t|piege/
-    )
-  )
+  // 🪤 Pièges / survie
+  if (n.match(/pi[eè]ge|pi[eè]ges|piege|collet|collets|trappe|lacet|lacets|fil de fer|hame[cç]on|app[aâ]t/))
     return "pieges";
 
-  /* ===========================
-     RÈGLES “KITS” (plus complètes)
-     =========================== */
-
   // Clés / crochetage
-  if (
-    n.match(
-      /clé|cle|serrure|cadenas|verrou|crochetage|outils de crochetage|passe-partout/
-    )
-  )
+  if (n.match(/clé|cle|serrure|cadenas|verrou|crochetage|outils de crochetage|passe-partout/))
     return "cles";
 
   // Cartes / navigation
-  if (n.match(/carte|plan|navigation|itinéraire|itineraire|boussole/))
-    return "cartes";
+  if (n.match(/carte|plan|navigation|itinéraire|itineraire|boussole/)) return "cartes";
 
   // Musique / jeux
-  if (n.match(/luth|fl[uû]te|tambour|instrument|musique|dés|des|jeu/))
-    return "musique";
+  if (n.match(/luth|fl[uû]te|tambour|instrument|musique|dés|des|jeu/)) return "musique";
 
   // Forge / mines / machine
-  if (
-    n.match(
-      /forge|forgeron|acier|métallurgie|metal|métal|lingot|tenaille|enclume/
-    )
-  )
-    return "forge";
+  if (n.match(/forge|forgeron|acier|métallurgie|metal|métal|lingot|tenaille|enclume/)) return "forge";
   if (n.match(/mines?|minerai|roche|pierre|cristal|charbon/)) return "mines";
-  if (n.match(/machine|engin|m[ée]canisme|rouage|engrenage|automate/))
-    return "machine";
+  if (n.match(/machine|engin|m[ée]canisme|rouage|engrenage|automate/)) return "machine";
 
   // Trophées / nature / poisons / rituels / factions
   if (n.match(/trophée|trophee|souvenir|dent|griffe|peau|os/)) return "trophees";
-  if (n.match(/herbe|plante|fleur|champignon|racine|[ée]corce|feuille/))
-    return "nature";
-  if (n.match(/poison|toxine|venin|fumigène|fumigene|dangereux/))
-    return "poisons";
+  if (n.match(/herbe|plante|fleur|champignon|racine|[ée]corce|feuille/)) return "nature";
+  if (n.match(/poison|toxine|venin|fumigène|fumigene|dangereux/)) return "poisons";
   if (n.match(/rituel|cercle magique|encens|bougie|pentacle/)) return "rituels";
-  if (n.match(/insigne|blason|emblème|embleme|guilde|ordre|famille|noble/))
-    return "factions";
+  if (n.match(/insigne|blason|emblème|embleme|guilde|ordre|famille|noble/)) return "factions";
 
   // Nourriture / cuisine
-  if (
-    n.match(
-      /ration|rations|pain|viande|nourriture|bouteille|vin|gourde|épice|epice|aromate|couverts?|marmite|écuelle|ecuelle|timbale/
-    )
-  )
+  if (n.match(/ration|rations|pain|viande|nourriture|bouteille|vin|gourde|épice|epice|aromate|couverts?|marmite|écuelle|ecuelle|timbale/))
     return "nourriture";
 
-  // Survie (tente etc.)
-  if (
-    n.match(
-      /tente|couverture|lanterne|torche|corde|hamac|couchage|sac de couchage|briquet/
-    )
-  )
+  // Survie (campement)
+  if (n.match(/tente|couverture|lanterne|torche|corde|hamac|couchage|sac de couchage|briquet/))
     return "survie";
 
   // Alchimie
   if (n.match(/potion|fiole|fioles|eau-de-vie|eau de vie/)) return "alchimie";
 
   // Écriture / papeterie
-  if (
-    n.match(
-      /cire [àa] cacheter|cachet|sceau|feuille|feuilles|papier|parchemin|plume|plume d['’]oie|encre|pot d['’]encre|journal|notes/
-    )
-  )
+  if (n.match(/cire [àa] cacheter|cachet|sceau|feuille|feuilles|papier|parchemin|plume|plume d['’]oie|encre|pot d['’]encre|journal|notes/))
     return "ecriture";
 
   // Contenants / bagagerie
-  if (
-    n.match(
-      /sac|sacoche|malle|bourse|gibecière|gibeciere|escarcelle|coffret|bo[îi]te|etui|étui/
-    )
-  )
+  if (n.match(/sac|sacoche|malle|bourse|gibecière|gibeciere|escarcelle|coffret|bo[îi]te|etui|étui/))
     return "contenants";
 
   // Armures
-  if (n.match(/armure|bouclier|casque|plastron|cotte de mailles/))
-    return "armures";
+  if (n.match(/armure|bouclier|casque|plastron|cotte de mailles/)) return "armures";
 
   // Magique / religieux
-  if (
-    n.match(
-      /icône|icone|relique|amulette|talisman|divin|divine|prière|priere|statuette|pieuse|anneau de prière/
-    )
-  )
+  if (n.match(/icône|icone|relique|amulette|talisman|divin|divine|prière|priere|statuette|pieuse|anneau de prière/))
     return "magiques";
 
   // Vêtements
@@ -300,6 +247,9 @@ export default function Inventory({ items, onChange }) {
   const toggleIconPicker = (id) =>
     setOpenIconPickerId((open) => (open === id ? null : id));
 
+  // ✅ seulement ces catégories sont "forcées" par l’auto-détection
+  const FORCE_AUTO_FOR = new Set(["vetements", "factions"]);
+
   return (
     <section className="inventory-card">
       <h2 className="inventory-title">Inventaire</h2>
@@ -309,9 +259,15 @@ export default function Inventory({ items, onChange }) {
       )}
 
       {items.map((item) => {
-        // ✅ priorité à l’auto-détection : si ça matche, ça écrase item.category
         const autoCategory = getCategoryFromName(item.name);
-        const category = autoCategory || item.category;
+
+        // ✅ Fix: on force uniquement certaines catégories,
+        // sinon l'utilisateur peut override via item.category.
+        const category =
+          autoCategory && FORCE_AUTO_FOR.has(autoCategory)
+            ? autoCategory
+            : item.category || autoCategory;
+
         const icon = INVENTORY_CATEGORY_ICONS[category];
         const isOpen = openIconPickerId === item.id;
 
@@ -344,11 +300,7 @@ export default function Inventory({ items, onChange }) {
                         setOpenIconPickerId(null);
                       }}
                     >
-                      <img
-                        src={src}
-                        alt={key}
-                        className="inventory-icon-menu-image"
-                      />
+                      <img src={src} alt={key} className="inventory-icon-menu-image" />
                       <span className="inventory-icon-menu-label">
                         {INVENTORY_CATEGORY_LABELS[key]}
                       </span>
@@ -364,9 +316,7 @@ export default function Inventory({ items, onChange }) {
               type="text"
               value={item.name}
               placeholder="Nom de l’objet"
-              onChange={(e) =>
-                handleItemChange(item.id, "name", e.target.value)
-              }
+              onChange={(e) => handleItemChange(item.id, "name", e.target.value)}
             />
 
             {/* Quantité */}

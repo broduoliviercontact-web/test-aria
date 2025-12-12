@@ -22,7 +22,6 @@ const KIT_ICONS = {
   voleur: voleurIcon,
   gourmet: gourmetIcon,
   voyageur: voyageurIcon,
-  
   erudit: eruditIcon,
 };
 
@@ -33,7 +32,7 @@ const KIT_ICONS = {
 const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
   const [selectedKitId, setSelectedKitId] = useState(initialKitId || null);
 
-  // Choix spéciaux
+  // Choix spéciaux existants
   const [combattantWeaponChoice, setCombattantWeaponChoice] = useState(null);
   const [eruditChoice, setEruditChoice] = useState(null);
 
@@ -46,6 +45,8 @@ const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
     onConfirm(kit, {
       combattantWeaponChoice,
       eruditChoice,
+      // ✅ aventurier : pas de select, on choisira dans weapon-list
+      aventurierNeedsWeaponChoice: kit.id === "aventurier",
     });
   };
 
@@ -77,9 +78,7 @@ const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
               return (
                 <div
                   key={kit.id}
-                  className={
-                    "kit-card" + (isSelected ? " kit-card--selected" : "")
-                  }
+                  className={"kit-card" + (isSelected ? " kit-card--selected" : "")}
                   onClick={() => setSelectedKitId(kit.id)}
                 >
                   {/* 4 coins décoratifs */}
@@ -115,6 +114,19 @@ const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
                         ))}
                       </ul>
 
+                      {/* ✅ NOTE : AVENTURIER */}
+                      {kit.id === "aventurier" && (
+                        <div
+                          className="kit-card-options"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <p className="kit-note">
+                            L&apos;arme &quot;à une main&quot; sera choisie dans la
+                            weapon-list après validation.
+                          </p>
+                        </div>
+                      )}
+
                       {/* =======================
                           OPTIONS : COMBATTANT
                          ======================= */}
@@ -143,9 +155,7 @@ const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
                               onClick={() => {
                                 setSelectedKitId("combattant");
                                 setCombattantWeaponChoice((prev) =>
-                                  prev === "twoHand"
-                                    ? "twoOneHand"
-                                    : "twoHand"
+                                  prev === "twoHand" ? "twoOneHand" : "twoHand"
                                 );
                               }}
                             >
@@ -172,9 +182,7 @@ const EquipmentKitModal = ({ isOpen, onClose, onConfirm, initialKitId }) => {
                           </p>
 
                           <div className="kit-switch-row">
-                            <span className="kit-switch-label">
-                              Fioles (x5)
-                            </span>
+                            <span className="kit-switch-label">Fioles (x5)</span>
 
                             <button
                               type="button"

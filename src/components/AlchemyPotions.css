@@ -10,11 +10,36 @@
   box-sizing: border-box;
 }
 
-.alchemy-card h2 {
+/* ✅ On garde le style du titre mais on passe par .alchemy-title */
+.alchemy-title {
   font-size: 1rem;
-  margin-bottom: 0.2rem;
+  margin: 0;
   color: #3b2a1a;
 }
+
+/* ===========================
+   TITRE + LOGO POTION
+   =========================== */
+
+.alchemy-titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+
+.alchemy-titleLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 8rem;
+  width: 32px;
+  height: 32px;
+}
+
+/* ===========================
+   TABLE
+   =========================== */
 
 .alchemy-table {
   border-top: 1px solid rgba(120, 90, 60, 0.35);
@@ -81,24 +106,22 @@
   color: #2f2115;
   box-sizing: border-box;
   max-width: 100%;
-    background-color: transparent;
+  background-color: transparent;
 }
 
 /* Potion (ligne 1) */
-
 .name-input {
   grid-area: name;
   width: 100%;
 }
 
-/* Effet (ligne 2) – textarea ou input, peu importe */
-
+/* Effet (ligne 2) */
 .effect-input {
   grid-area: effect;
   width: 100%;
   min-height: 2.6rem;
   line-height: 1.2;
-  resize: vertical;      /* seulement vertical */
+  resize: vertical;
   overflow: auto;
   background-color: transparent;
 }
@@ -118,7 +141,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-self: end;      /* 🔹 pousse le bloc vers la droite */
+  justify-self: end;
 }
 
 .difficulty-input {
@@ -143,7 +166,7 @@
   width: 2rem;
   text-align: right;
   font-size: 0.75rem;
-  justify-self: end;      /* 🔹 aligne la quantité sur la droite */
+  justify-self: end;
 }
 
 /* ===========================
@@ -158,7 +181,7 @@
   font-size: 0.85rem;
   color: #8a3b34;
   padding: 0.1rem 0.25rem;
-  justify-self: end;      /* 🔹 colle la croix au bord droit */
+  justify-self: end;
 }
 
 .delete-potion-btn:hover {
@@ -175,26 +198,267 @@
   justify-content: center;
 }
 
+/* On laisse ce nom de classe (utile si tu veux des overrides), mais le style vient de ui-checkbox-btn */
 .add-potion-btn {
-  border: 1px solid rgba(120, 90, 60, 0.85);
-  background: #f9f3e5;
+}
+
+/* ===========================
+   UIverse - heavy-cheetah-95 (Nawsome)
+   Bouton style switch
+   =========================== */
+
+.ui-checkbox-btn {
+  --primary-color: #b78846;
+  --secondary-color: #fff;
+  --primary-hover-color: #a3773d;
+
+  background-color: var(--primary-color);
+  border: 2px solid var(--primary-color);
   border-radius: 999px;
-  padding: 0.15rem 0.6rem;
-  font-size: 0.78rem;
+  color: var(--secondary-color);
   cursor: pointer;
-  color: #3b2a1a;
-  box-shadow: 0 1px 0 #e0d2b8, 0 2px 4px rgba(0, 0, 0, 0.15);
-  transition:
-    background-color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.05s ease;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.35rem 0.9rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+  user-select: none;
 }
 
-.add-potion-btn:hover {
-  background: #f1e0c5;
+.ui-checkbox-btn:hover {
+  background-color: var(--primary-hover-color);
+  border-color: var(--primary-hover-color);
 }
 
-.add-potion-btn:active {
-  background: #e2cfa8;
-  transform: translateY(1px);
+.ui-checkbox-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.ui-checkbox-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(183, 136, 70, 0.35),
+    0 6px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ===========================
+   POTION (design) - repris de AlchemyToggleButton.css
+   + version MINI pour le header
+   =========================== */
+
+.potion-container {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(30deg);
+}
+
+.potion-container--mini {
+  width: 34px;
+  height: 34px;
+}
+
+/* Top */
+.potion-top {
+  width: 25px;
+  height: 35px;
+  position: absolute;
+  top: -38px;
+  border-radius: 5px;
+  border: 3px solid #000000;
+  border-bottom-color: transparent;
+  background-color: transparent;
+  z-index: 3;
+}
+
+.potion-container--mini .potion-top {
+  width: 8px;
+  height: 10px;
+  top: -14px;
+  border-width: 2px;
+}
+
+/* Top line */
+.potion-top-line {
+  position: absolute;
+  width: 8px;
+  top: 5px;
+  height: 2px;
+  right: 2px;
+  background-color: #000000;
+}
+
+.potion-container--mini .potion-top-line {
+  width: 4px;
+  height: 2px;
+  top: 3px;
+  right: 1px;
+}
+
+/* Neck */
+.potion-neck {
+  width: 45px;
+  height: 15px;
+  position: absolute;
+  z-index: 4;
+  top: -22px;
+  border-radius: 5px;
+  border: 3px solid #000000;
+  background-color: transparent;
+}
+
+.potion-container--mini .potion-neck {
+  width: 14px;
+  height: 6px;
+  top: -6px;
+  border-width: 2px;
+}
+
+/* Body */
+.potion-body {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 5px solid #000000;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.potion-container--mini .potion-body {
+  width: 32px;
+  height: 32px;
+  border-width: 2px;
+}
+
+/* Content */
+.potion-content {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: transparent;
+  position: relative;
+  z-index: 2;
+  top: 6px;
+  left: 6px;
+  overflow: hidden;
+}
+
+.potion-container--mini .potion-content {
+  width: 28px;
+  height: 28px;
+  top: 2px;
+  left: 2px;
+}
+
+/* Liquid */
+.potion-content::after {
+  content: "";
+  position: absolute;
+  border-radius: 40%;
+  width: 160px;
+  height: 140px;
+  bottom: -80px;
+  left: -20px;
+  background-color: #f200ff;
+  animation: drift 3000ms infinite cubic-bezier(0.5, 0.7, 0.7, 0.5);
+}
+
+.potion-container--mini .potion-content::after {
+  width: 46px;
+  height: 40px;
+  bottom: -24px;
+  left: -8px;
+}
+
+/* Bubbles */
+.blob-container {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 40%;
+  left: 10%;
+  z-index: 4;
+}
+
+.potion-container--mini .blob-container {
+  width: 14px;
+  height: 14px;
+  top: 40%;
+  left: 12%;
+}
+
+.blob {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #000000;
+}
+
+.potion-container--mini .blob {
+  width: 5px;
+  height: 5px;
+}
+
+.blob::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background-color: #36d8c5;
+  top: 2px;
+  left: 3px;
+}
+
+.potion-container--mini .blob::after {
+  width: 3px;
+  height: 3px;
+  top: 1px;
+  left: 1px;
+}
+
+.blob-one {
+  top: 12px;
+  left: 18px;
+}
+
+.blob-two {
+  top: 22px;
+  left: 0;
+}
+
+.blob-three {
+  top: 36px;
+  left: 16px;
+}
+
+.potion-container--mini .blob-one {
+  top: 3px;
+  left: 6px;
+}
+
+.potion-container--mini .blob-two {
+  top: 6px;
+  left: 0;
+}
+
+.potion-container--mini .blob-three {
+  top: 10px;
+  left: 5px;
+}
+
+/* Animation */
+@keyframes drift {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
