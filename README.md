@@ -69,4 +69,4 @@ Interface moderne, logique métier complète, pensée pour un usage réel en tab
 ---
 
 **Auteur : Zuber**  
-Projet portfolio – logique métier & UX orientée utilisateur réel.
+
