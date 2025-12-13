@@ -6,18 +6,17 @@ import "./StatsDiceRoller.css";
 /**
  * Props:
  * - competences: tableau produit par CompetenceList via onCompetencesChange
- *   ex: [{id,name,score,...}]
  * - specialCompetences: tableau de SpecialCompetences
- *   ex: [{id,name,score,...}]
  *
- * ⚠️ Important: le state (sélection, etc.) reste ici, pas dans App.
+ * State 100% ici (sélection + affichage résultat)
  */
-export default function SpecialCompetenceDiceTray({ competences, specialCompetences }) {
+export default function SpecialCompetenceDiceTray({
+  competences,
+  specialCompetences,
+}) {
   const { rollRequest, setRollResult, resultsByKey, requestRoll } = useDiceRoll();
-
   const dice3DRef = useRef(null);
 
-  // ✅ state "dice roller en bas"
   const [selectedKey, setSelectedKey] = useState("");
   const [active, setActive] = useState(null);
 
@@ -57,14 +56,14 @@ export default function SpecialCompetenceDiceTray({ competences, specialCompeten
 
   const last = selected ? resultsByKey[selected.entityKey] : null;
 
-  const canRoll = !!selected && Number.isFinite(selected.target) && selected.target > 0;
+  const canRoll =
+    !!selected && Number.isFinite(selected.target) && selected.target > 0;
 
-  // ✅ Clique "Tester" => on envoie une requestRoll (le state reste ici)
   const handleTest = () => {
     if (!canRoll) return;
 
     requestRoll({
-      mode: selected.mode,          // "competence" | "special"
+      mode: selected.mode, // "competence" | "special"
       entityKey: selected.entityKey,
       label: selected.label,
       target: selected.target,
@@ -72,15 +71,14 @@ export default function SpecialCompetenceDiceTray({ competences, specialCompeten
     });
   };
 
-  // ✅ Quand une requête arrive (même si ça vient d’ailleurs), on la prend en charge
+  // ✅ reçoit une requête globale (si un autre composant en envoie une)
   useEffect(() => {
     if (!rollRequest) return;
     if (rollRequest.mode !== "special" && rollRequest.mode !== "competence") return;
-
     setActive(rollRequest);
   }, [rollRequest?.id]);
 
-  // ✅ Auto-lance le dé quand active change
+  // ✅ auto-roll quand active change
   useEffect(() => {
     if (!active) return;
 
@@ -101,22 +99,27 @@ export default function SpecialCompetenceDiceTray({ competences, specialCompeten
     };
 
     tick();
-
     return () => {
       cancelled = true;
     };
   }, [active?.id]);
 
-  // ✅ Callback résultat du Dice3D
   const handleRoll = ({ total, rolls }) => {
     if (!active) return;
 
     const target = Number(active.target) || 0;
-    const finalTotal = typeof total === "number" ? total : Number(rolls?.[0]) || 0;
+
+    // si la lib renvoie un tableau, total peut être la somme / ou juste 1 valeur
+    const finalTotal =
+      typeof total === "number"
+        ? total
+        : Array.isArray(rolls) && rolls.length
+        ? Number(rolls[0]) || 0
+        : 0;
 
     const outcome = {
       total: finalTotal,
-      rolls: Array.isArray(rolls) ? rolls : [finalTotal],
+      rolls: Array.isArray(rolls) && rolls.length ? rolls : [finalTotal],
       target,
       success: finalTotal <= target,
       label: active.label || "Test",
@@ -130,11 +133,16 @@ export default function SpecialCompetenceDiceTray({ competences, specialCompeten
     <section className="stats-dice-roller" style={{ marginTop: "0.75rem" }}>
       <div className="stats-dice-roller__header">
         <div style={{ width: "100%" }}>
-          <div style={{ textAlign: "center", fontWeight: 700, letterSpacing: "0.06em" }}>
-            Test de compétence (d100)
+          <div
+            style={{
+              textAlign: "center",
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+            }}
+          >
+            Test de compétence 
           </div>
 
-          {/* ✅ Menu déroulant DANS stats-dice-roller */}
           <div
             style={{
               marginTop: "0.5rem",
@@ -188,17 +196,21 @@ export default function SpecialCompetenceDiceTray({ competences, specialCompeten
               disabled={!canRoll}
               className="modal-primary-btn"
               style={{ padding: "0.5rem 1rem", borderRadius: 999 }}
-              title={!canRoll ? "Choisis une compétence avec un score > 0" : "Lancer un d100"}
+              title={
+                !canRoll
+                  ? "Choisis une compétence avec un score > 0"
+                  : "Lancer un d100"
+              }
             >
               🎲 Tester
             </button>
           </div>
 
-          {/* ✅ Affichage objectif + dernier résultat */}
           <div style={{ marginTop: "0.45rem", textAlign: "center" }}>
             {selected ? (
               <div style={{ fontSize: "0.95rem" }}>
-                <strong>{selected.label}</strong> — objectif : <strong>{selected.target}%</strong>
+                <strong>{selected.label}</strong> — objectif :{" "}
+                <strong>{selected.target}%</strong>
               </div>
             ) : (
               <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
@@ -219,7 +231,6 @@ export default function SpecialCompetenceDiceTray({ competences, specialCompeten
         </div>
       </div>
 
-      {/* ✅ Dice 3D (notation d100) */}
       <Dice3D
         ref={dice3DRef}
         notation={active?.notation || "d100"}

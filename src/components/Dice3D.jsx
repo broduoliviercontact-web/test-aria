@@ -7,6 +7,10 @@ import React, {
 } from "react";
 import "./Dice3D.css";
 
+/* ===========================
+   Chargement des scripts
+   =========================== */
+
 function loadOnce(id, src) {
   return new Promise((resolve, reject) => {
     const existing = document.getElementById(id);
@@ -37,19 +41,25 @@ function loadOnce(id, src) {
   });
 }
 
-// 🎨 Couleurs harmonieuses : palette analogue autour d’une teinte
+/* ===========================
+   Couleurs
+   =========================== */
+
 function makeHsl(h, s = 55, l = 32) {
   const hh = ((h % 360) + 360) % 360;
   return `hsl(${hh} ${s}% ${l}%)`;
 }
+
 function randomBaseHue() {
   return Math.floor(Math.random() * 360);
 }
+
 function makeAnalogPalette(count, baseHue) {
   if (count <= 1) return [makeHsl(baseHue)];
   const spread = 28;
   const step = (spread * 2) / (count - 1);
   const colors = [];
+
   for (let i = 0; i < count; i++) {
     const hue = baseHue - spread + step * i;
     const light = 26 + (i % 2 === 0 ? 4 : 0);
@@ -58,7 +68,6 @@ function makeAnalogPalette(count, baseHue) {
   return colors;
 }
 
-// ✅ IMPORTANT : on remplace le material (car la couleur est baked dans la texture)
 function applyColorsToDice(dices, mode) {
   if (!Array.isArray(dices) || dices.length === 0) return;
   if (!window.DICE?.make_material_for_type) return;
@@ -68,10 +77,9 @@ function applyColorsToDice(dices, mode) {
   if (mode === "gradient") {
     const palette = makeAnalogPalette(dices.length, baseHue);
     dices.forEach((dice, idx) => {
-      const color = palette[idx];
       dice.material = window.DICE.make_material_for_type(
         dice.dice_type,
-        color,
+        palette[idx],
         "#f5f0e6"
       );
       dice.material.needsUpdate = true;
@@ -89,24 +97,87 @@ function applyColorsToDice(dices, mode) {
   }
 }
 
+/* ✅ d100 : 2 couleurs “cousines” (teintes proches) */
+function applyCousinPercentileColors(dices) {
+  if (!Array.isArray(dices) || dices.length < 2) return;
+  if (!window.DICE?.make_material_for_type) return;
+
+  const baseHue = randomBaseHue();
+
+  // ⭐⭐ VARIABLE À MODIFIER POUR AUGMENTER L’ÉCART DE COULEUR ⭐⭐
+  // Plus delta est grand, plus les 2 couleurs s’éloignent.
+  // Ex: 18–28 = cousines ; 35–55 = plus marqué ; 70+ = contraste fort.
+  const delta = 18 + Math.floor(Math.random() * 20); // 18–28° (cousines)
+
+  const tensColor = makeHsl(baseHue, 55, 32);
+  const onesColor = makeHsl(baseHue + delta, 55, 32);
+
+  const tensDie = dices[0];
+  const onesDie = dices[1];
+
+  tensDie.material = window.DICE.make_material_for_type(
+    tensDie.dice_type,
+    tensColor,
+    "#f5f0e6"
+  );
+  tensDie.material.needsUpdate = true;
+
+  onesDie.material = window.DICE.make_material_for_type(
+    onesDie.dice_type,
+    onesColor,
+    "#f5f0e6"
+  );
+  onesDie.material.needsUpdate = true;
+}
+
+/* ===========================
+   Helpers d100
+   =========================== */
+
+function isD100Notation(raw) {
+  const r = String(raw || "").trim().toLowerCase();
+  return r === "d100" || r === "1d100" || r === "1d100+0" || r === "d100+0";
+}
+
+function toPercentileFromResults(tensRaw, onesRaw) {
+  // tensRaw attendu: 0,10..90 (fallback 1..10)
+  let tens =
+    tensRaw >= 0 && tensRaw <= 90 && tensRaw % 10 === 0
+      ? tensRaw
+      : (tensRaw === 10 ? 0 : tensRaw) * 10;
+
+  // onesRaw attendu: 0..9 (fallback 1..10)
+  let ones =
+    onesRaw >= 0 && onesRaw <= 9 ? onesRaw : onesRaw === 10 ? 0 : onesRaw;
+
+  if (!Number.isFinite(tens)) tens = 0;
+  if (!Number.isFinite(ones)) ones = 0;
+
+  return tens + ones === 0 ? 100 : tens + ones;
+}
+
+/* ===========================
+   Composant
+   =========================== */
+
 const Dice3D = forwardRef(function Dice3D(
   {
     notation = "3d6",
     height = 240,
     onRoll,
     hideToolbar = false,
-    colorMode: controlledColorMode, // optionnel (contrôlé par parent)
-    onChangeColorMode, // optionnel
+    colorMode: controlledColorMode,
+    onChangeColorMode,
   },
   ref
 ) {
   const containerRef = useRef(null);
   const boxRef = useRef(null);
+  const effectiveNotationRef = useRef("3d6");
 
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
 
-  // si non contrôlé, on garde un state interne
   const [localColorMode, setLocalColorMode] = useState("solid");
   const colorMode = controlledColorMode ?? localColorMode;
 
@@ -151,64 +222,111 @@ const Dice3D = forwardRef(function Dice3D(
     if (!ready || !containerRef.current || boxRef.current) return;
 
     try {
-      if (!window.DICE || typeof window.DICE.dice_box !== "function") {
-        setError("DICE non disponible (dice.js n'a pas chargé correctement).");
-        return;
+      const box = new window.DICE.dice_box(containerRef.current);
+      boxRef.current = box;
+
+      // ✅ click+slide / swipe to roll
+      try {
+        const el = containerRef.current;
+
+        box.bind_swipe(
+          el,
+          // before_roll: setDice au moment du geste
+          () => {
+            const raw = String(notation || "1d6").trim().toLowerCase();
+            const effective = isD100Notation(raw) ? "1d100+1d10" : raw;
+
+            effectiveNotationRef.current = effective;
+            box.setDice(effective);
+
+            // null => résultat random
+            return null;
+          },
+          // after_roll: parse résultats
+          (notationObj) => {
+            const rolls = Array.isArray(notationObj?.result)
+              ? notationObj.result
+              : [];
+            const effective = effectiveNotationRef.current;
+
+            if (effective === "1d100+1d10") {
+              const tensRaw = Number(rolls?.[0] ?? 0);
+              const onesRaw = Number(rolls?.[1] ?? 0);
+              const pct = toPercentileFromResults(tensRaw, onesRaw);
+
+              onRoll?.({ total: pct, rolls: [tensRaw, onesRaw] });
+              applyCousinPercentileColors(box.dices);
+              return;
+            }
+
+            const total =
+              typeof notationObj?.resultTotal === "number"
+                ? notationObj.resultTotal
+                : rolls.reduce((a, b) => a + b, 0);
+
+            onRoll?.({ total, rolls });
+            applyColorsToDice(box.dices, colorMode);
+          }
+        );
+      } catch (e) {
+        console.warn("bind_swipe a échoué :", e);
       }
-      boxRef.current = new window.DICE.dice_box(containerRef.current);
     } catch (e) {
       console.error(e);
       setError("Impossible d'initialiser la dice box");
     }
   }, [ready]);
 
-const roll = () => {
-  const box = boxRef.current;
-  if (!box) return;
+  const roll = () => {
+    const box = boxRef.current;
+    if (!box) return;
 
-  try {
-    const raw = String(notation || "1d6").trim().toLowerCase();
-
-    // ✅ Support d100 : on lance 2d10 et on convertit en percentile
-    const isD100 =
-      raw === "d100" || raw === "1d100" || raw === "1d100+0" || raw === "d100+0";
-
-    const effectiveNotation = isD100 ? "2d10" : notation;
-
-    box.setDice(effectiveNotation);
-
-    box.start_throw(null, (notationObj) => {
-      const rolls = Array.isArray(notationObj?.result) ? notationObj.result : [];
-      const totalFromLib =
-        typeof notationObj?.resultTotal === "number"
-          ? notationObj.resultTotal
-          : rolls.reduce((a, b) => a + b, 0);
+    try {
+      const raw = String(notation || "1d6").trim().toLowerCase();
+      const isD100 = isD100Notation(raw);
 
       if (isD100) {
-        // rolls attendu: [x, y] (1..10). On mappe 10 -> 0 pour le percentile
-        const a = rolls?.[0] ?? 10;
-        const b = rolls?.[1] ?? 10;
+        const effective = "1d100+1d10";
+        effectiveNotationRef.current = effective;
 
-        const tens = (a === 10 ? 0 : a) * 10;
-        const ones = b === 10 ? 0 : b;
+        box.setDice(effective);
 
-        const pct = tens + ones === 0 ? 100 : tens + ones;
+        box.start_throw(null, (notationObj) => {
+          const rolls = Array.isArray(notationObj?.result)
+            ? notationObj.result
+            : [];
 
-        onRoll?.({ total: pct, rolls: [pct] });
+          const tensRaw = Number(rolls?.[0] ?? 0);
+          const onesRaw = Number(rolls?.[1] ?? 0);
+          const pct = toPercentileFromResults(tensRaw, onesRaw);
+
+          onRoll?.({ total: pct, rolls: [tensRaw, onesRaw] });
+        });
+
+        applyCousinPercentileColors(box.dices);
         return;
       }
 
-      onRoll?.({ total: totalFromLib, rolls });
-    });
+      // cas normal
+      effectiveNotationRef.current = raw;
+      box.setDice(notation);
 
-    // ✅ après start_throw, box.dices existe
-    applyColorsToDice(box.dices, colorMode);
-  } catch (e) {
-    console.error(e);
-    setError("Erreur pendant le lancer 3D.");
-  }
-};
+      box.start_throw(null, (notationObj) => {
+        const rolls = Array.isArray(notationObj?.result) ? notationObj.result : [];
+        const total =
+          typeof notationObj?.resultTotal === "number"
+            ? notationObj.resultTotal
+            : rolls.reduce((a, b) => a + b, 0);
 
+        onRoll?.({ total, rolls });
+      });
+
+      applyColorsToDice(box.dices, colorMode);
+    } catch (e) {
+      console.error(e);
+      setError("Erreur pendant le lancer 3D.");
+    }
+  };
 
   useImperativeHandle(ref, () => ({
     roll,
@@ -228,15 +346,12 @@ const roll = () => {
             {ready ? `🎲 Lancer ${notation} (3D)` : "Chargement des dés 3D…"}
           </button>
 
- 
-
           {error ? <div className="dice3d__error">{error}</div> : null}
         </div>
       )}
 
       <div ref={containerRef} className="dice3d__canvas" style={{ height }} />
 
-      {/* Si toolbar cachée, on garde quand même l’erreur visible (sous le canvas) */}
       {hideToolbar && error ? (
         <div className="dice3d__error dice3d__error--below">{error}</div>
       ) : null}
