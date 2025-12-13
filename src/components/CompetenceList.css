@@ -35,7 +35,7 @@
 /* Ligne type grid (header + lignes) */
 .row {
   display: grid;
-  grid-template-columns: 2fr 0.6fr 0.1fr; /* ✅ 3 colonnes */
+  grid-template-columns: 2fr 0.8fr 0.8fr 0.4fr; /* ✅ 4 colonnes */
   align-items: center;
   padding: 0.25rem 0.5rem;
   gap: 5px;
@@ -89,10 +89,13 @@
 
 .col-score {
   text-align: right;
-  padding-right: 0.4rem;
+  justify-self: end;          /* ✅ super important en grid */
   font-variant-numeric: tabular-nums;
+  padding-right: 0.2rem;
 }
-
+.col-score span {  
+  text-align: right;
+   }
 /* 🫧 Bulle de description (sous la ligne) */
 
 .competence-tooltip {
@@ -253,7 +256,7 @@
   }
 
   .row {
-    grid-template-columns: 2fr 0.7fr 0.9fr;
+    grid-template-columns: 2fr 0.7fr 0.8fr;
   }
 
   .competence-tooltip {
