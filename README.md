@@ -1,16 +1,72 @@
-# React + Vite
+# 🛡️ ARIA – Web Character Sheet
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application web pour créer, gérer et exporter des fiches de personnage pour le jeu de rôle **ARIA**.  
+Interface moderne, logique métier complète, pensée pour un usage réel en table de jeu.
 
-Currently, two official plugins are available:
+👉 Projet personnel **frontend React** – UX, règles de jeu, export PDF.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 🎲 Génération des caractéristiques (3d6 ou point-buy)
+- 🎒 Inventaire & kits d’équipement intelligents
+- ⚔️ Weapon list dédiée (armes ≠ inventaire)
+- ⚗️ Alchimie optionnelle (potions & compétences)
+- 💾 Sauvegarde locale & serveur
+- 📄 Export PDF fidèle à la fiche officielle
+- 🎲 Dés en 3D (desktop & mobile)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📸 Aperçu
+
+### Création de personnage & jets de dés
+![Création](./screenshots/creation.png)
+> Choix des modes de jeu, jets de dés en 3D et génération des caractéristiques.
+
+---
+
+### Inventaire & kits d’équipement
+![Inventaire](./screenshots/inventory.png)
+> Inventaire dynamique + kits avec logique métier (armes placées automatiquement).
+
+---
+
+### Weapon List
+![Weapons](./screenshots/weapons.png)
+> Gestion dédiée des armes : icône, dégâts, validation.
+
+---
+
+### Alchimie
+![Alchimie](./screenshots/alchemy.png)
+> Système d’alchimie activable : potions, effets, difficulté.
+
+---
+
+### Export PDF
+![PDF](./screenshots/pdf.png)
+> Export PDF prêt à être imprimé.
+
+---
+
+## 🛠️ Stack
+
+- React (Vite)
+- CSS custom
+- jsPDF / html2canvas
+- Backend REST
+- Déployé sur Netlify
+
+---
+
+## 🙏 Crédits
+
+- Icônes : https://game-icons.net  
+- Dés 3D : https://github.com/sarahRosannaBusch/dice
+
+---
+
+**Auteur : Zuber**  
+Projet portfolio – logique métier & UX orientée utilisateur réel.
