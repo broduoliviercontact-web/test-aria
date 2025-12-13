@@ -23,6 +23,8 @@ import PhraseDeSynthese from "./components/PhraseDeSynthese";
 import EquipmentKitModal from "./components/EquipmentKitModal";
 import AlchemyPotions from "./components/AlchemyPotions";
 import StartingGoldRoller from "./components/StartingGoldRoller";
+import { DiceRollProvider } from "./components/DiceRollContext";
+import SpecialCompetenceDiceTray from "./components/SpecialCompetenceDiceTray";
 
 // ✅ pour choisir une icône d'arme par défaut quand le kit Aventurier ajoute une arme
 import { weaponIcons } from "./bladeIcons";
@@ -1094,298 +1096,310 @@ function App() {
 
   // page === "character"
   return (
-    <div className="character-page">
-      <div className="app app-character">
-        {user && (
-          <header
-            style={{
-              width: "100%",
-              marginBottom: "0.75rem",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              color: "#f5f0e6",
-            }}
-          >
-            <span>
-              Connecté en tant que{" "}
-              <strong>{user.displayName || user.email}</strong>
-            </span>
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => setPage("my-characters")}
-            >
-              Mes personnages
-            </button>
-          </header>
-        )}
-
-        {showCreationModal && (
-          <CreationModal
-            skillMode={skillMode}
-            onChangeSkillMode={handleChangeSkillMode}
-            statMode={statMode}
-            onChangeStatMode={handleChangeStatMode}
-            onClose={() => setShowCreationModal(false)}
-            isAlchemist={isAlchemist}
-            onChangeIsAlchemist={setIsAlchemist}
-          />
-        )}
-
-        {/* FICHE INTERACTIVE ÉCRAN */}
-        <div ref={screenSheetRef} className="character-sheet-container">
-          {/* En-tête */}
-          <div className="sheet-header">
-            <div className="sheet-header-line" />
-            <h1 className="sheet-header-title">
-              {characterName || "Nom du personnage"}
-            </h1>
-            <div className="sheet-header-line" />
-          </div>
-          <div className="sheet-header-ornament">
-            <img
-              src="/crown-logo.svg"
-              alt="Ornement de couronne"
-              className="sheet-header-icon"
-            />
-          </div>
-
-          {/* ZONE HAUTE */}
-          <div className="top-grid">
-            <div className="top-left">
-              <section className="identity-card">
-                <h2 className="identity-title">Identité</h2>
-                <div className="identity-grid">
-                  <div className="identity-field">
-                    <CharacterName
-                      name={characterName}
-                      onNameChange={setCharacterName}
-                    />
-                  </div>
-                  <div className="identity-field">
-                    <CharacterAge age={age} onAgeChange={setAge} />
-                  </div>
-                  <div className="identity-field">
-                    <CharacterProfession
-                      profession={profession}
-                      onProfessionChange={setProfession}
-                    />
-                  </div>
-                </div>
-              </section>
-
-              <div className="top-purse">
-                <GoldPouch
-                  totalFer={purseFer}
-                  onChangeTotalFer={setPurseFer}
-                  showStartingGold={!showCreationModal}
-                />
-              </div>
-            </div>
-
-            <div className="top-center">
-              <HitPointsBadge value={hitPoints} onChange={undefined} size={120} />
-              <BlessureBadge value={wounds} onChange={setWounds} size={120} />
-              <ArmureBadge value={armor} onChange={setArmor} size={120} />
-            </div>
-
-            <div className="top-right">
-              <CharacterPortrait
-                imageUrl={portraitDataUrl}
-                onChangeImage={handleChangePortrait}
-              />
-
-              <div className="top-stats-card">
-                <CharacterStats
-                  stats={stats}
-                  onChangeStat={handleChangeStat}
-                  isLocked={isStatsLockedForUi}
-                />
-                {statMode === "point-buy" && (
-                  <p className="stat-points-info">
-                    Points à répartir restants : <strong>{statPointsPool}</strong>
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ✅ Dice roller : uniquement au début en 3d6, puis disparaît après application */}
-          {statMode === "3d6" && !statsRolled && (
-            <StatsDiceRoller
-              stats={stats}
-              onApplyStats={(newStats) => {
-                setStats(newStats);
-                setStatsRolled(true); // ✅ disparaît après choix
+    <DiceRollProvider>
+      <div className="character-page">
+        <div className="app app-character">
+          {user && (
+            <header
+              style={{
+                width: "100%",
+                marginBottom: "0.75rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                color: "#f5f0e6",
               }}
+            >
+              <span>
+                Connecté en tant que{" "}
+                <strong>{user.displayName || user.email}</strong>
+              </span>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setPage("my-characters")}
+              >
+                Mes personnages
+              </button>
+            </header>
+          )}
+
+          {showCreationModal && (
+            <CreationModal
+              skillMode={skillMode}
+              onChangeSkillMode={handleChangeSkillMode}
+              statMode={statMode}
+              onChangeStatMode={handleChangeStatMode}
+              onClose={() => setShowCreationModal(false)}
+              isAlchemist={isAlchemist}
+              onChangeIsAlchemist={setIsAlchemist}
             />
           )}
 
-          {!showCreationModal && statsRolled && purseFer === 0 && (
-            <StartingGoldRoller
-              onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
-            />
-          )}
-
-          {/* Sceptre qui flotte */}
-          <div className="stats-competences-wrapper">
-            <div className="stats-separator-floating">
-              <img
-                src="/septre-logo.svg"
-                alt="Ornement vertical"
-                className="stats-separator-floating-icon"
-              />
+          {/* FICHE INTERACTIVE ÉCRAN */}
+          <div ref={screenSheetRef} className="character-sheet-container">
+            {/* En-tête */}
+            <div className="sheet-header">
+              <div className="sheet-header-line" />
+              <h1 className="sheet-header-title">
+                {characterName || "Nom du personnage"}
+              </h1>
+              <div className="sheet-header-line" />
             </div>
-
-            <div className="stats-competences-layout">
-              <div className="stats-column">
-                <Inventory items={inventory} onChange={setInventory} />
-
-                {/* ✅ kit : visible une seule fois */}
-                {!selectedKit && (
-                  <button
-                    type="button"
-                    className="modal-primary-btn"
-                    onClick={() => setIsKitModalOpen(true)}
-                  >
-                    Choisir un kit d’équipement
-                  </button>
-                )}
-
-                <WeaponList weapons={weapons} onChange={setWeapons} />
-              </div>
-
-              <div className="competences-column">
-                <CompetenceList
-                  stats={stats}
-                  mode={skillMode}
-                  isLocked={false}
-                  onCompetencesChange={handleCompetencesChange}
-                />
-
-                <SpecialCompetences
-                  specialCompetences={specialCompetences}
-                  onChange={setSpecialCompetences}
-                />
-
-                {isAlchemist && (
-                  <AlchemyPotions
-                    potions={alchemyPotions}
-                    onChange={setAlchemyPotions}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* SECTION PHRASE DE SYNTHÈSE */}
-          <div className="phrase-section">
-            <PhraseDeSynthese
-              phraseGenial={phraseGenial}
-              setPhraseGenial={setPhraseGenial}
-              phraseSociete={phraseSociete}
-              setPhraseSociete={setPhraseSociete}
-            />
-            <div className="phrase-ornament">
+            <div className="sheet-header-ornament">
               <img
-                src="/couronne-logo.svg"
+                src="/crown-logo.svg"
                 alt="Ornement de couronne"
-                className="phrase-ornament-icon"
+                className="sheet-header-icon"
               />
             </div>
-          </div>
 
-          {/* XP + Nom du joueur */}
-          <div className="xp-player-section">
-            <CharacterXP xp={xp} onChangeXp={setXp} />
-            <CharacterPlayer
-              playerName={playerName}
-              onPlayerNameChange={setPlayerName}
+            {/* ZONE HAUTE */}
+            <div className="top-grid">
+              <div className="top-left">
+                <section className="identity-card">
+                  <h2 className="identity-title">Identité</h2>
+                  <div className="identity-grid">
+                    <div className="identity-field">
+                      <CharacterName
+                        name={characterName}
+                        onNameChange={setCharacterName}
+                      />
+                    </div>
+                    <div className="identity-field">
+                      <CharacterAge age={age} onAgeChange={setAge} />
+                    </div>
+                    <div className="identity-field">
+                      <CharacterProfession
+                        profession={profession}
+                        onProfessionChange={setProfession}
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                <div className="top-purse">
+                  <GoldPouch
+                    totalFer={purseFer}
+                    onChangeTotalFer={setPurseFer}
+                    showStartingGold={!showCreationModal}
+                  />
+                </div>
+              </div>
+
+              <div className="top-center">
+                <HitPointsBadge value={hitPoints} onChange={undefined} size={120} />
+                <BlessureBadge value={wounds} onChange={setWounds} size={120} />
+                <ArmureBadge value={armor} onChange={setArmor} size={120} />
+              </div>
+
+              <div className="top-right">
+                <CharacterPortrait
+                  imageUrl={portraitDataUrl}
+                  onChangeImage={handleChangePortrait}
+                />
+
+                <div className="top-stats-card">
+                  <CharacterStats
+                    stats={stats}
+                    onChangeStat={handleChangeStat}
+                    isLocked={isStatsLockedForUi}
+                  />
+                  {statMode === "point-buy" && (
+                    <p className="stat-points-info">
+                      Points à répartir restants : <strong>{statPointsPool}</strong>
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* ✅ ICI : on remet ton StatsDiceRoller NORMAL (pas de "slot dice") */}
+            {statMode === "3d6" && !statsRolled && (
+              <StatsDiceRoller
+                stats={stats}
+                onApplyStats={(newStats) => {
+                  setStats(newStats);
+                  setStatsRolled(true);
+                }}
+              />
+            )}
+
+            {!showCreationModal && statsRolled && purseFer === 0 && (
+              <StartingGoldRoller
+                onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
+              />
+            )}
+
+            {/* Sceptre qui flotte */}
+            <div className="stats-competences-wrapper">
+              <div className="stats-separator-floating">
+                <img
+                  src="/septre-logo.svg"
+                  alt="Ornement vertical"
+                  className="stats-separator-floating-icon"
+                />
+              </div>
+
+              <div className="stats-competences-layout">
+                <div className="stats-column">
+                  <Inventory items={inventory} onChange={setInventory} />
+
+                  {/* ✅ kit : visible une seule fois */}
+                  {!selectedKit && (
+                    <button
+                      type="button"
+                      className="modal-primary-btn"
+                      onClick={() => setIsKitModalOpen(true)}
+                    >
+                      Choisir un kit d’équipement
+                    </button>
+                  )}
+
+                  <WeaponList weapons={weapons} onChange={setWeapons} />
+                </div>
+
+                <div className="competences-column">
+                  <CompetenceList
+                    stats={stats}
+                    mode={skillMode}
+                    isLocked={false}
+                    onCompetencesChange={handleCompetencesChange}
+                  />
+
+                  <SpecialCompetences
+                    specialCompetences={specialCompetences}
+                    onChange={setSpecialCompetences}
+                  />
+
+                  {isAlchemist && (
+                    <AlchemyPotions
+                      potions={alchemyPotions}
+                      onChange={setAlchemyPotions}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION PHRASE DE SYNTHÈSE */}
+            <div className="phrase-section">
+              <PhraseDeSynthese
+                phraseGenial={phraseGenial}
+                setPhraseGenial={setPhraseGenial}
+                phraseSociete={phraseSociete}
+                setPhraseSociete={setPhraseSociete}
+              />
+              <div className="phrase-ornament">
+                <img
+                  src="/couronne-logo.svg"
+                  alt="Ornement de couronne"
+                  className="phrase-ornament-icon"
+                />
+              </div>
+            </div>
+
+            {/* XP + Nom du joueur */}
+            <div className="xp-player-section">
+              <CharacterXP xp={xp} onChangeXp={setXp} />
+              <CharacterPlayer
+                playerName={playerName}
+                onPlayerNameChange={setPlayerName}
+              />
+            </div>
+
+            {/* ✅ ICI : TON DiceTray tout en bas, juste sous l'XP */}
+        <SpecialCompetenceDiceTray
+  competences={competences}
+  specialCompetences={specialCompetences}
+/>
+
+            {/* Fiche PDF cachée */}
+            <div
+              ref={pdfSheetRef}
+              style={{
+                position: "absolute",
+                left: "-9999px",
+                top: 0,
+              }}
+            >
+              <PdfCharacterSheet
+                characterName={characterName}
+                playerName={playerName}
+                age={age}
+                profession={profession}
+                stats={stats}
+                competences={competences}
+                specialCompetences={specialCompetences}
+                xp={xp}
+                purseFer={purseFer}
+                inventory={inventory}
+                weapons={weapons}
+                portraitUrl={portraitDataUrl}
+                hitPoints={hitPoints}
+                wounds={wounds}
+                armor={armor}
+                phraseGenial={phraseGenial}
+                phraseSociete={phraseSociete}
+              />
+            </div>
+
+            {/* Boutons hors fiche */}
+            <div className="export-actions" style={{ marginTop: "1rem" }}>
+              <button type="button" className="btn-primary" onClick={handleExportPdf}>
+                Exporter la fiche en PDF
+              </button>
+            </div>
+
+            {/* ✅ Actions: seulement sauvegarder + supprimer */}
+            <div className="creation-validate">
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => handleSaveToBackend(false)}
+              >
+                Sauvegarder le personnage
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => handleSaveToBackend(true)}
+              >
+                Sauvegarder et aller à “Mes personnages”
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleDeleteCharacter}
+              >
+                Supprimer le personnage
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="btn-back"
+              onClick={() => setPage("home")}
+            >
+              ← Retour à l&apos;accueil
+            </button>
+
+            <EquipmentKitModal
+              isOpen={isKitModalOpen}
+              onClose={() => setIsKitModalOpen(false)}
+              onConfirm={handleKitConfirm}
+              initialKitId={selectedKit ? selectedKit.id : null}
             />
+
+            {/* Debug JSON */}
+            {/* <pre className="debug-json">{JSON.stringify(characterPayload, null, 2)}</pre> */}
           </div>
-
-          {/* Fiche PDF cachée */}
-          <div
-            ref={pdfSheetRef}
-            style={{
-              position: "absolute",
-              left: "-9999px",
-              top: 0,
-            }}
-          >
-            <PdfCharacterSheet
-              characterName={characterName}
-              playerName={playerName}
-              age={age}
-              profession={profession}
-              stats={stats}
-              competences={competences}
-              specialCompetences={specialCompetences}
-              xp={xp}
-              purseFer={purseFer}
-              inventory={inventory}
-              weapons={weapons}
-              portraitUrl={portraitDataUrl}
-              hitPoints={hitPoints}
-              wounds={wounds}
-              armor={armor}
-              phraseGenial={phraseGenial}
-              phraseSociete={phraseSociete}
-            />
-          </div>
-
-          {/* Boutons hors fiche */}
-          <div className="export-actions" style={{ marginTop: "1rem" }}>
-            <button type="button" className="btn-primary" onClick={handleExportPdf}>
-              Exporter la fiche en PDF
-            </button>
-          </div>
-
-          {/* ✅ Actions: seulement sauvegarder + supprimer */}
-          <div className="creation-validate">
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={() => handleSaveToBackend(false)}
-            >
-              Sauvegarder le personnage
-            </button>
-
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => handleSaveToBackend(true)}
-            >
-              Sauvegarder et aller à “Mes personnages”
-            </button>
-
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={handleDeleteCharacter}
-            >
-              Supprimer le personnage
-            </button>
-          </div>
-
-          <button type="button" className="btn-back" onClick={() => setPage("home")}>
-            ← Retour à l&apos;accueil
-          </button>
-
-          <EquipmentKitModal
-            isOpen={isKitModalOpen}
-            onClose={() => setIsKitModalOpen(false)}
-            onConfirm={handleKitConfirm}
-            initialKitId={selectedKit ? selectedKit.id : null}
-          />
-
-          {/* Debug JSON */}
-          {/* <pre className="debug-json">{JSON.stringify(characterPayload, null, 2)}</pre> */}
         </div>
       </div>
-    </div>
+    </DiceRollProvider>
   );
 }
-////
+
 export default App;

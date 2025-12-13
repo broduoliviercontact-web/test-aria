@@ -162,32 +162,53 @@ const Dice3D = forwardRef(function Dice3D(
     }
   }, [ready]);
 
-  const roll = () => {
-    const box = boxRef.current;
-    if (!box) return;
+const roll = () => {
+  const box = boxRef.current;
+  if (!box) return;
 
-    try {
-      box.setDice(notation);
+  try {
+    const raw = String(notation || "1d6").trim().toLowerCase();
 
-      box.start_throw(null, (notationObj) => {
-        const rolls = Array.isArray(notationObj?.result)
-          ? notationObj.result
-          : [];
-        const total =
-          typeof notationObj?.resultTotal === "number"
-            ? notationObj.resultTotal
-            : rolls.reduce((a, b) => a + b, 0);
+    // ✅ Support d100 : on lance 2d10 et on convertit en percentile
+    const isD100 =
+      raw === "d100" || raw === "1d100" || raw === "1d100+0" || raw === "d100+0";
 
-        onRoll?.({ total, rolls });
-      });
+    const effectiveNotation = isD100 ? "2d10" : notation;
 
-      // ✅ après start_throw, box.dices existe
-      applyColorsToDice(box.dices, colorMode);
-    } catch (e) {
-      console.error(e);
-      setError("Erreur pendant le lancer 3D.");
-    }
-  };
+    box.setDice(effectiveNotation);
+
+    box.start_throw(null, (notationObj) => {
+      const rolls = Array.isArray(notationObj?.result) ? notationObj.result : [];
+      const totalFromLib =
+        typeof notationObj?.resultTotal === "number"
+          ? notationObj.resultTotal
+          : rolls.reduce((a, b) => a + b, 0);
+
+      if (isD100) {
+        // rolls attendu: [x, y] (1..10). On mappe 10 -> 0 pour le percentile
+        const a = rolls?.[0] ?? 10;
+        const b = rolls?.[1] ?? 10;
+
+        const tens = (a === 10 ? 0 : a) * 10;
+        const ones = b === 10 ? 0 : b;
+
+        const pct = tens + ones === 0 ? 100 : tens + ones;
+
+        onRoll?.({ total: pct, rolls: [pct] });
+        return;
+      }
+
+      onRoll?.({ total: totalFromLib, rolls });
+    });
+
+    // ✅ après start_throw, box.dices existe
+    applyColorsToDice(box.dices, colorMode);
+  } catch (e) {
+    console.error(e);
+    setError("Erreur pendant le lancer 3D.");
+  }
+};
+
 
   useImperativeHandle(ref, () => ({
     roll,

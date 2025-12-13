@@ -1,14 +1,15 @@
 // src/components/SpecialCompetences.jsx
 import React from "react";
 import "./SpecialCompetences.css";
+import { useDiceRoll } from "./DiceRollContext";
 
-const MIN_ROWS = 1; // nombre minimum de lignes affichées
+const MIN_ROWS = 1;
 
 function SpecialCompetences({ specialCompetences, onChange }) {
-  // lignes réellement stockées
+  const { requestRoll, resultsByKey } = useDiceRoll();
+
   const realRows = specialCompetences || [];
 
-  // lignes affichées (on complète avec des lignes vides si besoin)
   const rows = [...realRows];
   while (rows.length < MIN_ROWS) {
     rows.push({
@@ -22,8 +23,6 @@ function SpecialCompetences({ specialCompetences, onChange }) {
   const handleFieldChange = (index, field, value) => {
     const updated = [...realRows];
 
-    // si on modifie une ligne qui était seulement "placeholder",
-    // on la transforme en vraie entrée
     if (!updated[index]) {
       updated[index] = {
         id: `special-${index}`,
@@ -59,6 +58,19 @@ function SpecialCompetences({ specialCompetences, onChange }) {
     onChange(updated);
   };
 
+  const handleTest = (row) => {
+    const target = Number(row.score);
+    if (!Number.isFinite(target)) return;
+
+    requestRoll({
+      mode: "special",
+      entityKey: row.id,
+      label: row.name || "Compétence spéciale",
+      target,
+      notation: "d100",
+    });
+  };
+
   return (
     <section className="special-competences">
       <h2>Compétences spéciales</h2>
@@ -68,11 +80,13 @@ function SpecialCompetences({ specialCompetences, onChange }) {
           <span className="special-col-name">Compétence</span>
           <span className="col-link">Lien</span>
           <span className="col-score">Score</span>
+          <span className="col-test">Test</span>
           <span className="col-delete" />
         </div>
 
         {rows.map((row, index) => {
           const isReal = index < realRows.length;
+          const last = row?.id ? resultsByKey[row.id] : null;
 
           return (
             <div key={row.id || index} className="special-row row">
@@ -81,19 +95,17 @@ function SpecialCompetences({ specialCompetences, onChange }) {
                 className="special-input special-name-input"
                 value={row.name}
                 placeholder="Nom de la compétence"
-                onChange={(e) =>
-                  handleFieldChange(index, "name", e.target.value)
-                }
+                onChange={(e) => handleFieldChange(index, "name", e.target.value)}
               />
+
               <input
                 type="text"
                 className="special-input special-link-input"
                 value={row.link}
                 placeholder="FOR/DEX"
-                onChange={(e) =>
-                  handleFieldChange(index, "link", e.target.value)
-                }
+                onChange={(e) => handleFieldChange(index, "link", e.target.value)}
               />
+
               <div className="score-wrapper">
                 <input
                   type="text"
@@ -102,12 +114,30 @@ function SpecialCompetences({ specialCompetences, onChange }) {
                   min={0}
                   max={100}
                   placeholder="0"
-                  onChange={(e) =>
-                    handleFieldChange(index, "score", e.target.value)
-                  }
+                  onChange={(e) => handleFieldChange(index, "score", e.target.value)}
                 />
                 <span className="score-suffix">%</span>
               </div>
+
+              {isReal ? (
+                <button
+                  type="button"
+                  className="special-test-btn"
+                  onClick={() => handleTest(row)}
+                  disabled={!row.score || Number.isNaN(Number(row.score))}
+                  title={last ? `Dernier : ${last.total}/${last.target}` : "Lancer un d100"}
+                  aria-label={`Tester ${row.name || "la compétence"} au d100`}
+                >
+                  🎲
+                  {last ? (
+                    <span className={"special-test-result" + (last.success ? " ok" : " ko")}>
+                      {last.total}/{last.target}
+                    </span>
+                  ) : null}
+                </button>
+              ) : (
+                <span className="col-test" />
+              )}
 
               {isReal ? (
                 <button
@@ -127,11 +157,7 @@ function SpecialCompetences({ specialCompetences, onChange }) {
       </div>
 
       <div className="special-actions">
-        <button
-          type="button"
-          className="add-special-btn"
-          onClick={handleAddRow}
-        >
+        <button type="button" className="add-special-btn" onClick={handleAddRow}>
           + Ajouter une compétence spéciale
         </button>
       </div>

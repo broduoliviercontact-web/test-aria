@@ -1,6 +1,7 @@
 // src/components/CompetenceList.jsx
 import React, { useState, useEffect } from "react";
 import "./CompetenceList.css";
+import { useDiceRoll } from "./DiceRollContext";
 
 // Liste des compétences d'Aria (version simplifiée)
 const COMPETENCES = [
@@ -194,8 +195,8 @@ function computeCustomScore(stats, competence) {
  * - onCompetencesChange : (liste) => void  // pour le JSON du back
  */
 function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
-
   const effectiveMode = mode || "ready";
+  const { requestRoll, resultsByKey } = useDiceRoll();
 
   const [openId, setOpenId] = useState(null); // description ouverte
   const [bonusById, setBonusById] = useState({}); // ajustements manuels
@@ -252,36 +253,42 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
 
       let actualDelta = newTotal - currentTotal;
 
-      // Gestion des 50 points uniquement en mode “custom”
-// Gestion des 50 points uniquement en mode “custom” (indicatif)
-if (effectiveMode === "custom") {
-  if (actualDelta !== 0) {
-    setRemainingPoints((pts) => pts - actualDelta);
-  }
-}
-
+      // Gestion des 50 points uniquement en mode “custom” (indicatif)
+      if (effectiveMode === "custom") {
+        if (actualDelta !== 0) {
+          setRemainingPoints((pts) => pts - actualDelta);
+        }
+      }
 
       const newBonus = currentBonus + actualDelta;
       return { ...prev, [id]: newBonus };
     });
   };
 
+  const runTest = (comp, totalScore) => {
+    requestRoll({
+      mode: "competence",
+      entityKey: comp.id,
+      label: comp.name,
+      target: totalScore,
+      notation: "d100",
+    });
+  };
+
   return (
     <section className="competence-section">
-  
-
-   {effectiveMode === "custom" && !isLocked && (
-  <p className="points-remaining">
-    Points de personnalisation restants :{" "}
-    <strong>{remainingPoints}</strong>
-  </p>
-)}
+      {effectiveMode === "custom" && !isLocked && (
+        <p className="points-remaining">
+          Points de personnalisation restants : <strong>{remainingPoints}</strong>
+        </p>
+      )}
 
       <div className="competence-table">
         <div className="competence-header row">
           <span className="col-name">Compétence</span>
           <span className="col-link">Lien</span>
           <span className="col-score">Score</span>
+          <span className="col-test" aria-hidden="true" />
         </div>
 
         {COMPETENCES.map((comp) => {
@@ -294,13 +301,13 @@ if (effectiveMode === "custom") {
           const totalScore = baseScore + bonus;
           const isOpen = openId === comp.id;
 
+          const lastResult = resultsByKey[comp.id];
+
           return (
             <div key={comp.id} className="competence-row">
               {/* ligne cliquable pour ouvrir la description */}
               <div
-                className={`row competence-row-main ${
-                  isOpen ? "is-open" : ""
-                }`}
+                className={`row competence-row-main ${isOpen ? "is-open" : ""}`}
                 onClick={() => handleToggleRow(comp.id)}
                 role="button"
                 tabIndex={0}
@@ -314,56 +321,78 @@ if (effectiveMode === "custom") {
               >
                 <span className="col-name">{comp.name}</span>
                 <span className="col-link">{comp.link}</span>
-
-                {/* Score en lecture seule dans le tableau */}
                 <span className="col-score">{totalScore}%</span>
+                <span className="col-test" aria-hidden="true" />
               </div>
 
               {isOpen && (
                 <div className="competence-tooltip">
                   <h3>{comp.name}</h3>
-                  <p className="link-hint">
-                    Caractéristiques liées : {comp.link}
-                  </p>
+                  <p className="link-hint">Caractéristiques liées : {comp.link}</p>
                   <p>{comp.description}</p>
 
-<div className="score-editor">
-  <span className="score-label">Score :</span>
-
-  {!isLocked && (
-    <>
-      <button
-        type="button"
-        className="score-btn"
-        onClick={() => changeScore(comp.id, baseScore, -1)}
+                  {/* ✅ Bouton test DANS la partie déroulante */}
+                  <div className="competence-tooltip-actions">
+  <button
+    type="button"
+    className="competence-test-btn"
+    onClick={(e) => {
+      e.stopPropagation();
+      runTest(comp, totalScore);
+    }}
+    title={
+      lastResult
+        ? `Dernier jet : ${lastResult.total}/${lastResult.target}`
+        : "Tester la compétence"
+    }
+    aria-label={`Tester ${comp.name} au d100`}
+  >
+    🎲 Tester
+    {lastResult && (
+      <span
+        className={
+          "competence-test-result " +
+          (lastResult.success ? "ok" : "ko")
+        }
       >
-        −
-      </button>
-      <span className="score-value">{totalScore}%</span>
-      <button
-        type="button"
-        className="score-btn"
-        onClick={() => changeScore(comp.id, baseScore, +1)}
-      >
-        +
-      </button>
-    </>
-  )}
-
-  {isLocked && (
-    <span className="score-value">{totalScore}%</span>
-  )}
+        {lastResult.total}/{lastResult.target}
+      </span>
+    )}
+  </button>
 </div>
 
+                  <div className="score-editor">
+                    <span className="score-label">Score :</span>
 
+                    {!isLocked && (
+                      <>
+                        <button
+                          type="button"
+                          className="score-btn"
+                          onClick={() => changeScore(comp.id, baseScore, -1)}
+                        >
+                          −
+                        </button>
+                        <span className="score-value">{totalScore}%</span>
+                        <button
+                          type="button"
+                          className="score-btn"
+                          onClick={() => changeScore(comp.id, baseScore, +1)}
+                        >
+                          +
+                        </button>
+                      </>
+                    )}
+
+                    {isLocked && <span className="score-value">{totalScore}%</span>}
+                  </div>
 
                   {effectiveMode === "custom" ? (
                     <p className="rules-hint">
-                      Méthode : <strong>personnalisation</strong>. Score initial
-                      = (carac1 + carac2) × 2 + points à répartir.
+                      Méthode : <strong>personnalisation</strong>. Score initial =
+                      (carac1 + carac2) × 2 + points à répartir.
                       <br />
-                      Score actuel : <strong>{totalScore}%</strong> (limité à
-                      90%).
+                      Score actuel : <strong>{totalScore}%</strong> (limité à 90%).
                     </p>
                   ) : (
                     <p className="rules-hint">

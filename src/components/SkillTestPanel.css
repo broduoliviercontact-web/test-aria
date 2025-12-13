@@ -1,0 +1,84 @@
+.skill-test-panel {
+  width: 100%;
+  margin-top: 0.8rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 90, 60, 0.8);
+  background: rgba(249, 243, 229, 0.9);
+  background-image: url("/parchment-bg2.jpg");
+  background-size: cover;
+  box-shadow: 0 1px 0 #e0d2b8, 0 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+.skill-test-panel__title {
+  font-family: "MedievalSharp", "Georgia", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3b2a1a;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.skill-test-panel__row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.skill-test-panel__select {
+  flex: 1;
+  min-width: 220px;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(140, 105, 70, 0.7);
+  background: rgba(255, 255, 255, 0.65);
+  color: #2f2115;
+}
+
+.skill-test-panel__btn {
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: #8b4513;
+  color: #fdf3df;
+  box-shadow: 0 4px 0 #4e2607;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.2s;
+}
+
+.skill-test-panel__btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 0 #4e2607;
+}
+
+.skill-test-panel__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.skill-test-panel__meta {
+  margin-top: 0.55rem;
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  color: #3b2a1a;
+  font-size: 0.9rem;
+}
+
+.skill-test-panel__result {
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.skill-test-panel__result.ok {
+  border-color: rgba(60, 120, 60, 0.6);
+}
+
+.skill-test-panel__result.ko {
+  border-color: rgba(160, 60, 50, 0.65);
+}
