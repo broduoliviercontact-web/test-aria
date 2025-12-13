@@ -294,3 +294,76 @@
   80%  { transform: translate3d(-1px, 1px,0) scale(1.01); }
   100% { transform: translate3d(0,0,0) scale(1); }
 }
+/* =========================
+   CRITIQUE : shake + flash doré (1 frame)
+   ========================= */
+
+.scdt__threeDPanel--crit {
+  position: relative;
+  animation: scdt-crit-shake 0.35s ease-out 0s 1;
+  filter: saturate(1.25) brightness(1.05);
+}
+
+/* Flash doré très court */
+.scdt__threeDPanel--crit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 7;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+      circle at 50% 40%,
+      rgba(255, 225, 140, 0.95),
+      rgba(255, 180, 70, 0.35) 40%,
+      rgba(0, 0, 0, 0) 70%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 215, 130, 0.25),
+      rgba(0, 0, 0, 0)
+    );
+  animation: scdt-gold-flash 0.12s linear 0s 1; /* ~1 frame “visible” */
+}
+
+@keyframes scdt-gold-flash {
+  0% { opacity: 0; }
+  1% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes scdt-crit-shake {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  15%  { transform: translate3d(-2px, -1px,0) scale(1.01); }
+  30%  { transform: translate3d(3px, 1px,0) scale(1.015); }
+  45%  { transform: translate3d(-3px, 0,0) scale(1.02); }
+  60%  { transform: translate3d(2px, -1px,0) scale(1.015); }
+  80%  { transform: translate3d(-1px, 1px,0) scale(1.01); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+
+/* =========================
+   FUMBLE : shake + blur + désaturation (0.4s)
+   ========================= */
+
+.scdt__threeDPanel--fumble {
+  animation: scdt-shake 0.55s ease-in-out 0s 3;
+}
+
+/* Blur/désaturation rapide puis retour */
+.scdt__threeDPanel--fumble {
+  filter: none;
+  animation-name: scdt-shake, scdt-fumble-filter;
+  animation-duration: 0.55s, 0.7s;
+  animation-timing-function: ease-in-out, ease-out;
+  animation-iteration-count: 3, 1;
+}
+
+@keyframes scdt-fumble-filter {
+  0%   { filter: none; }
+  25%  { filter: blur(0.6px) saturate(0.55) brightness(0.95) contrast(1.05); }
+  60%  { filter: blur(1.2px) saturate(0.25) brightness(0.9) contrast(1.08); }
+  100% { filter: none; }
+}

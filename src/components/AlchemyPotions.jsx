@@ -1,10 +1,9 @@
-// src/components/AlchemyPotions.jsx
 import React from "react";
 import "./AlchemyPotions.css";
 
 const MIN_ROWS = 1;
 
-function AlchemyPotions({ potions, onChange }) {
+export default function AlchemyPotions({ potions, onChange }) {
   const realRows = potions || [];
   const rows = [...realRows];
 
@@ -12,144 +11,103 @@ function AlchemyPotions({ potions, onChange }) {
     rows.push({
       id: `placeholder-${rows.length}`,
       name: "",
+      components: "",
       effect: "",
       difficulty: "",
       quantity: "",
     });
   }
 
-  const handleFieldChange = (index, field, value) => {
+  const ensureRow = (row, index) => ({
+    id: row?.id || `potion-${index}`,
+    name: row?.name || "",
+    components: row?.components || "",
+    effect: row?.effect || "",
+    difficulty: row?.difficulty || "",
+    quantity: row?.quantity || "",
+  });
+
+  const handleChange = (index, field, value) => {
     const updated = [...realRows];
-
-    if (!updated[index]) {
-      updated[index] = {
-        id: `potion-${index}`,
-        name: "",
-        effect: "",
-        difficulty: "",
-        quantity: "",
-      };
-    }
-
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    };
-
+    updated[index] = { ...ensureRow(updated[index], index), [field]: value };
     onChange(updated);
   };
 
   const handleAddRow = () => {
-    const updated = [
+    onChange([
       ...realRows,
       {
         id: `potion-${realRows.length}`,
         name: "",
+        components: "",
         effect: "",
         difficulty: "",
         quantity: "",
       },
-    ];
-    onChange(updated);
+    ]);
   };
 
-  const handleDeleteRow = (indexToDelete) => {
-    const updated = realRows.filter((_, i) => i !== indexToDelete);
-    onChange(updated);
+  const handleDeleteRow = (index) => {
+    onChange(realRows.filter((_, i) => i !== index));
   };
 
   return (
     <section className="alchemy-card">
-      {/* ✅ Titre + logo potion (design only) */}
       <div className="alchemy-titleRow">
-        
-
         <h2 className="alchemy-title">Alchimie – Potions</h2>
-        <div className="alchemy-titleLogo" aria-hidden="true">
-          <div className="potion-container potion-container--mini">
-            <div className="potion-top">
-              <div className="potion-top-line" />
-            </div>
-            <div className="potion-neck" />
-            <div className="potion-body">
-              <div className="potion-content">
-                <div className="blob-container">
-                  <div className="blob blob-one" />
-                  <div className="blob blob-two" />
-                  <div className="blob blob-three" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="alchemy-titleLogo" aria-hidden="true" />
       </div>
 
       <div className="alchemy-table">
-        <div className="alchemy-header row">
-          <span className="alchemy-col-name">Potion</span>
-          <span className="alchemy-col-effect">Effet</span>
-          <span className="alchemy-col-difficulty">Diff.</span>
-          <span className="alchemy-col-qty">Qté</span>
-          <span className="alchemy-col-delete" />
-        </div>
+<div className="alchemy-header">
+  <span className="alchemy-col-name">Potion</span>
+  <span className="alchemy-col-components">Composants</span>
+  <span className="alchemy-col-difficulty">Diff.</span>
+  <span className="alchemy-col-qty">Qté</span>
+  <span className="alchemy-col-delete" aria-hidden="true" />
+</div>
 
         {rows.map((row, index) => {
           const isReal = index < realRows.length;
 
           return (
-            <div key={row.id || index} className="alchemy-row row">
-              {/* Nom */}
+            <div key={row.id || index} className="alchemy-row">
+              {/* LIGNE 1 */}
               <input
-                type="text"
                 className="alchemy-input name-input"
-                value={row.name}
                 placeholder="Nom de la potion"
-                onChange={(e) => handleFieldChange(index, "name", e.target.value)}
+                value={row.name}
+                onChange={(e) => handleChange(index, "name", e.target.value)}
               />
 
-              {/* Effet */}
-              <textarea
-                className="alchemy-input effect-input"
-                value={row.effect}
-                placeholder="Effet principal"
-                rows={2}
-                onChange={(e) =>
-                  handleFieldChange(index, "effect", e.target.value)
-                }
+              <input
+                className="alchemy-input components-input"
+                placeholder="Soufre, racine…"
+                value={row.components}
+                onChange={(e) => handleChange(index, "components", e.target.value)}
               />
 
-              {/* Difficulté */}
               <div className="difficulty-wrapper">
                 <input
-                  type="text"
                   className="alchemy-input difficulty-input"
-                  value={row.difficulty}
-                  min={0}
-                  max={100}
                   placeholder="0"
+                  value={row.difficulty}
                   onChange={(e) =>
-                    handleFieldChange(index, "difficulty", e.target.value)
+                    handleChange(index, "difficulty", e.target.value)
                   }
                 />
                 <span className="difficulty-suffix">%</span>
               </div>
 
-              {/* Quantité */}
               <input
-                type="text"
                 className="alchemy-input qty-input"
-                value={row.quantity}
-                min={0}
                 placeholder="0"
-                onChange={(e) =>
-                  handleFieldChange(index, "quantity", e.target.value)
-                }
+                value={row.quantity}
+                onChange={(e) => handleChange(index, "quantity", e.target.value)}
               />
 
-              {/* Delete */}
               {isReal ? (
                 <button
-                  type="button"
                   className="delete-potion-btn"
                   onClick={() => handleDeleteRow(index)}
                   aria-label="Supprimer cette potion"
@@ -157,24 +115,30 @@ function AlchemyPotions({ potions, onChange }) {
                   ✕
                 </button>
               ) : (
-                <span className="col-delete" />
+                <span className="delete-potion-spacer" />
               )}
+
+              {/* LIGNE 2 */}
+              <h3 className="alchemy-subtitle effect-title">EFFET</h3>
+
+              {/* LIGNE 3 */}
+              <textarea
+                className="alchemy-input effect-input"
+                placeholder="Effet principal"
+                value={row.effect}
+                onChange={(e) => handleChange(index, "effect", e.target.value)}
+                rows={3}
+              />
             </div>
           );
         })}
       </div>
 
       <div className="alchemy-actions">
-        <button
-          type="button"
-          className="ui-checkbox-btn add-potion-btn"
-          onClick={handleAddRow}
-        >
+        <button type="button" className="ui-checkbox-btn" onClick={handleAddRow}>
           + Ajouter une potion
         </button>
       </div>
     </section>
   );
 }
-
-export default AlchemyPotions;
