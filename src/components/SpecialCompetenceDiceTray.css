@@ -1,0 +1,111 @@
+/* src/components/SpecialCompetenceDiceTray.css */
+
+/* ✅ Container “à la StatsDiceRoller”, mais isolé */
+.scdt {
+  margin: 0.75rem 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(78, 60, 42, 0.5);
+  background: rgba(255, 254, 253, 0);
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(120, 90, 60, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #4a311e;
+}
+
+/* Header */
+.scdt__header {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scdt__title {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* Controls row */
+.scdt__controls {
+  margin-top: 0.1rem;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.scdt__select {
+  min-width: 260px;
+  max-width: 520px;
+  width: min(520px, 100%);
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(140, 105, 70, 0.7);
+  background: rgba(255, 255, 255, 0.65);
+  color: #2f2115;
+  outline: none;
+}
+
+.scdt__select:focus {
+  border-color: rgba(140, 105, 70, 0.95);
+  box-shadow: 0 0 0 3px rgba(140, 105, 70, 0.2);
+}
+
+.scdt__btn {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+}
+
+.scdt__btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Status area */
+.scdt__status {
+  margin-top: 0.1rem;
+  text-align: center;
+  width: 100%;
+}
+
+.scdt__hint {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.scdt__meta {
+  font-size: 0.95rem;
+}
+
+.scdt__result {
+  margin-top: 0.25rem;
+  font-size: 1rem;
+}
+
+.scdt__strong {
+  font-weight: 700;
+}
+
+/* ✅ Zone 3D (canvas full width) */
+.scdt__threeDPanel {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+/* Force canvas full width comme StatsDiceRoller */
+.scdt .dice3d,
+.scdt .dice3d__canvas {
+  width: 100%;
+}

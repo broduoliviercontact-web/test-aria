@@ -104,10 +104,9 @@ function applyCousinPercentileColors(dices) {
 
   const baseHue = randomBaseHue();
 
-  // ⭐⭐ VARIABLE À MODIFIER POUR AUGMENTER L’ÉCART DE COULEUR ⭐⭐
-  // Plus delta est grand, plus les 2 couleurs s’éloignent.
-  // Ex: 18–28 = cousines ; 35–55 = plus marqué ; 70+ = contraste fort.
-  const delta = 18 + Math.floor(Math.random() * 20); // 18–28° (cousines)
+  // ⭐ VARIABLE À MODIFIER POUR AUGMENTER / RÉDUIRE L’ÉCART
+  // cousines = ~18–28 ; plus marqué = ~35–55 ; contraste = 70+
+  const delta = 18 + Math.floor(Math.random() * 10); // 18–28°
 
   const tensColor = makeHsl(baseHue, 55, 32);
   const onesColor = makeHsl(baseHue + delta, 55, 32);
@@ -140,13 +139,11 @@ function isD100Notation(raw) {
 }
 
 function toPercentileFromResults(tensRaw, onesRaw) {
-  // tensRaw attendu: 0,10..90 (fallback 1..10)
   let tens =
     tensRaw >= 0 && tensRaw <= 90 && tensRaw % 10 === 0
       ? tensRaw
       : (tensRaw === 10 ? 0 : tensRaw) * 10;
 
-  // onesRaw attendu: 0..9 (fallback 1..10)
   let ones =
     onesRaw >= 0 && onesRaw <= 9 ? onesRaw : onesRaw === 10 ? 0 : onesRaw;
 
@@ -185,6 +182,23 @@ const Dice3D = forwardRef(function Dice3D(
     if (onChangeColorMode) onChangeColorMode(mode);
     else setLocalColorMode(mode);
   };
+
+  // ✅ refs anti-stale-closure (fix swipe)
+  const onRollRef = useRef(onRoll);
+  const notationRef = useRef(notation);
+  const colorModeRef = useRef(colorMode);
+
+  useEffect(() => {
+    onRollRef.current = onRoll;
+  }, [onRoll]);
+
+  useEffect(() => {
+    notationRef.current = notation;
+  }, [notation]);
+
+  useEffect(() => {
+    colorModeRef.current = colorMode;
+  }, [colorMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -231,18 +245,18 @@ const Dice3D = forwardRef(function Dice3D(
 
         box.bind_swipe(
           el,
-          // before_roll: setDice au moment du geste
+          // before_roll
           () => {
-            const raw = String(notation || "1d6").trim().toLowerCase();
+            const raw = String(notationRef.current || "1d6")
+              .trim()
+              .toLowerCase();
             const effective = isD100Notation(raw) ? "1d100+1d10" : raw;
 
             effectiveNotationRef.current = effective;
             box.setDice(effective);
-
-            // null => résultat random
-            return null;
+            return null; // random
           },
-          // after_roll: parse résultats
+          // after_roll
           (notationObj) => {
             const rolls = Array.isArray(notationObj?.result)
               ? notationObj.result
@@ -254,7 +268,7 @@ const Dice3D = forwardRef(function Dice3D(
               const onesRaw = Number(rolls?.[1] ?? 0);
               const pct = toPercentileFromResults(tensRaw, onesRaw);
 
-              onRoll?.({ total: pct, rolls: [tensRaw, onesRaw] });
+              onRollRef.current?.({ total: pct, rolls: [tensRaw, onesRaw] });
               applyCousinPercentileColors(box.dices);
               return;
             }
@@ -264,8 +278,8 @@ const Dice3D = forwardRef(function Dice3D(
                 ? notationObj.resultTotal
                 : rolls.reduce((a, b) => a + b, 0);
 
-            onRoll?.({ total, rolls });
-            applyColorsToDice(box.dices, colorMode);
+            onRollRef.current?.({ total, rolls });
+            applyColorsToDice(box.dices, colorModeRef.current);
           }
         );
       } catch (e) {
