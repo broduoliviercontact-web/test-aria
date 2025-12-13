@@ -9,10 +9,10 @@ Interface moderne, logique métier complète, pensée pour un usage réel en tab
 
 ## ✨ Features
 
-- 🎲 Génération des caractéristiques (3d6 ou point-buy)
-- 🎒 Inventaire & kits d’équipement intelligents
-- ⚔️ Weapon list dédiée (armes ≠ inventaire)
-- ⚗️ Alchimie optionnelle (potions & compétences)
+- 🎲 Génération des caractéristique
+- 🎒 Inventaire 
+- ⚔️ Weapon list dédiée 
+- ⚗️ Alchimie 
 - 💾 Sauvegarde locale & serveur
 - 📄 Export PDF fidèle à la fiche officielle
 - 🎲 Dés en 3D (desktop & mobile)
