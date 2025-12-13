@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Confetti from "react-confetti";
 import Dice3D from "./Dice3D";
 import { useDiceRoll } from "./DiceRollContext";
 import "./SpecialCompetenceDiceTray.css";
@@ -12,6 +13,33 @@ export default function SpecialCompetenceDiceTray({
 
   const [selectedKey, setSelectedKey] = useState("");
   const [active, setActive] = useState(null);
+
+  // ✅ Confetti sizing (pour confetti limité au panel)
+  const confettiBoxRef = useRef(null);
+  const [confSize, setConfSize] = useState({ w: 0, h: 0 });
+
+  // ✅ FX states
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showFumbleFx, setShowFumbleFx] = useState(false);
+
+  useEffect(() => {
+    const el = confettiBoxRef.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver(() => {
+      const rect = el.getBoundingClientRect();
+      setConfSize({
+        w: Math.max(0, Math.round(rect.width)),
+        h: Math.max(0, Math.round(rect.height)),
+      });
+    });
+
+    ro.observe(el);
+    const rect = el.getBoundingClientRect();
+    setConfSize({ w: Math.round(rect.width), h: Math.round(rect.height) });
+
+    return () => ro.disconnect();
+  }, []);
 
   const options = useMemo(() => {
     const normal = Array.isArray(competences) ? competences : [];
@@ -52,7 +80,7 @@ export default function SpecialCompetenceDiceTray({
   const canRoll =
     !!selected && Number.isFinite(selected.target) && selected.target > 0;
 
-  // micro-optim : attente propre
+  // attente "propre"
   const rollWhenReady = (attempt = 0) => {
     const maxAttempts = 90;
     if (dice3DRef.current?.isReady?.()) {
@@ -75,6 +103,14 @@ export default function SpecialCompetenceDiceTray({
     };
   };
 
+  // ✅ Règles Aria
+  const computeAriaCritFumble = (total) => {
+    const n = Number(total) || 0;
+    const isCrit = n >= 1 && n <= 9;       // 01–09
+    const isFumble = n >= 91 && n <= 100;  // 91–00
+    return { isCrit, isFumble };
+  };
+
   const storeOutcome = (req, { total, rolls }) => {
     if (!req) return;
 
@@ -86,6 +122,8 @@ export default function SpecialCompetenceDiceTray({
         ? Number(rolls[0]) || 0
         : 0;
 
+    const { isCrit, isFumble } = computeAriaCritFumble(finalTotal);
+
     const outcome = {
       total: finalTotal,
       rolls: Array.isArray(rolls) && rolls.length ? rolls : [finalTotal],
@@ -93,9 +131,25 @@ export default function SpecialCompetenceDiceTray({
       success: finalTotal <= target,
       label: req.label || "Test",
       at: Date.now(),
+      isCrit,
+      isFumble,
     };
 
     setRollResult(req.entityKey, outcome);
+
+    // ✅ Critique: confetti plus long (3.5s)
+    if (isCrit) {
+      setShowConfetti(true);
+      window.clearTimeout(storeOutcome.__critT);
+      storeOutcome.__critT = window.setTimeout(() => setShowConfetti(false), 3500);
+    }
+
+    // ✅ Fumble: neige + shake (4s)
+    if (isFumble) {
+      setShowFumbleFx(true);
+      window.clearTimeout(storeOutcome.__fumT);
+      storeOutcome.__fumT = window.setTimeout(() => setShowFumbleFx(false), 4000);
+    }
   };
 
   const handleTest = () => {
@@ -117,6 +171,13 @@ export default function SpecialCompetenceDiceTray({
     rollWhenReady();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rollRequest?.id]);
+
+  const renderTag = () => {
+    if (!last) return null;
+    if (last.isCrit) return <span className="scdt__tag scdt__tag--crit">🔥 Critique !</span>;
+    if (last.isFumble) return <span className="scdt__tag scdt__tag--fumble">💀 Fumble !</span>;
+    return null;
+  };
 
   return (
     <section className="scdt">
@@ -187,24 +248,52 @@ export default function SpecialCompetenceDiceTray({
               <span className="scdt__strong">
                 {last.total}/{last.target}
               </span>{" "}
-              {last.success ? "✅" : "❌"}
+              {last.success ? "✅" : "❌"} {renderTag()}
             </div>
           ) : null}
         </div>
       </div>
 
-      <div className="scdt__threeDPanel">
+      {/* Panel FX + Dice */}
+<div
+  className={
+    "scdt__threeDPanel" +
+    (showFumbleFx ? " scdt__threeDPanel--fumble" : "") +
+    (showConfetti ? " scdt__threeDPanel--crit" : "")
+  }
+  ref={confettiBoxRef}
+>
+
+        {/* ✅ Confetti au-dessus */}
+        {showConfetti && confSize.w > 0 && confSize.h > 0 ? (
+          <div className="scdt__confetti">
+            <Confetti
+              width={confSize.w}
+              height={confSize.h}
+              numberOfPieces={260}
+              recycle={false}
+              gravity={0.18}
+            />
+          </div>
+        ) : null}
+
+        {/* ✅ Fumble snow overlay (inspiré du CodePen) */}
+        {showFumbleFx ? (
+          <div className="scdt__snowFx" aria-hidden="true">
+            <div className="scdt__snowFxInner" />
+          </div>
+        ) : null}
+
         <Dice3D
           ref={dice3DRef}
           notation={active?.notation || "d100"}
           height={280}
           hideToolbar={true}
           onRoll={(payload) => {
-            // IMPORTANT : on ne dépend pas d’un state async.
             const req = active || buildReqFromSelection();
             if (!req) return;
 
-            if (!active) setActive(req); // pour "coller" au choix actuel
+            if (!active) setActive(req);
             storeOutcome(req, payload);
           }}
         />

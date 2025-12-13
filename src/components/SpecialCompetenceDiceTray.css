@@ -109,3 +109,188 @@
 .scdt .dice3d__canvas {
   width: 100%;
 }
+.scdt__tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.scdt__tag--crit {
+  background: rgba(255, 210, 120, 0.22);
+  color: #ffd278;
+}
+
+.scdt__tag--fumble {
+  background: rgba(255, 120, 120, 0.22);
+  color: #ffb0b0;
+}
+
+.scdt__tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.scdt__tag--crit {
+  background: rgba(255, 210, 120, 0.22);
+  color: #ffd278;
+}
+
+.scdt__tag--fumble {
+  background: rgba(255, 120, 120, 0.22);
+  color: #ffb0b0;
+}
+
+/* Confetti au-dessus du Dice3D */
+.scdt__threeDPanel {
+  position: relative;
+}
+
+.scdt__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+/* ===== Crit/Fumble tags ===== */
+.scdt__tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.scdt__tag--crit {
+  background: rgba(255, 210, 120, 0.22);
+  color: #ffd278;
+}
+
+.scdt__tag--fumble {
+  background: rgba(255, 120, 120, 0.22);
+  color: #ffb0b0;
+}
+
+/* ===== Confetti overlay ===== */
+.scdt__threeDPanel {
+  position: relative;
+}
+
+.scdt__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ===== Fumble FX : shake + neige (inspiré du CodePen laviperchik) ===== */
+/* Source d’inspiration : “css snow” :contentReference[oaicite:1]{index=1} */
+
+.scdt__threeDPanel--fumble {
+  animation: scdt-shake 0.55s ease-in-out 0s 3;
+  filter: saturate(1.15) contrast(1.05);
+}
+
+@keyframes scdt-shake {
+  0%   { transform: translate3d(0,0,0) rotate(0deg); }
+  12%  { transform: translate3d(-2px, 1px,0) rotate(-0.4deg); }
+  25%  { transform: translate3d(3px, -1px,0) rotate(0.5deg); }
+  40%  { transform: translate3d(-3px, 2px,0) rotate(-0.6deg); }
+  55%  { transform: translate3d(2px, -2px,0) rotate(0.5deg); }
+  70%  { transform: translate3d(-1px, 2px,0) rotate(-0.3deg); }
+  100% { transform: translate3d(0,0,0) rotate(0deg); }
+}
+
+/* Overlay neige */
+.scdt__snowFx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* petite teinte froide “échec” */
+.scdt__snowFx::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 35%,
+    rgba(160, 210, 255, 0.12),
+    rgba(0, 0, 0, 0.12)
+  );
+  mix-blend-mode: screen;
+}
+
+/* L’idée du CodePen : plusieurs couches en pseudo-elements qui défilent lentement */
+.scdt__snowFxInner::before,
+.scdt__snowFxInner::after {
+  content: "";
+  position: absolute;
+  top: -220%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.01);
+  background-repeat: repeat;
+  opacity: 0.9;
+  animation-name: scdt-move-snow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* couche floue (grosse neige) */
+.scdt__snowFxInner::before {
+  filter: blur(3px);
+  background-image: url("http://www.freepngimg.com/download/winter_snow/4-2-white-snow-png.png");
+  background-size: 80%;
+  animation-duration: 7s;
+}
+
+/* couche fine (petite neige) */
+.scdt__snowFxInner::after {
+  filter: blur(1px);
+  background-image: url("http://www.freepngimg.com/download/winter_snow/4-2-white-snow-png.png");
+  background-size: 45%;
+  animation-duration: 5s;
+  opacity: 0.75;
+}
+
+@keyframes scdt-move-snow {
+  from { transform: translateY(0); }
+  to   { transform: translateY(70%); }
+}
+/* ===== CRITIQUE FX : shake héroïque ===== */
+
+.scdt__threeDPanel--crit {
+  animation: scdt-crit-shake 0.35s ease-out 0s 1;
+  filter: saturate(1.25) brightness(1.05);
+}
+
+@keyframes scdt-crit-shake {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  15%  { transform: translate3d(-2px, -1px,0) scale(1.01); }
+  30%  { transform: translate3d(3px, 1px,0) scale(1.015); }
+  45%  { transform: translate3d(-3px, 0,0) scale(1.02); }
+  60%  { transform: translate3d(2px, -1px,0) scale(1.015); }
+  80%  { transform: translate3d(-1px, 1px,0) scale(1.01); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
