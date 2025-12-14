@@ -1,7 +1,7 @@
 /* src/components/AlchemyPotions.css */
 
 .alchemy-card {
-  padding: 0.6rem;
+  padding: 1rem;
   border-radius: 10px;
   border: 1px solid rgba(120, 90, 60, 0.8);
   background-image: url("/parchment-bg2.jpg");
@@ -27,15 +27,13 @@
 }
 
 /* =========================
-   HEADER (DOIT matcher .alchemy-row)
+   HEADER / ROW : mêmes colonnes
+   ✅ FIX : Diff/Qté alignés car colonnes fixes
    ========================= */
 
 .alchemy-header {
   display: grid;
-
-  /* ✅ IMPORTANT : mêmes colonnes que .alchemy-row */
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1.6fr) 2.9rem 2.7rem 2rem;
-
+  grid-template-columns: minmax(0, 2fr) minmax(0, 0.9fr) 1.9rem 1rem 0.9rem;
   gap: 0.35rem;
   font-weight: 700;
   font-size: 0.82rem;
@@ -49,34 +47,34 @@
 .alchemy-col-delete {
   text-align: center;
 }
-
-/* =========================
-   ROW : 3 lignes
-   ========================= */
-
+.alchemy-input name-input {
+  font-size: 12px;
+}
 .alchemy-row {
   display: grid;
-
-  /* ✅ IMPORTANT : mêmes colonnes que .alchemy-header */
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) 2.9rem 2.7rem 2rem;
-
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) 2.43rem 1.62rem 0.5rem;
   grid-template-areas:
     "name components diff qty delete"
     "effectTitle effectTitle diff qty delete"
     "effect effect effect effect effect";
-
-  gap: 0.35rem;
+  gap: 0.2rem;
   margin-bottom: 1rem;
   align-items: start;
+  font-size: 12px;
 }
 
 /* Areas */
 .name-input {
   grid-area: name;
+    font-weight: 700;
+  font-size: 10px;
 }
 
 .components-input {
   grid-area: components;
+  font-size: 10px;
+  font-weight: 700;
+
 }
 
 .difficulty-wrapper {
@@ -84,12 +82,14 @@
   justify-self: end;
   position: relative;
   align-self: start;
+    
 }
 
 .qty-input {
   grid-area: qty;
   justify-self: end;
   align-self: start;
+   font-weight: 700;
 }
 
 .delete-potion-btn,
@@ -117,7 +117,7 @@
   border-radius: 4px;
   border: 2px solid rgba(73, 55, 36, 0.7);
   background: transparent;
-  font-size: 0.8rem;
+  font-size: 0.69rem;
   min-width: 0;
   box-sizing: border-box;
   color: #2f2115;
@@ -128,15 +128,10 @@
 .components-input,
 .difficulty-input,
 .qty-input {
-  height: 2.35rem;
+  height: 2rem;
 }
 
-/* Composants : visuellement un peu compact */
-.components-input {
-  opacity: 0.98;
-}
-
-/* Diff / Qté : remplissent la colonne fixe */
+/* Diff / Qté remplissent leur colonne fixe */
 .difficulty-input {
   width: 100%;
   padding-right: 1.1rem;
@@ -185,9 +180,9 @@
    ========================= */
 
 .delete-potion-btn {
-  width: 100%;
-  height: 2.35rem;
-  display: flex;
+  width: 60%;
+
+  
   align-items: center;
   justify-content: center;
   background: none;
@@ -195,7 +190,8 @@
   cursor: pointer;
   color: #8a3b34;
   font-size: 1rem;
-  line-height: 1;
+  line-height: 2;
+
 }
 
 .delete-potion-btn:hover {
@@ -235,12 +231,240 @@
 }
 
 /* =========================
+   LOGO POTION (mini) - header
+   ========================= */
+
+.alchemy-titleLogo {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container */
+.potion-container {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(30deg);
+}
+
+.potion-container--mini {
+  width: 34px;
+  height: 34px;
+}
+
+/* Top */
+.potion-top {
+  width: 25px;
+  height: 35px;
+  position: absolute;
+  top: -38px;
+  border-radius: 5px;
+  border: 3px solid #000;
+  border-bottom-color: transparent;
+  background-color: transparent;
+  z-index: 3;
+}
+
+.potion-container--mini .potion-top {
+  width: 8px;
+  height: 10px;
+  top: -14px;
+  border-width: 2px;
+}
+
+/* Top line */
+.potion-top-line {
+  position: absolute;
+  width: 8px;
+  top: 5px;
+  height: 2px;
+  right: 2px;
+  background-color: #000;
+}
+
+.potion-container--mini .potion-top-line {
+  width: 4px;
+  top: 3px;
+  right: 1px;
+}
+
+/* Neck */
+.potion-neck {
+  width: 45px;
+  height: 15px;
+  position: absolute;
+  z-index: 4;
+  top: -22px;
+  border-radius: 5px;
+  border: 3px solid #000;
+  background-color: transparent;
+}
+
+.potion-container--mini .potion-neck {
+  width: 14px;
+  height: 6px;
+  top: -6px;
+  border-width: 2px;
+}
+
+/* Body */
+.potion-body {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 5px solid #000;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.potion-container--mini .potion-body {
+  width: 32px;
+  height: 32px;
+  border-width: 2px;
+}
+
+/* Content */
+.potion-content {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+  top: 6px;
+  left: 6px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.potion-container--mini .potion-content {
+  width: 28px;
+  height: 28px;
+  top: 2px;
+  left: 2px;
+}
+
+/* Liquid */
+.potion-content::after {
+  content: "";
+  position: absolute;
+  border-radius: 40%;
+  width: 160px;
+  height: 140px;
+  bottom: -80px;
+  left: -20px;
+  background-color: #f200ff;
+  animation: drift 3000ms infinite cubic-bezier(0.5, 0.7, 0.7, 0.5);
+}
+
+.potion-container--mini .potion-content::after {
+  width: 46px;
+  height: 40px;
+  bottom: -24px;
+  left: -8px;
+}
+
+/* Bubbles */
+.blob-container {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 40%;
+  left: 10%;
+  z-index: 4;
+}
+
+.potion-container--mini .blob-container {
+  width: 14px;
+  height: 14px;
+  top: 40%;
+  left: 12%;
+}
+
+.blob {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #000;
+}
+
+.potion-container--mini .blob {
+  width: 5px;
+  height: 5px;
+}
+
+.blob::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background-color: #36d8c5;
+  top: 2px;
+  left: 3px;
+}
+
+.potion-container--mini .blob::after {
+  width: 3px;
+  height: 3px;
+  top: 1px;
+  left: 1px;
+}
+
+.blob-one {
+  top: 12px;
+  left: 18px;
+}
+
+.blob-two {
+  top: 22px;
+  left: 0;
+}
+
+.blob-three {
+  top: 36px;
+  left: 16px;
+}
+
+.potion-container--mini .blob-one {
+  top: 3px;
+  left: 6px;
+}
+
+.potion-container--mini .blob-two {
+  top: 6px;
+  left: 0;
+}
+
+.potion-container--mini .blob-three {
+  top: 10px;
+  left: 5px;
+}
+
+/* Animation */
+@keyframes drift {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
    RESPONSIVE (mobile)
    - On empile Composants sous Potion
    ========================= */
 
 @media (max-width: 520px) {
-  /* Header en 4 colonnes (on “cache” la colonne composants) */
+  /* Header en 4 colonnes (on "cache" composants) */
   .alchemy-header {
     grid-template-columns: 1fr 2.9rem 2.7rem 2rem;
   }

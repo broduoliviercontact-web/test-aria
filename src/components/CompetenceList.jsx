@@ -361,7 +361,7 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
   </button>
 </div>
 
-                  <div className="score-editor">
+                  {/* <div className="score-editor">
                     <span className="score-label">Score :</span>
 
                     {!isLocked && (
@@ -385,7 +385,7 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
                     )}
 
                     {isLocked && <span className="score-value">{totalScore}%</span>}
-                  </div>
+                  </div> */}
 
                   {effectiveMode === "custom" ? (
                     <p className="rules-hint">

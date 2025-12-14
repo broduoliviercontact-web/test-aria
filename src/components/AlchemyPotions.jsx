@@ -54,25 +54,45 @@ export default function AlchemyPotions({ potions, onChange }) {
   return (
     <section className="alchemy-card">
       <div className="alchemy-titleRow">
-        <h2 className="alchemy-title">Alchimie – Potions</h2>
-        <div className="alchemy-titleLogo" aria-hidden="true" />
+        <h2 className="alchemy-title">Alchimie</h2>
+
+        {/* ✅ Logo potion (mini) */}
+        <div className="alchemy-titleLogo" aria-hidden="true">
+          <div className="potion-container potion-container--mini">
+            <div className="potion-top">
+              <div className="potion-top-line" />
+            </div>
+            <div className="potion-neck" />
+            <div className="potion-body">
+              <div className="potion-content">
+                <div className="blob-container">
+                  <div className="blob blob-one" />
+                  <div className="blob blob-two" />
+                  <div className="blob blob-three" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="alchemy-table">
-<div className="alchemy-header">
-  <span className="alchemy-col-name">Potion</span>
-  <span className="alchemy-col-components">Composants</span>
-  <span className="alchemy-col-difficulty">Diff.</span>
-  <span className="alchemy-col-qty">Qté</span>
-  <span className="alchemy-col-delete" aria-hidden="true" />
-</div>
+        {/* ✅ IMPORTANT : 5 colonnes exactement (dont delete vide) */}
+        <div className="alchemy-header">
+          <span className="alchemy-col-name">Potion</span>
+          <span className="alchemy-col-components">Comp</span>
+          <span className="alchemy-col-difficulty">Diff.</span>
+          <span className="alchemy-col-qty">Qté</span>
+          <span className="alchemy-col-delete" aria-hidden="true" />
+        </div>
 
         {rows.map((row, index) => {
           const isReal = index < realRows.length;
 
           return (
             <div key={row.id || index} className="alchemy-row">
-              {/* LIGNE 1 */}
+              {/* Ligne 1 */}
+              
               <input
                 className="alchemy-input name-input"
                 placeholder="Nom de la potion"
@@ -92,9 +112,7 @@ export default function AlchemyPotions({ potions, onChange }) {
                   className="alchemy-input difficulty-input"
                   placeholder="0"
                   value={row.difficulty}
-                  onChange={(e) =>
-                    handleChange(index, "difficulty", e.target.value)
-                  }
+                  onChange={(e) => handleChange(index, "difficulty", e.target.value)}
                 />
                 <span className="difficulty-suffix">%</span>
               </div>
@@ -108,6 +126,7 @@ export default function AlchemyPotions({ potions, onChange }) {
 
               {isReal ? (
                 <button
+                  type="button"
                   className="delete-potion-btn"
                   onClick={() => handleDeleteRow(index)}
                   aria-label="Supprimer cette potion"
@@ -115,13 +134,13 @@ export default function AlchemyPotions({ potions, onChange }) {
                   ✕
                 </button>
               ) : (
-                <span className="delete-potion-spacer" />
+                <span className="delete-potion-spacer" aria-hidden="true" />
               )}
 
-              {/* LIGNE 2 */}
+              {/* Ligne 2 */}
               <h3 className="alchemy-subtitle effect-title">EFFET</h3>
 
-              {/* LIGNE 3 */}
+              {/* Ligne 3 */}
               <textarea
                 className="alchemy-input effect-input"
                 placeholder="Effet principal"

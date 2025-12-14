@@ -1,15 +1,13 @@
-// src/components/WeaponList.jsx
 import React, { useState } from "react";
 import "./WeaponList.css";
 import { weaponIcons } from "../bladeIcons";
 
 export default function WeaponList({ weapons, onChange }) {
-  // Tri alphabétique FR
   const sortedWeaponIcons = [...weaponIcons].sort((a, b) =>
     a.label.localeCompare(b.label, "fr", { sensitivity: "base" })
   );
 
-  const defaultIcon = sortedWeaponIcons[0]?.url ?? "";
+  const defaultIcon = sortedWeaponIcons[0]?.url ?? "/icons/weapon.gif";
   const [openPickerIndex, setOpenPickerIndex] = useState(null);
 
   const updateWeapon = (index, key, value) => {
@@ -31,8 +29,7 @@ export default function WeaponList({ weapons, onChange }) {
   };
 
   const removeWeapon = (index) => {
-    const copy = weapons.filter((_, i) => i !== index);
-    onChange(copy);
+    onChange(weapons.filter((_, i) => i !== index));
   };
 
   const validateWeapon = (index) => {
@@ -47,8 +44,10 @@ export default function WeaponList({ weapons, onChange }) {
 
   return (
     <section className="weapon-section">
+      <div className="arme-title">
       <h2 className="weapon-title">Armes</h2>
-
+      <img src="/icons/weapon.gif" className="arme"alt="Armes" />
+</div>
       {weapons.map((weapon, index) => {
         const currentIcon = weapon.icon || defaultIcon;
         const isValidated = !!weapon.validated;
@@ -57,11 +56,9 @@ export default function WeaponList({ weapons, onChange }) {
         return (
           <div
             key={index}
-            className={`weapon-row ${
-              isValidated ? "weapon-row--validated" : ""
-            }`}
+            className={`weapon-row ${isValidated ? "weapon-row--validated" : ""}`}
           >
-            {/* Bloc icône = médaillon + menu déroulant personnalisé */}
+            {/* Médaillon icône */}
             <div className="weapon-icon-block">
               <button
                 type="button"
@@ -80,44 +77,48 @@ export default function WeaponList({ weapons, onChange }) {
               {!isValidated && isPickerOpen && (
                 <div className="weapon-icon-picker">
                   {sortedWeaponIcons.map((icon) => {
-  const isSelected = icon.url === (weapon.icon || defaultIcon);
+                    const isSelected =
+                      icon.url === (weapon.icon || defaultIcon);
 
-  return (
-    <button
-      key={icon.id}
-      type="button"
-      className={
-        "weapon-icon-picker-item" +
-        (isSelected ? " weapon-icon-picker-item--selected" : "")
-      }
-      onClick={() => {
-        updateWeapon(index, "icon", icon.url);
-        setOpenPickerIndex(null);
-      }}
-    >
-      <img
-        src={icon.url}
-        alt={icon.label}
-        className="weapon-icon-picker-image"
-      />
-      <span className="weapon-icon-picker-label">
-        {icon.label}
-      </span>
-    </button>
-  );
-})}
-
+                    return (
+                      <button
+                        key={icon.id}
+                        type="button"
+                        className={
+                          "weapon-icon-picker-item" +
+                          (isSelected
+                            ? " weapon-icon-picker-item--selected"
+                            : "")
+                        }
+                        onClick={() => {
+                          updateWeapon(index, "icon", icon.url);
+                          setOpenPickerIndex(null);
+                        }}
+                      >
+                        <img
+                          src={icon.url}
+                          alt={icon.label}
+                          className="weapon-icon-picker-image"
+                        />
+                        <span className="weapon-icon-picker-label">
+                          {icon.label}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
 
-            {/* Bloc principal : nom + dégâts */}
+            {/* Nom + dégâts */}
             <div className="weapon-main">
               <input
                 type="text"
                 placeholder="Nom de l'arme"
                 value={weapon.name || ""}
-                onChange={(e) => updateWeapon(index, "name", e.target.value)}
+                onChange={(e) =>
+                  updateWeapon(index, "name", e.target.value)
+                }
                 className="weapon-input weapon-name-input"
               />
 
@@ -125,12 +126,14 @@ export default function WeaponList({ weapons, onChange }) {
                 type="text"
                 placeholder="Dégâts (ex : 1D6)"
                 value={weapon.damage || ""}
-                onChange={(e) => updateWeapon(index, "damage", e.target.value)}
+                onChange={(e) =>
+                  updateWeapon(index, "damage", e.target.value)
+                }
                 className="weapon-input weapon-damage-input"
               />
             </div>
 
-            {/* Boutons à droite */}
+            {/* Actions */}
             <div className="weapon-actions">
               {!isValidated && (
                 <button
