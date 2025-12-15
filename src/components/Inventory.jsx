@@ -252,7 +252,14 @@ export default function Inventory({ items, onChange }) {
 
   return (
     <section className="inventory-card">
-      <h2 className="inventory-title">Inventaire</h2>
+
+      <div className="inventory-tititle">
+
+         <img src="/icons/bagpack.gif" className="arme1"alt="Armes" />
+          <h2 className="inventory-title">Inventaire</h2>
+           <img src="/icons/bagpack.gif" className="arme1"alt="Armes" />
+          </div>
+  
 
       {items.length === 0 && (
         <p className="inventory-empty">Aucun objet pour l’instant.</p>

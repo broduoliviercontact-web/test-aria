@@ -45,8 +45,9 @@ export default function WeaponList({ weapons, onChange }) {
   return (
     <section className="weapon-section">
       <div className="arme-title">
+           <img src="/icons/weapon-2.gif" className="arme"alt="Armes" />
       <h2 className="weapon-title">Armes</h2>
-      <img src="/icons/weapon.gif" className="arme"alt="Armes" />
+      <img src="/icons/weapon-2.gif" className="arme"alt="Armes" />
 </div>
       {weapons.map((weapon, index) => {
         const currentIcon = weapon.icon || defaultIcon;

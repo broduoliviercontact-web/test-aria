@@ -35,6 +35,8 @@ export default function PdfCharacterSheet({
   hitPoints,
   wounds,
   armor,
+  isAlchemist = false,
+  alchemyPotions = [],
 }) {
   const { gold, silver, copper, iron } = breakdownPurse(purseFer || 0);
 
@@ -235,7 +237,43 @@ export default function PdfCharacterSheet({
               </table>
             )}
           </div>
+          {isAlchemist && (
+  <div className="pdf-card pdf-alchemy-card">
+    <h2 className="pdf-card-title">Alchimie</h2>
+
+    <table className="pdf-alchemy-table">
+      <thead>
+        <tr>
+          <th className="pdf-alchemy-col-name">Potion</th>
+          <th className="pdf-alchemy-col-diff">Diff.</th>
+          <th className="pdf-alchemy-col-qty">Qté</th>
+        </tr>
+      </thead>
+      <tbody>
+        {(alchemyPotions || [])
+          .filter((p) => p && (p.name || p.difficulty || p.quantity))
+          .slice(0, 8)
+          .map((p, idx) => (
+            <tr key={p.id || `${p.name}-${idx}`}>
+              <td className="pdf-alchemy-col-name">{p.name || ""}</td>
+              <td className="pdf-alchemy-col-diff">
+                {p.difficulty != null && p.difficulty !== "" ? `${p.difficulty}%` : ""}
+              </td>
+              <td className="pdf-alchemy-col-qty">
+                {p.quantity != null ? String(p.quantity) : ""}
+              </td>
+            </tr>
+          ))}
+      </tbody>
+    </table>
+
+    {(!alchemyPotions || alchemyPotions.length === 0) && (
+      <p className="pdf-empty-text">—</p>
+    )}
+  </div>
+)}
         </div>
+
 
         {/* Colonne DROITE : Compétences */}
         <div className="pdf-card pdf-competences">
@@ -244,7 +282,7 @@ export default function PdfCharacterSheet({
             <thead>
               <tr>
                 <th>Compétence</th>
-                <th>Type</th>
+                
                 <th>Lien</th>
                 <th>Score</th>
               </tr>

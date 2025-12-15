@@ -156,8 +156,8 @@
 
 /* Effet : grand, confortable */
 .effect-input {
-  min-height: 6.2rem;
-  padding: 0.45rem 0.45rem;
+  min-height: 3.2rem;
+  padding: 0.3rem 0.3rem;
   line-height: 1.25;
   resize: vertical;
 }

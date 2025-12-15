@@ -54,6 +54,24 @@ export default function AlchemyPotions({ potions, onChange }) {
   return (
     <section className="alchemy-card">
       <div className="alchemy-titleRow">
+              {/* ✅ Logo potion (mini) */}
+        <div className="alchemy-titleLogo" aria-hidden="true">
+          <div className="potion-container potion-container--mini">
+            <div className="potion-top">
+              <div className="potion-top-line" />
+            </div>
+            <div className="potion-neck" />
+            <div className="potion-body">
+              <div className="potion-content">
+                <div className="blob-container">
+                  <div className="blob blob-one" />
+                  <div className="blob blob-two" />
+                  <div className="blob blob-three" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <h2 className="alchemy-title">Alchimie</h2>
 
         {/* ✅ Logo potion (mini) */}
@@ -146,7 +164,7 @@ export default function AlchemyPotions({ potions, onChange }) {
                 placeholder="Effet principal"
                 value={row.effect}
                 onChange={(e) => handleChange(index, "effect", e.target.value)}
-                rows={3}
+                rows={1}
               />
             </div>
           );

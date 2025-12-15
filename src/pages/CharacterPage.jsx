@@ -30,8 +30,29 @@ import SpecialCompetenceDiceTray from "../components/SpecialCompetenceDiceTray";
 
 // PDF
 import jsPDF from "jspdf";
+
 import html2canvas from "html2canvas";
 
+function getStatValue(stats, statId) {
+  const found = stats?.find((s) => s.id === statId);
+  return found?.value ?? 0;
+}
+
+// Mode "ready" : moyenne des 2 caracs × 5
+function computeReadyScore(stats, competence) {
+  const [a, b] = competence.keyAttributes;
+  const v1 = getStatValue(stats, a);
+  const v2 = getStatValue(stats, b);
+  return Math.round(((v1 + v2) / 2) * 5);
+}
+
+// Mode "custom" : base simple (sans bonus utilisateur)
+function computeCustomBase(stats, competence) {
+  const [a, b] = competence.keyAttributes;
+  const v1 = getStatValue(stats, a);
+  const v2 = getStatValue(stats, b);
+  return (v1 + v2) * 2;
+}
 /* ===========================
    MODALE DE CREATION
    =========================== */
@@ -368,11 +389,11 @@ try {
           <div ref={screenSheetRef} className="character-sheet-container">
             {/* En-tête */}
             <div className="sheet-header">
-              <div className="sheet-header-line" />
+          
               <h1 className="sheet-header-title">
                 {characterName || "Nom du personnage"}
               </h1>
-              <div className="sheet-header-line" />
+         
             </div>
 
             <div className="sheet-header-ornament">
@@ -566,6 +587,8 @@ try {
                 hitPoints={hitPoints}
                 wounds={wounds}
                 armor={armor}
+                isAlchemist={isAlchemist}
+                alchemyPotions={alchemyPotions}
                 phraseGenial={phraseGenial}
                 phraseSociete={phraseSociete}
               />

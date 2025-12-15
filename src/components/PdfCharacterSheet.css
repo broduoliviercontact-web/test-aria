@@ -284,3 +284,23 @@
   padding-bottom: 0.2mm;
   font-size: 7pt;
 }
+
+/* Alchimie : plus compact que les autres tableaux */
+.pdf-alchemy-table {
+  font-size: 6.4pt; /* ↓ (actuellement pas défini chez toi) */
+}
+
+.pdf-alchemy-table th {
+  font-size: 6.8pt; /* ↓ */
+  letter-spacing: 0.06em;
+}
+
+.pdf-alchemy-table td {
+  padding: 0.45mm 1mm; /* ↓ un poil */
+  line-height: 1.15;   /* ↓ */
+}
+
+.pdf-alchemy-col-name {
+  font-size: 6.2pt;
+  line-height: 1.1;
+}
