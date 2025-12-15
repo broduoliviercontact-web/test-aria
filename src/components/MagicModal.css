@@ -1,0 +1,102 @@
+.magic-modal__backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.magic-modal__panel{
+  width: min(860px, calc(100vw - 24px));
+  max-height: min(80vh, 760px);
+  overflow: auto;
+  background: #f9f3e5fa;
+  border: 1px solid rgba(111, 77, 45, .8);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  padding: 16px;
+}
+
+.magic-modal__header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.magic-modal__close{
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.magic-modal__deckrow{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.magic-modal__btn{
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(111, 77, 45, .8);
+  background: #fff6;
+  cursor: pointer;
+  box-shadow: 0 2px 4px #0003, 0 0 0 1px #fff6;
+}
+.magic-modal__btn:disabled{
+  opacity: .5;
+  cursor: not-allowed;
+}
+.magic-modal__btn.ghost{
+  background: transparent;
+}
+
+.magic-modal__cardzone{
+  margin-top: 12px;
+}
+
+.magic-modal__placeholder{
+  border: 1px dashed rgba(111, 77, 45, .6);
+  border-radius: 12px;
+  padding: 18px;
+  opacity: .8;
+}
+
+.magic-modal__card{
+  border: 1px solid rgba(111, 77, 45, .8);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+
+.magic-modal__card.is-joker{
+  background: #fff6;
+}
+
+.magic-modal__cardtitle{
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.magic-modal__cardmeta{
+  opacity: .85;
+  margin-bottom: 14px;
+}
+
+.magic-modal__actions{
+  display: flex;
+  gap: 10px;
+}
+
+.magic-modal__footer{
+  margin-top: 14px;
+  opacity: .85;
+}

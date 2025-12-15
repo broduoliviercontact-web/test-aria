@@ -9,8 +9,8 @@ body {
   min-height: 100vh;
   background-image: url("/aria-background.webp");
   background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-repeat:repeat-y;
+
   font-family: "Georgia", "Times New Roman", serif;
 }
 
@@ -499,7 +499,7 @@ body {
   min-height: 100vh;
   justify-content: center;
   align-items: flex-start;
-  background-image: url("/aria-background2.webp");
+
 }
 
 .app-character {
@@ -859,4 +859,29 @@ body {
    =========================== */
 body.pdf-exporting * {
   background-image: none !important;
+}
+.magic-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(111, 77, 45, .8);
+  background: #f9f3e5fa;
+  border-radius: 12px;
+  padding: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px #0003, 0 0 0 1px #fff6;
+}
+
+.magic-btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.magic-btn__img{
+  width: 44px;
+  height: 44px;
+  image-rendering: auto;
+  display: block;
+  border-radius: 8px;
 }

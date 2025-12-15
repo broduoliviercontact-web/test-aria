@@ -320,9 +320,9 @@ const changeScore = (id, baseScore, delta) => {
     <section className="competence-section">
       {/* ✅ header custom compact + bouton valider */}
       <div className="com-tititle">
-            <img src="/icons/competence.gif" className="arme"alt="Armes" />
+            <img src="/icons/books.gif" className="arme"alt="Armes" />
           <h2 className="inventory-title">Competences</h2>
-              <img src="/icons/competence.gif" className="arme"alt="Armes" />
+              <img src="/icons/books.gif" className="arme"alt="Armes" />
           </div>
       {effectiveMode === "custom" && !effectiveLocked && (
         <div className="custom-points-header">

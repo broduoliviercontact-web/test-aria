@@ -204,7 +204,7 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1rem;
-  min-width: 600px;
+  min-width: 650px;
 }
 
 /* Chaque entrée */

@@ -1,5 +1,5 @@
 // src/pages/CharacterPage.jsx
-import React, { useRef } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 // Context dés
 import { DiceRollProvider } from "../components/DiceRollContext";
@@ -20,17 +20,17 @@ import Inventory from "../components/Inventory";
 import GoldPouch from "../components/GoldPouch";
 import HitPointsBadge from "../components/HitPointsBadge";
 import BlessureBadge from "../components/BlessureBadge";
-import ArmureBadge from "../components/ArmureBadge";
+import ArmureBadge from "../components/BlessureBadge";
 import WeaponList from "../components/WeaponList";
 import PhraseDeSynthese from "../components/PhraseDeSynthese";
 import EquipmentKitModal from "../components/EquipmentKitModal";
 import AlchemyPotions from "../components/AlchemyPotions";
 import StartingGoldRoller from "../components/StartingGoldRoller";
 import SpecialCompetenceDiceTray from "../components/SpecialCompetenceDiceTray";
+import MagicModal from "../components/MagicModal";
 
 // PDF
 import jsPDF from "jspdf";
-
 import html2canvas from "html2canvas";
 
 function getStatValue(stats, statId) {
@@ -53,6 +53,7 @@ function computeCustomBase(stats, competence) {
   const v2 = getStatValue(stats, b);
   return (v1 + v2) * 2;
 }
+
 /* ===========================
    MODALE DE CREATION
    =========================== */
@@ -62,8 +63,14 @@ function CreationModal({
   statMode,
   onChangeStatMode,
   onClose,
+
+  // alchimie
   isAlchemist,
   onChangeIsAlchemist,
+
+  // magie
+  isMageEnabled,
+  onChangeIsMageEnabled,
 }) {
   const isCustomSkills = skillMode === "custom";
   const isPointBuy = statMode === "point-buy";
@@ -176,6 +183,18 @@ function CreationModal({
           />
           Activer la carte d&apos;alchimie (gestion des potions)
         </label>
+
+        <h3>Magie</h3>
+        <p>Ce personnage possède-t-il le don de magie (cartes) ?</p>
+        <label style={{ fontSize: "0.85rem", marginTop: "0.25rem" }}>
+          <input
+            type="checkbox"
+            checked={isMageEnabled}
+            onChange={(e) => onChangeIsMageEnabled(e.target.checked)}
+            style={{ marginRight: "0.4rem" }}
+          />
+          Activer la magie (nécessite INT ≥ 14 pour lancer des sorts)
+        </label>
       </div>
     </div>
   );
@@ -190,8 +209,7 @@ export default function CharacterPage({
   onGoToMyCharacters,
   onBackHome,
 
-
-    setStats,    
+  setStats,
 
   // UI
   showCreationModal,
@@ -211,7 +229,7 @@ export default function CharacterPage({
 
   // stats + handler point-buy
   stats,
-  onChangeStat, // ✅ IMPORTANT : handler venant de App.jsx
+  onChangeStat,
 
   // identité
   characterName,
@@ -273,77 +291,115 @@ export default function CharacterPage({
   onSaveAndGoMyCharacters,
   onDeleteCharacter,
 }) {
-  // refs internes (tu peux aussi passer des refs depuis App si tu veux)
+  // refs internes
   const screenSheetRef = useRef(null);
   const pdfSheetRef = useRef(null);
 
-const handleExportPdf = async () => {
-  if (!pdfSheetRef.current) return;
+  // ===========================
+  // MAGIE (modal + state)
+  // ===========================
+  const [isMagicOpen, setIsMagicOpen] = useState(false);
 
-  // ✅ coupe les backgrounds (parchemins) pendant l'export
-  document.body.classList.add("pdf-exporting");
+  // INT : on couvre plusieurs id possibles
+  const intValue =
+    getStatValue(stats, "INT") ||
+    getStatValue(stats, "intelligence") ||
+    getStatValue(stats, "int") ||
+    0;
 
-  try {
-    const element = pdfSheetRef.current;
+  // State magie persistant (dans CharacterPage)
+  const [magic, setMagic] = useState({
+    isMage: false, // activé via le switch de création
+    deck: [],
+    currentCard: null,
+    used: [],
+  });
 
-    // ✅ attendre le chargement des images (portrait + icônes)
-    const imgs = Array.from(element.querySelectorAll("img"));
-    await Promise.all(
-      imgs.map(
-        (img) =>
-          new Promise((resolve) => {
-            if (!img || img.complete) return resolve();
-            img.addEventListener("load", resolve, { once: true });
-            img.addEventListener("error", resolve, { once: true });
-          })
-      )
-    );
+  // Mage effectif = option magie activée + INT >= 14
+  const isMage = !!magic.isMage && intValue >= 14;
 
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: "#f6ebd3",
-      imageTimeout: 15000,
-      logging: false,
-    });
-
-    if (!canvas.width || !canvas.height) {
-      throw new Error("Canvas vide (0x0) — élément PDF non rendu ou caché.");
-    }
-
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-    const imgWidthPx = canvas.width;
-    const imgHeightPx = canvas.height;
-
-    const ratio = Math.min(pdfWidth / imgWidthPx, pdfHeight / imgHeightPx);
-    const imgWidth = imgWidthPx * ratio;
-    const imgHeight = imgHeightPx * ratio;
-
-    const x = (pdfWidth - imgWidth) / 2;
-    const y = (pdfHeight - imgHeight) / 2;
-
-    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
-    pdf.save("fiche-personnage-aria.pdf");
-  } catch (error) {
-    console.error("Erreur pendant la génération du PDF :", error);
-    alert("Erreur pendant la génération du PDF");
-  } finally {
-    document.body.classList.remove("pdf-exporting");
+  function openMagic() {
+    if (!isMage) return;
+    setIsMagicOpen(true);
   }
-};
 
-document.body.classList.add("pdf-exporting");
-try {
-  // ... ton code html2canvas + jsPDF
-} finally {
-  document.body.classList.remove("pdf-exporting");
-}
+  // "character" compatible avec MagicModal (qui attend character/setCharacter)
+  const magicCharacter = useMemo(
+    () => ({ intelligence: intValue, magic }),
+    [intValue, magic]
+  );
+
+  // Setter compatible (MagicModal fait setCharacter(prev => ({...prev, magic: {...}})))
+  function setMagicCharacter(updater) {
+    setMagic((prevMagic) => {
+      const prevChar = { intelligence: intValue, magic: prevMagic };
+      const nextChar =
+        typeof updater === "function" ? updater(prevChar) : updater;
+      return nextChar?.magic ?? prevMagic;
+    });
+  }
+
+  const handleExportPdf = async () => {
+    if (!pdfSheetRef.current) return;
+
+    // ✅ coupe les backgrounds (parchemins) pendant l'export
+    document.body.classList.add("pdf-exporting");
+
+    try {
+      const element = pdfSheetRef.current;
+
+      // ✅ attendre le chargement des images (portrait + icônes)
+      const imgs = Array.from(element.querySelectorAll("img"));
+      await Promise.all(
+        imgs.map(
+          (img) =>
+            new Promise((resolve) => {
+              if (!img || img.complete) return resolve();
+              img.addEventListener("load", resolve, { once: true });
+              img.addEventListener("error", resolve, { once: true });
+            })
+        )
+      );
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#f6ebd3",
+        imageTimeout: 15000,
+        logging: false,
+      });
+
+      if (!canvas.width || !canvas.height) {
+        throw new Error("Canvas vide (0x0) — élément PDF non rendu ou caché.");
+      }
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidthPx = canvas.width;
+      const imgHeightPx = canvas.height;
+
+      const ratio = Math.min(pdfWidth / imgWidthPx, pdfHeight / imgHeightPx);
+      const imgWidth = imgWidthPx * ratio;
+      const imgHeight = imgHeightPx * ratio;
+
+      const x = (pdfWidth - imgWidth) / 2;
+      const y = (pdfHeight - imgHeight) / 2;
+
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+      pdf.save("fiche-personnage-aria.pdf");
+    } catch (error) {
+      console.error("Erreur pendant la génération du PDF :", error);
+      alert("Erreur pendant la génération du PDF");
+    } finally {
+      document.body.classList.remove("pdf-exporting");
+    }
+  };
+
   return (
     <DiceRollProvider>
       <div className="character-page">
@@ -382,6 +438,17 @@ try {
               onClose={() => setShowCreationModal(false)}
               isAlchemist={isAlchemist}
               onChangeIsAlchemist={setIsAlchemist}
+              isMageEnabled={magic.isMage}
+              onChangeIsMageEnabled={(checked) =>
+                setMagic((prev) => ({
+                  ...prev,
+                  isMage: checked,
+                  // optionnel : reset deck si on désactive
+                  ...(checked
+                    ? {}
+                    : { deck: [], currentCard: null, used: [] }),
+                }))
+              }
             />
           )}
 
@@ -389,11 +456,9 @@ try {
           <div ref={screenSheetRef} className="character-sheet-container">
             {/* En-tête */}
             <div className="sheet-header">
-          
               <h1 className="sheet-header-title">
                 {characterName || "Nom du personnage"}
               </h1>
-         
             </div>
 
             <div className="sheet-header-ornament">
@@ -432,7 +497,10 @@ try {
                 </section>
 
                 <div className="top-purse">
-                  <GoldPouch totalFer={purseFer} onChangeTotalFer={setPurseFer} />
+                  <GoldPouch
+                    totalFer={purseFer}
+                    onChangeTotalFer={setPurseFer}
+                  />
                 </div>
               </div>
 
@@ -451,7 +519,7 @@ try {
                 <div className="top-stats-card">
                   <CharacterStats
                     stats={stats}
-                    onChangeStat={onChangeStat} // ✅ FIX : point-buy fonctionne
+                    onChangeStat={onChangeStat}
                     isLocked={isStatsLockedForUi}
                   />
 
@@ -466,18 +534,17 @@ try {
             </div>
 
             {/* Roller 3d6 (one-shot) */}
-         {statMode === "3d6" && !statsRolled && (
-  <StatsDiceRoller
-    stats={stats}
-    onApplyStats={(newStats) => {
-      setStats(newStats);      // ✅ applique les caracs
-      setStatsRolled(true);    // ✅ cache le roller
-    }}
-  />
-)}
+            {statMode === "3d6" && !statsRolled && (
+              <StatsDiceRoller
+                stats={stats}
+                onApplyStats={(newStats) => {
+                  setStats(newStats);
+                  setStatsRolled(true);
+                }}
+              />
+            )}
 
-
-            {/* Starting gold (si tu l’utilises) */}
+            {/* Starting gold */}
             {!showCreationModal && statsRolled && purseFer === 0 && (
               <StartingGoldRoller
                 onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
@@ -509,6 +576,21 @@ try {
                   )}
 
                   <WeaponList weapons={weapons} onChange={setWeapons} />
+
+  
+  {magic.isMage && (
+  <button
+    type="button"
+    className="magic-btn"
+    onClick={openMagic}
+    disabled={!isMage}
+    title={!isMage ? "INT 14 minimum" : "Ouvrir la magie"}
+    aria-label="Ouvrir la magie"
+  >
+    <img src="/icon/satanic.gif" alt="" className="magic-btn__img" />
+  </button>
+)}
+
                 </div>
 
                 <div className="competences-column">
@@ -596,7 +678,11 @@ try {
 
             {/* Export PDF */}
             <div className="export-actions" style={{ marginTop: "1rem" }}>
-              <button type="button" className="btn-primary" onClick={handleExportPdf}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleExportPdf}
+              >
                 Exporter la fiche en PDF
               </button>
             </div>
@@ -628,6 +714,13 @@ try {
             <button type="button" className="btn-back" onClick={onBackHome}>
               ← Retour à l&apos;accueil
             </button>
+
+            <MagicModal
+              isOpen={isMagicOpen}
+              onClose={() => setIsMagicOpen(false)}
+              character={magicCharacter}
+              setCharacter={setMagicCharacter}
+            />
 
             {/* Modal kit */}
             <EquipmentKitModal
