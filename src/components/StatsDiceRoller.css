@@ -1,0 +1,286 @@
+.stats-dice-roller {
+  margin: 0.75rem 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(78, 60, 42, 0.5);
+  background: rgba(255, 254, 253, 0);
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(120, 90, 60, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #4a311e;
+}
+
+/* Header */
+.stats-dice-roller__header {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+  align-items: center;
+  
+}
+
+.stats-dice-roller__switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* ✅ toolbar du Dice3D dans le header */
+.stats-dice-roller__diceToolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.stats-dice-roller__color {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.stats-dice-roller__colorLabel {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* Bouton principal */
+.dice-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.3rem 1.6rem;
+  font-size: 1.05rem;
+  cursor: pointer;
+  background: #8b4513;
+  color: #fdf3df;
+  box-shadow: 0 3px 0 #4e2607;
+  font-family: "MedievalSharp", "Georgia", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+}
+
+.dice-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #4e2607;
+}
+
+.dice-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #4e2607;
+}
+
+.dice-button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.dice-hint {
+  margin: 0.6rem 0 0.4rem;
+  font-size: 0.9rem;
+  text-align: left;
+  align-self: stretch;
+}
+
+/* Zone 3D */
+.stats-dice-roller__threeDPanel {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.stats-dice-roller__currentStat {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Force canvas full width */
+.stats-dice-roller .dice3d,
+.stats-dice-roller .dice3d__canvas {
+  width: 100%;
+}
+
+/* Séries */
+.dice-series-list {
+  width: 100%;
+  margin-top: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.dice-series {
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(181, 143, 93, 0.5);
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  font-size: 0.85rem;
+}
+
+.dice-series--active {
+  background: rgba(210, 180, 120, 0.45);
+  border-color: rgba(140, 105, 70, 0.9);
+}
+
+.dice-series-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.25rem;
+}
+
+.dice-series-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dice-series-total {
+  font-weight: 600;
+}
+
+.dice-series-stats-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.dice-series-stat {
+  opacity: 0.9;
+}
+
+.dice-series-choose {
+  border: none;
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: rgba(140, 105, 70, 0.9);
+  color: #fdf3df;
+  box-shadow: 0 2px 0 rgba(80, 55, 35, 0.8);
+}
+
+/* Résultats détaillés */
+.dice-results {
+  width: 100%;
+  margin-top: 0.8rem;
+  border-top: 1px solid rgba(140, 105, 70, 0.6);
+  padding-top: 0.6rem;
+}
+
+.dice-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(181, 143, 93, 0.4);
+  font-size: 0.95rem;
+}
+
+.dice-stat-label {
+  min-width: 110px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.dice-symbols {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 1rem;
+  font-size: 1.8rem;
+}
+
+.dice-total {
+  margin-left: auto;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+
+
+/* ✅ Checkbox style (inspiré UIverse) */
+.ui-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  user-select: none;
+  cursor: pointer;
+}
+
+.ui-checkbox__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ui-checkbox__box {
+  width: 20px;
+  height: 20px;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.95);
+
+  /* look “heavy” */
+  background: rgba(35, 25, 15, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.65);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.45),
+    0 2px 0 rgba(0, 0, 0, 0.55);
+  transition: transform 120ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.ui-checkbox__tick {
+  width: 18px;
+  height: 18px;
+  transform: scale(0.2);
+  opacity: 0;
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+.ui-checkbox__label {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0.95;
+}
+
+.ui-checkbox:hover .ui-checkbox__box {
+  transform: translateY(-1px);
+}
+
+.ui-checkbox__input:focus-visible + .ui-checkbox__box {
+  outline: 2px solid rgba(210, 180, 120, 0.75);
+  outline-offset: 3px;
+}
+
+.ui-checkbox__input:checked + .ui-checkbox__box {
+  background: rgba(139, 69, 19, 0.95);
+  border-color: rgba(0, 0, 0, 0.85);
+}
+
+.ui-checkbox__input:checked + .ui-checkbox__box .ui-checkbox__tick {
+  opacity: 1;
+  transform: scale(1);
+}
+.stats-dice-roller__switchRow {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* ou flex-start si tu le veux à gauche */
+  margin-top: 0.25rem;
+}

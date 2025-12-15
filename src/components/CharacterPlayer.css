@@ -1,0 +1,43 @@
+/* src/components/CharacterPlayer.css */
+
+.character-player {
+  margin-bottom: 0.8rem;
+  text-align: center;
+}
+
+.character-player-label {
+  display: block;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5a3b22;
+  margin-bottom: 0.3rem;
+}
+
+.character-player-input {
+  width: 80%;
+  max-width: 320px;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 60, 0.65);
+  background: rgba(249, 243, 229, 0.9);
+  font-family: "Merienda", cursive;
+  font-size: 0.80rem;
+  text-align: center;
+  color: #2f2115;
+  outline: none;
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.character-player-input::placeholder {
+  color: rgba(120, 90, 60, 0.6);
+}
+
+.character-player-input:focus {
+  border-color: #7c4a2a;
+  box-shadow:
+    0 0 0 2px rgba(124, 74, 42, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.12);
+}

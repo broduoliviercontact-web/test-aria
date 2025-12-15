@@ -1,0 +1,369 @@
+/* src/components/SpecialCompetenceDiceTray.css */
+
+/* ✅ Container “à la StatsDiceRoller”, mais isolé */
+.scdt {
+  margin: 0.75rem 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(78, 60, 42, 0.5);
+  background: rgba(255, 254, 253, 0);
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(120, 90, 60, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #4a311e;
+}
+
+/* Header */
+.scdt__header {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scdt__title {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* Controls row */
+.scdt__controls {
+  margin-top: 0.1rem;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.scdt__select {
+  min-width: 260px;
+  max-width: 520px;
+  width: min(520px, 100%);
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(140, 105, 70, 0.7);
+  background: rgba(255, 255, 255, 0.65);
+  color: #2f2115;
+  outline: none;
+}
+
+.scdt__select:focus {
+  border-color: rgba(140, 105, 70, 0.95);
+  box-shadow: 0 0 0 3px rgba(140, 105, 70, 0.2);
+}
+
+.scdt__btn {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+}
+
+.scdt__btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Status area */
+.scdt__status {
+  margin-top: 0.1rem;
+  text-align: center;
+  width: 100%;
+}
+
+.scdt__hint {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.scdt__meta {
+  font-size: 0.95rem;
+}
+
+.scdt__result {
+  margin-top: 0.25rem;
+  font-size: 1rem;
+}
+
+.scdt__strong {
+  font-weight: 700;
+}
+
+/* ✅ Zone 3D (canvas full width) */
+.scdt__threeDPanel {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+/* Force canvas full width comme StatsDiceRoller */
+.scdt .dice3d,
+.scdt .dice3d__canvas {
+  width: 100%;
+}
+.scdt__tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.scdt__tag--crit {
+  background: rgba(255, 210, 120, 0.22);
+  color: #ffd278;
+}
+
+.scdt__tag--fumble {
+  background: rgba(255, 120, 120, 0.22);
+  color: #ffb0b0;
+}
+
+.scdt__tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.scdt__tag--crit {
+  background: rgba(255, 210, 120, 0.22);
+  color: #ffd278;
+}
+
+.scdt__tag--fumble {
+  background: rgba(255, 120, 120, 0.22);
+  color: #ffb0b0;
+}
+
+/* Confetti au-dessus du Dice3D */
+.scdt__threeDPanel {
+  position: relative;
+}
+
+.scdt__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+/* ===== Crit/Fumble tags ===== */
+.scdt__tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.scdt__tag--crit {
+  background: rgba(255, 210, 120, 0.22);
+  color: #ffd278;
+}
+
+.scdt__tag--fumble {
+  background: rgba(255, 120, 120, 0.22);
+  color: #ffb0b0;
+}
+
+/* ===== Confetti overlay ===== */
+.scdt__threeDPanel {
+  position: relative;
+}
+
+.scdt__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ===== Fumble FX : shake + neige (inspiré du CodePen laviperchik) ===== */
+/* Source d’inspiration : “css snow” :contentReference[oaicite:1]{index=1} */
+
+.scdt__threeDPanel--fumble {
+  animation: scdt-shake 0.55s ease-in-out 0s 3;
+  filter: saturate(1.15) contrast(1.05);
+}
+
+@keyframes scdt-shake {
+  0%   { transform: translate3d(0,0,0) rotate(0deg); }
+  12%  { transform: translate3d(-2px, 1px,0) rotate(-0.4deg); }
+  25%  { transform: translate3d(3px, -1px,0) rotate(0.5deg); }
+  40%  { transform: translate3d(-3px, 2px,0) rotate(-0.6deg); }
+  55%  { transform: translate3d(2px, -2px,0) rotate(0.5deg); }
+  70%  { transform: translate3d(-1px, 2px,0) rotate(-0.3deg); }
+  100% { transform: translate3d(0,0,0) rotate(0deg); }
+}
+
+/* Overlay neige */
+.scdt__snowFx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* petite teinte froide “échec” */
+.scdt__snowFx::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 35%,
+    rgba(160, 210, 255, 0.12),
+    rgba(0, 0, 0, 0.12)
+  );
+  mix-blend-mode: screen;
+}
+
+/* L’idée du CodePen : plusieurs couches en pseudo-elements qui défilent lentement */
+.scdt__snowFxInner::before,
+.scdt__snowFxInner::after {
+  content: "";
+  position: absolute;
+  top: -220%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.01);
+  background-repeat: repeat;
+  opacity: 0.9;
+  animation-name: scdt-move-snow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* couche floue (grosse neige) */
+.scdt__snowFxInner::before {
+  filter: blur(3px);
+  background-image: url("http://www.freepngimg.com/download/winter_snow/4-2-white-snow-png.png");
+  background-size: 80%;
+  animation-duration: 7s;
+}
+
+/* couche fine (petite neige) */
+.scdt__snowFxInner::after {
+  filter: blur(1px);
+  background-image: url("http://www.freepngimg.com/download/winter_snow/4-2-white-snow-png.png");
+  background-size: 45%;
+  animation-duration: 5s;
+  opacity: 0.75;
+}
+
+@keyframes scdt-move-snow {
+  from { transform: translateY(0); }
+  to   { transform: translateY(70%); }
+}
+/* ===== CRITIQUE FX : shake héroïque ===== */
+
+.scdt__threeDPanel--crit {
+  animation: scdt-crit-shake 0.35s ease-out 0s 1;
+  filter: saturate(1.25) brightness(1.05);
+}
+
+@keyframes scdt-crit-shake {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  15%  { transform: translate3d(-2px, -1px,0) scale(1.01); }
+  30%  { transform: translate3d(3px, 1px,0) scale(1.015); }
+  45%  { transform: translate3d(-3px, 0,0) scale(1.02); }
+  60%  { transform: translate3d(2px, -1px,0) scale(1.015); }
+  80%  { transform: translate3d(-1px, 1px,0) scale(1.01); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+/* =========================
+   CRITIQUE : shake + flash doré (1 frame)
+   ========================= */
+
+.scdt__threeDPanel--crit {
+  position: relative;
+  animation: scdt-crit-shake 0.35s ease-out 0s 1;
+  filter: saturate(1.25) brightness(1.05);
+}
+
+/* Flash doré très court */
+.scdt__threeDPanel--crit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 7;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+      circle at 50% 40%,
+      rgba(255, 225, 140, 0.95),
+      rgba(255, 180, 70, 0.35) 40%,
+      rgba(0, 0, 0, 0) 70%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 215, 130, 0.25),
+      rgba(0, 0, 0, 0)
+    );
+  animation: scdt-gold-flash 0.12s linear 0s 1; /* ~1 frame “visible” */
+}
+
+@keyframes scdt-gold-flash {
+  0% { opacity: 0; }
+  1% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes scdt-crit-shake {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  15%  { transform: translate3d(-2px, -1px,0) scale(1.01); }
+  30%  { transform: translate3d(3px, 1px,0) scale(1.015); }
+  45%  { transform: translate3d(-3px, 0,0) scale(1.02); }
+  60%  { transform: translate3d(2px, -1px,0) scale(1.015); }
+  80%  { transform: translate3d(-1px, 1px,0) scale(1.01); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+
+/* =========================
+   FUMBLE : shake + blur + désaturation (0.4s)
+   ========================= */
+
+.scdt__threeDPanel--fumble {
+  animation: scdt-shake 0.55s ease-in-out 0s 3;
+}
+
+/* Blur/désaturation rapide puis retour */
+.scdt__threeDPanel--fumble {
+  filter: none;
+  animation-name: scdt-shake, scdt-fumble-filter;
+  animation-duration: 0.55s, 0.7s;
+  animation-timing-function: ease-in-out, ease-out;
+  animation-iteration-count: 3, 1;
+}
+
+@keyframes scdt-fumble-filter {
+  0%   { filter: none; }
+  25%  { filter: blur(0.6px) saturate(0.55) brightness(0.95) contrast(1.05); }
+  60%  { filter: blur(1.2px) saturate(0.25) brightness(0.9) contrast(1.08); }
+  100% { filter: none; }
+}

@@ -1,0 +1,29 @@
+/* src/StatCounter.css */
+
+.stat-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  width: 120px;
+}
+
+.stat-value {
+  min-width: 2rem;
+  text-align: center;
+}
+
+.stat-button {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #ccc;
+  background: rgb(133, 120, 120);
+  cursor: pointer;
+}
+
+.stat-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
