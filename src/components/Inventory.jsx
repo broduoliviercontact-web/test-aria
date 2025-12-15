@@ -255,9 +255,9 @@ export default function Inventory({ items, onChange }) {
 
       <div className="inventory-tititle">
 
-         <img src="/icons/bagpack.gif" className="arme1"alt="Armes" />
+         <img src="/icons/backpack.gif" className="arme1"alt="Armes" />
           <h2 className="inventory-title">Inventaire</h2>
-           <img src="/icons/bagpack.gif" className="arme1"alt="Armes" />
+           <img src="/icons/backpack.gif" className="arme1"alt="Armes" />
           </div>
   
 

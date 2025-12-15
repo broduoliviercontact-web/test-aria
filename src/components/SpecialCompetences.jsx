@@ -73,7 +73,14 @@ function SpecialCompetences({ specialCompetences, onChange }) {
 
   return (
     <section className="special-competences">
-      <h2>Compétences spéciales</h2>
+
+ <div className="special-competences-tititle">
+
+         <img src="/icons/gem.gif" className="gem"alt="Armes" />
+          <h2 className="inventory-title">Compétences spéciales</h2>
+           <img src="/icons/gem.gif" className="gem"alt="Armes" />
+          </div>
+      {/* <h2>Compétences spéciales</h2> */}
 
       <div className="special-competences-table">
         <div className="special-header row">
