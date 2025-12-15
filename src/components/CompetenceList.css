@@ -20,6 +20,8 @@
 
 
 }
+
+
 .inventory-tititle img {
   width: 90%;
 }
@@ -33,12 +35,13 @@
 }
 .competence-section h2 {
   margin: 0.4rem 1rem 0.4rem;
-  font-size: 1rem;
+     font-size: 1.2rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-family: "MedievalSharp", "Georgia", serif;
-  color: #3b2a1a;
-  align-items: center;
+  color: #000000;
+    font-weight: 700;
+  align-items : center;
 }
 
 /* Tableau */
