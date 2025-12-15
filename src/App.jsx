@@ -2,7 +2,13 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import "./App.css";
 
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 
 // Pages
 import HomePage from "./pages/HomePage";
@@ -27,9 +33,9 @@ const INITIAL_STATS = [
   { id: "charisme", label: "Charisme", value: 10, min: 0, max: 20 },
 ];
 
-// Règles point-buy (84 total - 4*6 = 60 points à répartir)
-const STAT_TOTAL_POINTS = 84;
-const STAT_MIN = 4;
+// ✅ Point-buy : 60 points à répartir, minimum 0, maximum 18
+const STAT_TOTAL_POINTS = 60;
+const STAT_MIN = 0;
 const STAT_MAX = 18;
 
 function AppRoutes() {
@@ -39,9 +45,21 @@ function AppRoutes() {
   const { user } = auth;
 
   // =========================
-  // STATE GLOBAL (inchangé)
+  // STATE GLOBAL
   // =========================
-  const [stats, setStats] = useState(INITIAL_STATS);
+  // ✅ Un seul state atomique pour éviter le +2 en StrictMode
+  const [statBuy, setStatBuy] = useState({
+    stats: INITIAL_STATS,
+    pool: 0,
+  });
+
+  const stats = statBuy.stats;
+  const statPointsPool = statBuy.pool;
+
+  const setStatsCompat = useCallback((nextStats) => {
+    setStatBuy((prev) => ({ ...prev, stats: nextStats }));
+  }, []);
+
   const [characterName, setCharacterName] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [age, setAge] = useState("");
@@ -63,7 +81,6 @@ function AppRoutes() {
 
   const [skillMode, setSkillMode] = useState("ready"); // "ready" | "custom"
   const [statMode, setStatMode] = useState("3d6"); // "3d6" | "point-buy"
-  const [statPointsPool, setStatPointsPool] = useState(0);
 
   // 🔁 id du perso courant (pour PUT au lieu de POST)
   const [currentCharacterId, setCurrentCharacterId] = useState(null);
@@ -89,7 +106,7 @@ function AppRoutes() {
 
   const [purseFer, setPurseFer] = useState(0);
 
-  // (refs gardés si tu en as encore besoin plus tard)
+  // refs (si besoin plus tard)
   const screenSheetRef = useRef(null);
   const pdfSheetRef = useRef(null);
 
@@ -134,7 +151,9 @@ function AppRoutes() {
     if (!isAlchemist) return;
 
     setSpecialCompetences((prev) => {
-      const alreadyHasIdentify = prev.some((c) => c.name === "Identifier une substance");
+      const alreadyHasIdentify = prev.some(
+        (c) => c.name === "Identifier une substance"
+      );
       const alreadyHasCreate = prev.some((c) => c.name === "Créer une potion");
 
       const updated = [...prev];
@@ -175,7 +194,10 @@ function AppRoutes() {
             quantity: 0,
           });
         } else if (!updated[existingIndex].effect) {
-          updated[existingIndex] = { ...updated[existingIndex], effect: effectText };
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            effect: effectText,
+          };
         }
       };
 
@@ -206,68 +228,62 @@ function AppRoutes() {
 
   const handleChangeStatMode = (mode) => {
     setStatMode(mode);
-
-    // si on repasse en 3d6, on veut revoir le roller
     setStatsRolled(false);
 
     if (mode === "point-buy") {
-      const count = INITIAL_STATS.length;
-      const base = STAT_MIN;
-      const used = base * count;
-      const pool = STAT_TOTAL_POINTS - used;
-
-      setStats(() =>
-        INITIAL_STATS.map((stat) => ({
+      setStatBuy({
+        stats: INITIAL_STATS.map((stat) => ({
           ...stat,
-          value: base,
-          min: STAT_MIN,
-          max: STAT_MAX,
-        }))
-      );
-      setStatPointsPool(pool);
+          value: STAT_MIN, // 0
+          min: STAT_MIN, // 0
+          max: STAT_MAX, // 18
+        })),
+        pool: STAT_TOTAL_POINTS, // 60
+      });
     } else {
-      setStats(() =>
-        INITIAL_STATS.map((stat) => ({
+      setStatBuy({
+        stats: INITIAL_STATS.map((stat) => ({
           ...stat,
           value: 10,
           min: 0,
           max: 20,
-        }))
-      );
-      setStatPointsPool(0);
+        })),
+        pool: 0,
+      });
     }
   };
 
+  // ✅ Point-buy : update atomique (1 clic = 1 update, jamais +2)
   const handleChangeStat = (id, delta) => {
-    if (statMode === "point-buy") {
-      setStats((prevStats) => {
-        const index = prevStats.findIndex((s) => s.id === id);
-        if (index === -1) return prevStats;
+    if (statMode !== "point-buy") return;
 
-        const stat = prevStats[index];
-        let desired = stat.value + delta;
-        if (desired < STAT_MIN) desired = STAT_MIN;
-        if (desired > STAT_MAX) desired = STAT_MAX;
+    setStatBuy((prev) => {
+      const stat = prev.stats.find((s) => s.id === id);
+      if (!stat) return prev;
 
-        let effectiveDelta = desired - stat.value;
-        if (effectiveDelta === 0) return prevStats;
+      let desired = stat.value + delta;
+      if (desired < STAT_MIN) desired = STAT_MIN;
+      if (desired > STAT_MAX) desired = STAT_MAX;
 
-        if (effectiveDelta > 0 && effectiveDelta > statPointsPool) {
-          effectiveDelta = statPointsPool;
-          desired = stat.value + effectiveDelta;
-        }
+      let effectiveDelta = desired - stat.value;
+      if (effectiveDelta === 0) return prev;
 
-        const updatedStats = prevStats.map((s) =>
-          s.id === id ? { ...s, value: desired } : s
-        );
+      // Si on augmente : clamp avec le pool dispo
+      if (effectiveDelta > 0 && effectiveDelta > prev.pool) {
+        effectiveDelta = prev.pool;
+        desired = stat.value + effectiveDelta;
+        if (effectiveDelta === 0) return prev;
+      }
 
-        setStatPointsPool((pool) => pool - effectiveDelta);
-        return updatedStats;
-      });
-      return;
-    }
+      const nextStats = prev.stats.map((s) =>
+        s.id === id ? { ...s, value: desired } : s
+      );
 
-    // mode 3d6 : pas de modif manuelle
+      return {
+        stats: nextStats,
+        pool: Math.max(0, prev.pool - effectiveDelta), // si delta négatif => pool remonte
+      };
+    });
   };
 
   // =========================
@@ -283,7 +299,8 @@ function AppRoutes() {
 
     if (match) {
       const raw = match[1];
-      if (raw.toLowerCase().startsWith("x")) quantity = parseInt(raw.slice(1), 10);
+      if (raw.toLowerCase().startsWith("x"))
+        quantity = parseInt(raw.slice(1), 10);
       else quantity = parseInt(raw, 10);
       name = firstChoice.replace(match[0], "").trim();
     }
@@ -304,10 +321,8 @@ function AppRoutes() {
       const now = Date.now();
 
       kit.content.forEach((label) => {
-        // combattant : on ne met pas "Arme à une main" dans l’inventaire
         if (kit.id === "combattant" && label.includes("Arme à une main")) return;
 
-        // érudit : choix Fioles (x5) OU Sablier
         if (kit.id === "erudit" && label.includes("Fioles (x5) ou Sablier")) {
           let name;
           let quantity;
@@ -334,7 +349,9 @@ function AppRoutes() {
             };
           } else {
             updated.push({
-              id: `kit-${kit.id}-${name}-${now}-${Math.random().toString(16).slice(2)}`,
+              id: `kit-${kit.id}-${name}-${now}-${Math.random()
+                .toString(16)
+                .slice(2)}`,
               name,
               quantity,
               fromKit: true,
@@ -357,7 +374,9 @@ function AppRoutes() {
           };
         } else {
           updated.push({
-            id: `kit-${kit.id}-${name}-${now}-${Math.random().toString(16).slice(2)}`,
+            id: `kit-${kit.id}-${name}-${now}-${Math.random()
+              .toString(16)
+              .slice(2)}`,
             name,
             quantity,
             fromKit: true,
@@ -368,7 +387,6 @@ function AppRoutes() {
       return updated;
     });
 
-    // WEAPONS : aventurier → ajoute 1 arme à une main
     if (kit.id === "aventurier") {
       const defaultIcon = getDefaultOneHandWeaponIcon();
       setWeapons((prevWeapons) => [
@@ -377,7 +395,6 @@ function AppRoutes() {
       ]);
     }
 
-    // WEAPONS : combattant → choix 2 armes 1 main OU 1 arme 2 mains
     if (kit.id === "combattant" && options.combattantWeaponChoice) {
       setWeapons((prevWeapons) => {
         const baseWeapon = { icon: "", name: "", damage: "", validated: false };
@@ -403,7 +420,7 @@ function AppRoutes() {
   // RESET / DELETE LOCAL
   // =========================
   const handleDeleteCharacter = () => {
-    setStats(INITIAL_STATS);
+    setStatBuy({ stats: INITIAL_STATS, pool: 0 });
     setCharacterName("");
     setPlayerName("");
     setAge("");
@@ -416,7 +433,6 @@ function AppRoutes() {
     setPurseFer(0);
     setSkillMode("ready");
     setStatMode("3d6");
-    setStatPointsPool(0);
     setShowCreationModal(true);
     setPhraseGenial("");
     setPhraseSociete("");
@@ -566,11 +582,16 @@ function AppRoutes() {
       setAge(typeof ch.age === "number" && !Number.isNaN(ch.age) ? String(ch.age) : "");
       setProfession(ch.profession || "");
 
-      setStats(Array.isArray(ch.stats) && ch.stats.length > 0 ? ch.stats : INITIAL_STATS);
+      const loadedStats =
+        Array.isArray(ch.stats) && ch.stats.length > 0 ? ch.stats : INITIAL_STATS;
 
       setStatMode(ch.statMode || "3d6");
-      setStatPointsPool(typeof ch.statPointsPool === "number" ? ch.statPointsPool : 0);
       setSkillMode(ch.skillMode || "ready");
+
+      setStatBuy({
+        stats: loadedStats,
+        pool: typeof ch.statPointsPool === "number" ? ch.statPointsPool : 0,
+      });
 
       setXp(typeof ch.xp === "number" ? ch.xp : 0);
       setInventory(Array.isArray(ch.inventory) ? ch.inventory : []);
@@ -674,8 +695,7 @@ function AppRoutes() {
 
             // data fiche
             stats={stats}
-            
-            setStats={setStats}
+            setStats={setStatsCompat}
             characterName={characterName}
             setCharacterName={setCharacterName}
             playerName={playerName}
@@ -735,18 +755,16 @@ function AppRoutes() {
             onSaveAndGoMyCharacters={() => handleSaveToBackend(true)}
             onDeleteCharacter={handleDeleteCharacter}
 
-            // 👇 IMPORTANT : ton CharacterPage actuel ne l’utilise pas encore,
-            // mais on le passe pour corriger le point-buy facilement (voir note en dessous)
+            // point-buy handler
             onChangeStat={handleChangeStat}
 
-            // refs (si un jour tu veux les exploiter côté page)
+            // refs
             screenSheetRef={screenSheetRef}
             pdfSheetRef={pdfSheetRef}
           />
         }
       />
 
-      {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

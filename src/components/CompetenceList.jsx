@@ -1,9 +1,10 @@
-// src/components/CompetenceList.jsx
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./CompetenceList.css";
 import { useDiceRoll } from "./DiceRollContext";
 
-// Liste des compétences d'Aria (version simplifiée)
+/* ===========================
+   LISTE DES COMPÉTENCES
+   =========================== */
 const COMPETENCES = [
   {
     id: "artisanat",
@@ -11,7 +12,7 @@ const COMPETENCES = [
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
     description:
-      "Fabriquer, réparer ou bricoler des objets, bâtiments simples, machines, etc.",
+      "Fabriquer, réparer, bricoler, construire. Tout ce qui relève de la technique et du savoir-faire manuel.",
   },
   {
     id: "combat_rapproche",
@@ -19,7 +20,7 @@ const COMPETENCES = [
     link: "FOR/DEX",
     keyAttributes: ["force", "dexterite"],
     description:
-      "Se battre au corps-à-corps avec armes blanches ou à mains nues.",
+      "Se battre au corps-à-corps : armes de mêlée, bagarre, techniques de combat rapproché.",
   },
   {
     id: "combat_distance",
@@ -27,7 +28,7 @@ const COMPETENCES = [
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
     description:
-      "Utiliser des armes de jet ou de tir : arcs, arbalètes, armes de jet, etc.",
+      "Tirer, viser, utiliser des armes à distance (arc, arbalète, projectiles, etc.).",
   },
   {
     id: "connaissance_nature",
@@ -35,7 +36,7 @@ const COMPETENCES = [
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
     description:
-      "Reconnaître plantes, animaux, terrains, lire les signes de la nature.",
+      "Reconnaître plantes, animaux, pistes, milieux naturels. Comprendre l’environnement.",
   },
   {
     id: "connaissance_secrets",
@@ -43,7 +44,7 @@ const COMPETENCES = [
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
     description:
-      "Légendes, occultisme, rumeurs, savoirs cachés et histoires mystérieuses.",
+      "Histoire, mystères, traditions, rumeurs, ésotérisme, informations cachées.",
   },
   {
     id: "courir_sauter",
@@ -51,7 +52,7 @@ const COMPETENCES = [
     link: "DEX/END",
     keyAttributes: ["dexterite", "endurance"],
     description:
-      "Efforts physiques explosifs : course, bonds, efforts rapides soutenus.",
+      "Athlétisme : course, saut, escalade rapide, déplacements physiques intenses.",
   },
   {
     id: "discretion",
@@ -59,7 +60,7 @@ const COMPETENCES = [
     link: "DEX/CHA",
     keyAttributes: ["dexterite", "charisme"],
     description:
-      "Se faire oublier, se déplacer en silence, se fondre dans la foule.",
+      "Se faufiler, se cacher, éviter l’attention, agir sans être remarqué.",
   },
   {
     id: "droit",
@@ -67,7 +68,7 @@ const COMPETENCES = [
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
     description:
-      "Lois, coutumes, règles, savoir tirer profit des textes officiels.",
+      "Comprendre les lois, procédures, contrats, règles d’une cité ou d’un royaume.",
   },
   {
     id: "esquiver",
@@ -75,7 +76,7 @@ const COMPETENCES = [
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
     description:
-      "Éviter les coups, les projectiles, se mettre à couvert au bon moment.",
+      "Éviter un coup, une attaque, un piège, un danger soudain. Réactivité défensive.",
   },
   {
     id: "intimider",
@@ -83,7 +84,7 @@ const COMPETENCES = [
     link: "FOR/CHA",
     keyAttributes: ["force", "charisme"],
     description:
-      "Faire peur, imposer le respect, obtenir quelque chose par la menace.",
+      "Faire pression, menacer, imposer sa présence ou sa force psychologique.",
   },
   {
     id: "lire_ecrire",
@@ -91,7 +92,7 @@ const COMPETENCES = [
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
     description:
-      "Lire, écrire, comprendre des textes, lettres, manuscrits ou symboles.",
+      "Lire, écrire, comprendre des textes, rédiger, décrypter des messages.",
   },
   {
     id: "mentir_convaincre",
@@ -99,7 +100,7 @@ const COMPETENCES = [
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
     description:
-      "Négocier, baratiner, manipuler ou persuader dans une discussion.",
+      "Persuader, baratiner, manipuler, mentir de façon crédible, négocier.",
   },
   {
     id: "perception",
@@ -107,7 +108,7 @@ const COMPETENCES = [
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
     description:
-      "Remarquer les détails, repérer un danger, sentir qu’on vous ment.",
+      "Repérer des détails, être attentif, sentir un danger, observer finement.",
   },
   {
     id: "piloter",
@@ -115,7 +116,7 @@ const COMPETENCES = [
     link: "DEX/END",
     keyAttributes: ["dexterite", "endurance"],
     description:
-      "Conduire un véhicule, une monture ou un engin dans des conditions difficiles.",
+      "Conduire, manœuvrer, piloter un véhicule, une monture ou une embarcation.",
   },
   {
     id: "psychologie",
@@ -123,7 +124,7 @@ const COMPETENCES = [
     link: "END/INT",
     keyAttributes: ["endurance", "intelligence"],
     description:
-      "Comprendre les émotions, motivations, mensonges et fragilités des autres.",
+      "Comprendre les émotions, intentions, comportements. Résister au stress mental.",
   },
   {
     id: "reflexes",
@@ -131,7 +132,7 @@ const COMPETENCES = [
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
     description:
-      "Réagir vite à l’imprévu, réussir un geste instinctif en urgence.",
+      "Réagir vite, attraper au vol, agir sous pression, réponses immédiates.",
   },
   {
     id: "serrures_pieges",
@@ -139,7 +140,7 @@ const COMPETENCES = [
     link: "DEX/END",
     keyAttributes: ["dexterite", "endurance"],
     description:
-      "Crocheter, poser ou désamorcer des serrures, mécanismes et pièges.",
+      "Crocheter une serrure, détecter/désamorcer un piège, manipulations délicates.",
   },
   {
     id: "soigner",
@@ -147,7 +148,7 @@ const COMPETENCES = [
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
     description:
-      "Premiers secours, médecine, soins prolongés, rassurer un blessé.",
+      "Premiers soins, diagnostic simple, bandages, traitements de base.",
   },
   {
     id: "survie",
@@ -155,7 +156,7 @@ const COMPETENCES = [
     link: "END/INT",
     keyAttributes: ["endurance", "intelligence"],
     description:
-      "Trouver de l’eau, de la nourriture, un abri, survivre en milieu hostile.",
+      "Tenir dans la nature, trouver eau/nourriture, s’orienter, improviser un camp.",
   },
   {
     id: "voler",
@@ -163,24 +164,27 @@ const COMPETENCES = [
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
     description:
-      "Fouiller discrètement, pickpocket, subtiliser ou manipuler des objets.",
+      "Pickpocket, larcin, subtiliser sans être vu, se servir discrètement.",
   },
 ];
 
-function getStatValue(stats, id) {
-  return stats.find((s) => s.id === id)?.value ?? 0;
+/* ===========================
+   HELPERS
+   =========================== */
+function getStatValue(stats, statId) {
+  const found = stats?.find((s) => s.id === statId);
+  return found?.value ?? 0;
 }
 
-// Méthode “calculs prêts à jouer” : moyenne arrondie × 5
+// Méthode “prêt à jouer” : moyenne(carac1, carac2) × 5
 function computeReadyScore(stats, competence) {
   const [a, b] = competence.keyAttributes;
   const v1 = getStatValue(stats, a);
   const v2 = getStatValue(stats, b);
-  const average = Math.floor((v1 + v2) / 2);
-  return average * 5;
+  return Math.round(((v1 + v2) / 2) * 5);
 }
 
-// Méthode “personnalisation de personnage” : (carac1 + carac2) × 2
+// Méthode “personnalisation” : (carac1 + carac2) × 2
 function computeCustomScore(stats, competence) {
   const [a, b] = competence.keyAttributes;
   const v1 = getStatValue(stats, a);
@@ -189,27 +193,56 @@ function computeCustomScore(stats, competence) {
 }
 
 /**
- * props :
+ * Props
  * - stats : [{ id: "force", value: 12 }, ...]
- * - mode  : "ready" ou "custom"
- * - onCompetencesChange : (liste) => void  // pour le JSON du back
+ * - mode  : "ready" | "custom"
+ * - onCompetencesChange : (liste) => void
+ * - isLocked : boolean
  */
-function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
+export default function CompetenceList({
+  stats,
+  mode,
+  onCompetencesChange,
+  isLocked = false,
+}) {
   const effectiveMode = mode || "ready";
   const { requestRoll, resultsByKey } = useDiceRoll();
 
-  const [openId, setOpenId] = useState(null); // description ouverte
-  const [bonusById, setBonusById] = useState({}); // ajustements manuels
-  const [remainingPoints, setRemainingPoints] = useState(50); // pour le mode custom
+  const [openId, setOpenId] = useState(null);
+  const [bonusById, setBonusById] = useState({});
+  const [remainingPoints, setRemainingPoints] = useState(50);
 
-  // Quand le mode ou les stats changent → reset des bonus & points
+  // ✅ NEW : validation du pool custom
+  const [isCustomConfirmed, setIsCustomConfirmed] = useState(false);
+
+// Verrou effectif :
+// - ready => toujours verrouillé (compétences 100% auto)
+// - custom => verrouillé après validation
+// - ou lock global si besoin
+const effectiveLocked =
+  !!isLocked ||
+  effectiveMode === "ready" ||
+  (effectiveMode === "custom" && isCustomConfirmed);
+
+  // Reset quand stats/mode changent
   useEffect(() => {
     setBonusById({});
     setRemainingPoints(50);
     setOpenId(null);
+    setIsCustomConfirmed(false);
   }, [effectiveMode, stats]);
 
-  // 🔁 À chaque changement, on renvoie les valeurs au parent (App)
+  // ✅ remainingPoints dérivé de bonusById (évite les désync)
+  useEffect(() => {
+    if (effectiveMode !== "custom") return;
+    const spent = Object.values(bonusById).reduce(
+      (sum, v) => sum + (Number(v) || 0),
+      0
+    );
+    setRemainingPoints(50 - spent);
+  }, [bonusById, effectiveMode]);
+
+  // Sync vers parent
   useEffect(() => {
     if (!onCompetencesChange) return;
 
@@ -240,30 +273,38 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
     setOpenId((current) => (current === id ? null : id));
   };
 
-  const changeScore = (id, baseScore, delta) => {
-    setBonusById((prev) => {
-      const currentBonus = prev[id] ?? 0;
-      const currentTotal = baseScore + currentBonus;
-      let newTotal = currentTotal + delta;
+  // ✅ Pool 50 points : bloque l’augmentation quand plus de points
+const changeScore = (id, baseScore, delta) => {
+  if (effectiveMode !== "custom") return;
 
-      // minimum 0
-      if (newTotal < 0) newTotal = 0;
-      // maximum 90% uniquement en “custom”
-      if (effectiveMode === "custom" && newTotal > 90) newTotal = 90;
+  setBonusById((prev) => {
+    const currentBonus = prev[id] ?? 0;
+    const currentTotal = baseScore + currentBonus;
 
-      let actualDelta = newTotal - currentTotal;
+    let newTotal = currentTotal + delta;
 
-      // Gestion des 50 points uniquement en mode “custom” (indicatif)
-      if (effectiveMode === "custom") {
-        if (actualDelta !== 0) {
-          setRemainingPoints((pts) => pts - actualDelta);
-        }
-      }
+    // 🚫 interdit de descendre sous le score de base
+    if (newTotal < baseScore) newTotal = baseScore;
 
-      const newBonus = currentBonus + actualDelta;
-      return { ...prev, [id]: newBonus };
-    });
-  };
+    // max 90
+    if (newTotal > 90) newTotal = 90;
+
+    const actualDelta = newTotal - currentTotal;
+
+    // 🚫 si on ajoute mais plus de points dispos → on refuse
+    if (actualDelta > 0) {
+      const spent = Object.values(prev).reduce(
+        (sum, v) => sum + (Number(v) || 0),
+        0
+      );
+      const remaining = 50 - spent;
+      if (actualDelta > remaining) return prev;
+    }
+
+    const newBonus = currentBonus + actualDelta;
+    return { ...prev, [id]: newBonus };
+  });
+};
 
   const runTest = (comp, totalScore) => {
     requestRoll({
@@ -277,10 +318,23 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
 
   return (
     <section className="competence-section">
-      {effectiveMode === "custom" && !isLocked && (
-        <p className="points-remaining">
-          Points de personnalisation restants : <strong>{remainingPoints}</strong>
-        </p>
+      {/* ✅ header custom compact + bouton valider */}
+      {effectiveMode === "custom" && !effectiveLocked && (
+        <div className="custom-points-header">
+          <button
+            type="button"
+            className="btn-validate-points"
+            onClick={() => setIsCustomConfirmed(true)}
+            title="Valider la répartition (verrouille les points)"
+          >
+            Valider
+          </button>
+
+          <p className="points-remaining">
+            Points de personnalisation restants :{" "}
+            <strong>{remainingPoints}</strong>
+          </p>
+        </div>
       )}
 
       <div className="competence-table">
@@ -305,7 +359,6 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
 
           return (
             <div key={comp.id} className="competence-row">
-              {/* ligne cliquable pour ouvrir la description */}
               <div
                 className={`row competence-row-main ${isOpen ? "is-open" : ""}`}
                 onClick={() => handleToggleRow(comp.id)}
@@ -328,80 +381,75 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
               {isOpen && (
                 <div className="competence-tooltip">
                   <h3>{comp.name}</h3>
-                  <p className="link-hint">Caractéristiques liées : {comp.link}</p>
+                  <p className="link-hint">
+                    Caractéristiques liées : {comp.link}
+                  </p>
                   <p>{comp.description}</p>
 
-                  {/* ✅ Bouton test DANS la partie déroulante */}
                   <div className="competence-tooltip-actions">
-  <button
-    type="button"
-    className="competence-test-btn"
-    onClick={(e) => {
-      e.stopPropagation();
-      runTest(comp, totalScore);
-    }}
-    title={
-      lastResult
-        ? `Dernier jet : ${lastResult.total}/${lastResult.target}`
-        : "Tester la compétence"
-    }
-    aria-label={`Tester ${comp.name} au d100`}
-  >
-    🎲 Tester
-    {lastResult && (
-      <span
-        className={
-          "competence-test-result " +
-          (lastResult.success ? "ok" : "ko")
-        }
-      >
-        {lastResult.total}/{lastResult.target}
-      </span>
-    )}
-  </button>
-</div>
+                    <button
+                      type="button"
+                      className="competence-test-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        runTest(comp, totalScore);
+                      }}
+                      title={
+                        lastResult
+                          ? `Dernier jet : ${lastResult.total}/${lastResult.target}`
+                          : "Tester la compétence"
+                      }
+                      aria-label={`Tester ${comp.name} au d100`}
+                    >
+                      🎲 Tester
+                      {lastResult && (
+                        <span
+                          className={
+                            "competence-test-result " +
+                            (lastResult.success ? "ok" : "ko")
+                          }
+                        >
+                          {lastResult.total}/{lastResult.target}
+                        </span>
+                      )}
+                    </button>
+                  </div>
 
-                  {/* <div className="score-editor">
+                  <div className="score-editor">
                     <span className="score-label">Score :</span>
 
-                    {!isLocked && (
+                    {!effectiveLocked && (
                       <>
                         <button
                           type="button"
                           className="score-btn"
-                          onClick={() => changeScore(comp.id, baseScore, -1)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            changeScore(comp.id, baseScore, -1);
+                          }}
                         >
                           −
                         </button>
+
                         <span className="score-value">{totalScore}%</span>
+
                         <button
                           type="button"
                           className="score-btn"
-                          onClick={() => changeScore(comp.id, baseScore, +1)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            changeScore(comp.id, baseScore, +1);
+                          }}
                         >
                           +
                         </button>
                       </>
                     )}
 
-                    {isLocked && <span className="score-value">{totalScore}%</span>}
-                  </div> */}
-
-                  {effectiveMode === "custom" ? (
-                    <p className="rules-hint">
-                      Méthode : <strong>personnalisation</strong>. Score initial =
-                      (carac1 + carac2) × 2 + points à répartir.
-                      <br />
-                      Score actuel : <strong>{totalScore}%</strong> (limité à 90%).
-                    </p>
-                  ) : (
-                    <p className="rules-hint">
-                      Méthode : <strong>prêts à jouer</strong>. Score de base =
-                      moyenne arrondie × 5.
-                      <br />
-                      Score actuel : <strong>{totalScore}%</strong>.
-                    </p>
-                  )}
+                    {effectiveLocked && (
+                      <span className="score-value">{totalScore}%</span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -411,5 +459,3 @@ function CompetenceList({ stats, mode, onCompetencesChange, isLocked }) {
     </section>
   );
 }
-
-export default CompetenceList;

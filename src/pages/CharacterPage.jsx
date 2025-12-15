@@ -256,41 +256,73 @@ export default function CharacterPage({
   const screenSheetRef = useRef(null);
   const pdfSheetRef = useRef(null);
 
-  const handleExportPdf = async () => {
-    if (!pdfSheetRef.current) return;
+const handleExportPdf = async () => {
+  if (!pdfSheetRef.current) return;
 
-    try {
-      const element = pdfSheetRef.current;
+  // ✅ coupe les backgrounds (parchemins) pendant l'export
+  document.body.classList.add("pdf-exporting");
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-      });
+  try {
+    const element = pdfSheetRef.current;
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
+    // ✅ attendre le chargement des images (portrait + icônes)
+    const imgs = Array.from(element.querySelectorAll("img"));
+    await Promise.all(
+      imgs.map(
+        (img) =>
+          new Promise((resolve) => {
+            if (!img || img.complete) return resolve();
+            img.addEventListener("load", resolve, { once: true });
+            img.addEventListener("error", resolve, { once: true });
+          })
+      )
+    );
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: "#f6ebd3",
+      imageTimeout: 15000,
+      logging: false,
+    });
 
-      const imgWidthPx = canvas.width;
-      const imgHeightPx = canvas.height;
-
-      const ratio = Math.min(pdfWidth / imgWidthPx, pdfHeight / imgHeightPx);
-      const imgWidth = imgWidthPx * ratio;
-      const imgHeight = imgHeightPx * ratio;
-
-      const x = (pdfWidth - imgWidth) / 2;
-      const y = (pdfHeight - imgHeight) / 2;
-
-      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
-      pdf.save("fiche-personnage-aria.pdf");
-    } catch (error) {
-      console.error("Erreur pendant la génération du PDF :", error);
-      alert("Erreur pendant la génération du PDF");
+    if (!canvas.width || !canvas.height) {
+      throw new Error("Canvas vide (0x0) — élément PDF non rendu ou caché.");
     }
-  };
 
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidthPx = canvas.width;
+    const imgHeightPx = canvas.height;
+
+    const ratio = Math.min(pdfWidth / imgWidthPx, pdfHeight / imgHeightPx);
+    const imgWidth = imgWidthPx * ratio;
+    const imgHeight = imgHeightPx * ratio;
+
+    const x = (pdfWidth - imgWidth) / 2;
+    const y = (pdfHeight - imgHeight) / 2;
+
+    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+    pdf.save("fiche-personnage-aria.pdf");
+  } catch (error) {
+    console.error("Erreur pendant la génération du PDF :", error);
+    alert("Erreur pendant la génération du PDF");
+  } finally {
+    document.body.classList.remove("pdf-exporting");
+  }
+};
+
+document.body.classList.add("pdf-exporting");
+try {
+  // ... ton code html2canvas + jsPDF
+} finally {
+  document.body.classList.remove("pdf-exporting");
+}
   return (
     <DiceRollProvider>
       <div className="character-page">

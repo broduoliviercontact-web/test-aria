@@ -995,3 +995,6 @@ background: transparent;
     font-size: 0.75rem;
   }
 }
+body.pdf-exporting * {
+  background-image: none !important;
+}
