@@ -20,11 +20,10 @@
   padding-top: 0.25rem;
 }
 .special-competences-tititle {   
-   display: flex;
+display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-
     width: 18%;
     gap: 4rem;
 }

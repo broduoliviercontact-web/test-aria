@@ -19,7 +19,9 @@
 }
 
 /* Titre */
-
+.inventory-tititle img {
+  width: 90%;
+}
 
 .inventory-tititle {
     display: flex;

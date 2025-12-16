@@ -38,6 +38,15 @@ const STAT_TOTAL_POINTS = 60;
 const STAT_MIN = 0;
 const STAT_MAX = 18;
 
+// ✅ Magie : état par défaut
+const defaultMagic = {
+  isMage: false,
+  deckSize: 24,
+  deck: [],
+  currentCard: null,
+  used: [],
+};
+
 function AppRoutes() {
   const navigate = useNavigate();
 
@@ -59,6 +68,17 @@ function AppRoutes() {
   const setStatsCompat = useCallback((nextStats) => {
     setStatBuy((prev) => ({ ...prev, stats: nextStats }));
   }, []);
+
+  // ✅ MAGIE globale
+// ✅ MAGIE globale
+const [magic, setMagic] = useState(defaultMagic);
+
+// ✅ validation point-buy (réversible)
+const [isPointBuyValidated, setIsPointBuyValidated] = useState(false);
+
+// ✅ validation compétences custom (réversible)
+const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
+
 
   const [characterName, setCharacterName] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -230,15 +250,21 @@ function AppRoutes() {
     setStatMode(mode);
     setStatsRolled(false);
 
+    // ✅ si on quitte point-buy, on enlève la validation
+ if (skillMode === "custom") {
+  setIsCustomSkillsValidated(true);
+}
+
+
     if (mode === "point-buy") {
       setStatBuy({
         stats: INITIAL_STATS.map((stat) => ({
           ...stat,
-          value: STAT_MIN, // 0
-          min: STAT_MIN, // 0
-          max: STAT_MAX, // 18
+          value: STAT_MIN,
+          min: STAT_MIN,
+          max: STAT_MAX,
         })),
-        pool: STAT_TOTAL_POINTS, // 60
+        pool: STAT_TOTAL_POINTS,
       });
     } else {
       setStatBuy({
@@ -253,9 +279,10 @@ function AppRoutes() {
     }
   };
 
-  // ✅ Point-buy : update atomique (1 clic = 1 update, jamais +2)
+  // ✅ Point-buy : update atomique (1 clic = 1 update)
   const handleChangeStat = (id, delta) => {
     if (statMode !== "point-buy") return;
+    if (isPointBuyValidated) return; // ✅ bloqué si validé
 
     setStatBuy((prev) => {
       const stat = prev.stats.find((s) => s.id === id);
@@ -268,7 +295,6 @@ function AppRoutes() {
       let effectiveDelta = desired - stat.value;
       if (effectiveDelta === 0) return prev;
 
-      // Si on augmente : clamp avec le pool dispo
       if (effectiveDelta > 0 && effectiveDelta > prev.pool) {
         effectiveDelta = prev.pool;
         desired = stat.value + effectiveDelta;
@@ -281,7 +307,7 @@ function AppRoutes() {
 
       return {
         stats: nextStats,
-        pool: Math.max(0, prev.pool - effectiveDelta), // si delta négatif => pool remonte
+        pool: Math.max(0, prev.pool - effectiveDelta),
       };
     });
   };
@@ -391,7 +417,12 @@ function AppRoutes() {
       const defaultIcon = getDefaultOneHandWeaponIcon();
       setWeapons((prevWeapons) => [
         ...prevWeapons,
-        { icon: defaultIcon, name: "Arme à une main", damage: "", validated: false },
+        {
+          icon: defaultIcon,
+          name: "Arme à une main",
+          damage: "",
+          validated: false,
+        },
       ]);
     }
 
@@ -431,6 +462,9 @@ function AppRoutes() {
     setInventory([]);
     setWeapons([]);
     setPurseFer(0);
+setIsCustomSkillsValidated(false);
+
+
     setSkillMode("ready");
     setStatMode("3d6");
     setShowCreationModal(true);
@@ -441,6 +475,12 @@ function AppRoutes() {
     setArmor(0);
     setIsAlchemist(false);
     setAlchemyPotions([]);
+
+    // reset magie
+    setMagic(defaultMagic);
+
+    // reset validation
+    setIsPointBuyValidated(false);
 
     setSelectedKit(null);
     setIsKitModalOpen(false);
@@ -459,43 +499,62 @@ function AppRoutes() {
   // =========================
   // BACKEND SAVE / LOAD
   // =========================
-  const characterPayload = {
-    meta: { status: "draft" },
-    player: playerName,
-    name: characterName,
-    age: age === "" ? null : Number(age),
-    profession,
-    stats,
-    statMode,
-    statPointsPool,
-    skillMode,
-    isAlchemist,
-    alchemyPotions,
-    xp,
-    inventory,
-    weapons,
-    purseFer,
-    competences,
-    specialCompetences,
-    phraseGenial,
-    phraseSociete,
-    portrait: portraitDataUrl,
-  };
-
   const handleSaveToBackend = async (redirectToMyCharacters = false) => {
     if (!user) {
-      alert(
-        "Pour sauvegarder ce personnage sur le serveur, il faut te connecter ou créer un compte (formulaire sur la page d'accueil)."
-      );
+      alert("Pour sauvegarder ce personnage, il faut se connecter.");
       return;
     }
 
     if (!characterName.trim()) {
-      alert("Tu dois donner un nom à ton personnage avant de l'enregistrer 🙂");
+      alert("Tu dois donner un nom à ton personnage.");
       return;
     }
 
-    const payloadForBackend = { ...characterPayload };
+    // ✅ si on est en point-buy, on valide automatiquement au save
+    if (statMode === "point-buy") {
+      setIsPointBuyValidated(true);
+    }
+
+
+    const payloadForBackend = {
+      meta: { status: "draft" },
+      player: playerName,
+      name: characterName,
+      age: age === "" ? null : Number(age),
+      profession,
+      stats,
+      statMode,
+      statPointsPool,
+      skillMode,
+
+      isAlchemist,
+      alchemyPotions,
+      xp,
+      inventory,
+      weapons,
+      purseFer,
+      competences,
+      specialCompetences,
+      phraseGenial,
+      phraseSociete,
+      portrait: portraitDataUrl,
+
+      // ✅ magie complète (deck/current/used)
+      magic: {
+        isMage: !!magic?.isMage,
+        deckSize: Number(magic?.deckSize) || 24,
+        deck: Array.isArray(magic?.deck) ? magic.deck : [],
+        currentCard: magic?.currentCard ?? null,
+        used: Array.isArray(magic?.used) ? magic.used : [],
+      },
+
+      // ✅ compat: anciens champs (tu peux les garder si tu veux)
+      isMage: !!magic?.isMage,
+      magicDeckSize: Number(magic?.deckSize) || 24,
+
+      // ✅ NEW: validation réversible point-buy
+      isPointBuyValidated: !!isPointBuyValidated,
+    };
 
     try {
       let res;
@@ -525,10 +584,7 @@ function AppRoutes() {
 
       if (!res.ok) {
         console.error("❌ Erreur API /characters :", data);
-        alert(
-          (data && data.message) ||
-            "Erreur lors de la sauvegarde du personnage sur le serveur."
-        );
+        alert((data && data.message) || "Erreur lors de la sauvegarde.");
         return;
       }
 
@@ -539,17 +595,19 @@ function AppRoutes() {
       if (redirectToMyCharacters) {
         navigate("/my-characters");
       } else {
-        alert("Personnage sauvegardé sur le serveur !");
+        alert("Personnage sauvegardé !");
       }
     } catch (err) {
       console.error("❌ Erreur réseau /characters :", err);
-      alert("Erreur réseau lors de la sauvegarde du personnage.");
+      alert("Erreur réseau lors de la sauvegarde.");
     }
   };
 
   const handleLoadCharacterFromBackend = async (id) => {
     if (!user) {
-      alert("Il faut être connecté pour charger un personnage sauvegardé sur le serveur.");
+      alert(
+        "Il faut être connecté pour charger un personnage sauvegardé sur le serveur."
+      );
       return;
     }
 
@@ -576,10 +634,34 @@ function AppRoutes() {
 
       const ch = data || {};
 
+      // ✅ magie (rehydrate complète)
+      if (ch.magic && typeof ch.magic === "object") {
+        setMagic({
+          isMage: !!ch.magic.isMage,
+          deckSize: Number(ch.magic.deckSize) || 24,
+          deck: Array.isArray(ch.magic.deck) ? ch.magic.deck : [],
+          currentCard: ch.magic.currentCard ?? null,
+          used: Array.isArray(ch.magic.used) ? ch.magic.used : [],
+        });
+      } else {
+        // fallback anciens persos
+        setMagic({
+          ...defaultMagic,
+          isMage: !!ch.isMage,
+          deckSize: Number(ch.magicDeckSize) || defaultMagic.deckSize,
+        });
+      }
+
+      // ✅ validation point-buy
+setIsPointBuyValidated(true);
+setIsCustomSkillsValidated(true);
+
       setCurrentCharacterId(ch._id || ch.id || null);
       setCharacterName(ch.name || "");
       setPlayerName(ch.player || "");
-      setAge(typeof ch.age === "number" && !Number.isNaN(ch.age) ? String(ch.age) : "");
+      setAge(
+        typeof ch.age === "number" && !Number.isNaN(ch.age) ? String(ch.age) : ""
+      );
       setProfession(ch.profession || "");
 
       const loadedStats =
@@ -599,16 +681,18 @@ function AppRoutes() {
       setPurseFer(typeof ch.purseFer === "number" ? ch.purseFer : 0);
 
       const hasKitItems =
-        Array.isArray(ch.inventory) && ch.inventory.some((item) => item && item.fromKit);
+        Array.isArray(ch.inventory) &&
+        ch.inventory.some((item) => item && item.fromKit);
 
       if (hasKitItems) setSelectedKit(ch.kit || { id: "loaded-kit" });
       else setSelectedKit(null);
 
-      // si perso chargé en 3d6 → on cache le roller
       setStatsRolled((ch.statMode || "3d6") === "3d6");
 
       setCompetences(Array.isArray(ch.competences) ? ch.competences : []);
-      setSpecialCompetences(Array.isArray(ch.specialCompetences) ? ch.specialCompetences : []);
+      setSpecialCompetences(
+        Array.isArray(ch.specialCompetences) ? ch.specialCompetences : []
+      );
 
       setPhraseGenial(ch.phraseGenial || "");
       setPhraseSociete(ch.phraseSociete || ch.phraseSocieter || "");
@@ -616,7 +700,8 @@ function AppRoutes() {
       const portraitFromBackend = ch.portrait || "";
       setPortraitDataUrl(portraitFromBackend);
       try {
-        if (portraitFromBackend) localStorage.setItem("aria-portrait-url", portraitFromBackend);
+        if (portraitFromBackend)
+          localStorage.setItem("aria-portrait-url", portraitFromBackend);
         else localStorage.removeItem("aria-portrait-url");
       } catch {
         // ignore
@@ -624,10 +709,14 @@ function AppRoutes() {
 
       if (ch.alchemy) {
         setIsAlchemist(!!ch.alchemy.enabled);
-        setAlchemyPotions(Array.isArray(ch.alchemy.potions) ? ch.alchemy.potions : []);
+        setAlchemyPotions(
+          Array.isArray(ch.alchemy.potions) ? ch.alchemy.potions : []
+        );
       } else {
         setIsAlchemist(!!ch.isAlchemist);
-        setAlchemyPotions(Array.isArray(ch.alchemyPotions) ? ch.alchemyPotions : []);
+        setAlchemyPotions(
+          Array.isArray(ch.alchemyPotions) ? ch.alchemyPotions : []
+        );
       }
 
       setShowCreationModal(false);
@@ -688,6 +777,17 @@ function AppRoutes() {
             onChangeStatMode={handleChangeStatMode}
             isStatsLockedForUi={isStatsLockedForUi}
             statPointsPool={statPointsPool}
+
+            // ✅ NEW: validation point-buy
+            isPointBuyValidated={isPointBuyValidated}
+            setIsPointBuyValidated={setIsPointBuyValidated}
+// ✅ validation compétences custom
+isCustomSkillsValidated={isCustomSkillsValidated}
+setIsCustomSkillsValidated={setIsCustomSkillsValidated}
+
+            // magie
+            magic={magic}
+            setMagic={setMagic}
 
             // dés
             statsRolled={statsRolled}
