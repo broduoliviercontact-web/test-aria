@@ -128,7 +128,9 @@ function CreationModal({
         <h3>Mode de calcul des compétences</h3>
 
         <div className="mode-switch">
-          <span className={`mode-label ${skillMode !== "custom" ? "active" : ""}`}>
+          <span
+            className={`mode-label ${skillMode !== "custom" ? "active" : ""}`}
+          >
             Calculs prêts à jouer
           </span>
 
@@ -143,7 +145,9 @@ function CreationModal({
             <span className="card-side" />
           </label>
 
-          <span className={`mode-label ${skillMode === "custom" ? "active" : ""}`}>
+          <span
+            className={`mode-label ${skillMode === "custom" ? "active" : ""}`}
+          >
             Personnalisation
           </span>
         </div>
@@ -590,7 +594,8 @@ export default function CharacterPage({
                       }}
                     >
                       <p style={{ margin: 0 }}>
-                        Points à répartir restants : <strong>{statPointsPool}</strong>
+                        Points à répartir restants :{" "}
+                        <strong>{statPointsPool}</strong>
                       </p>
 
                       <button
@@ -624,11 +629,13 @@ export default function CharacterPage({
             )}
 
             {/* Starting gold */}
-       {!showCreationModal && (statsRolled || statMode === "point-buy") && purseFer === 0 && (
-              <StartingGoldRoller
-                onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
-              />
-            )}
+            {!showCreationModal &&
+              (statsRolled || statMode === "point-buy") &&
+              purseFer === 0 && (
+                <StartingGoldRoller
+                  onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
+                />
+              )}
 
             {/* Layout stats/compétences */}
             <div className="stats-competences-wrapper">
@@ -655,25 +662,25 @@ export default function CharacterPage({
                   )}
 
                   <WeaponList weapons={weapons} onChange={setWeapons} />
-       <div className="magic-btn-wrapper"> 
-                  {magic.isMage && (
-             
-                    <button
-                      type="button"
-                      className="magic-btn"
-                      onClick={openMagic}
-                      disabled={!isMage}
-                      title={!isMage ? "INT 14 minimum" : "Ouvrir la magie"}
-                      aria-label="Ouvrir la magie"
-                    >
-                      <img
-                        src="/icons/satanic.gif"
-                        alt=""
-                        className="magic-btn__img"
-                      />
-                    </button>
-                  )}
-                       </div>
+
+                  <div className="magic-btn-wrapper">
+                    {magic.isMage && (
+                      <button
+                        type="button"
+                        className="magic-btn"
+                        onClick={openMagic}
+                        disabled={!isMage}
+                        title={!isMage ? "INT 14 minimum" : "Ouvrir la magie"}
+                        aria-label="Ouvrir la magie"
+                      >
+                        <img
+                          src="/icons/satanic.gif"
+                          alt=""
+                          className="magic-btn__img"
+                        />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="competences-column">

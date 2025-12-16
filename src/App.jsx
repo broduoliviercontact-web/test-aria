@@ -635,22 +635,28 @@ setIsCustomSkillsValidated(false);
       const ch = data || {};
 
       // ✅ magie (rehydrate complète)
-      if (ch.magic && typeof ch.magic === "object") {
-        setMagic({
-          isMage: !!ch.magic.isMage,
-          deckSize: Number(ch.magic.deckSize) || 24,
-          deck: Array.isArray(ch.magic.deck) ? ch.magic.deck : [],
-          currentCard: ch.magic.currentCard ?? null,
-          used: Array.isArray(ch.magic.used) ? ch.magic.used : [],
-        });
-      } else {
-        // fallback anciens persos
-        setMagic({
-          ...defaultMagic,
-          isMage: !!ch.isMage,
-          deckSize: Number(ch.magicDeckSize) || defaultMagic.deckSize,
-        });
-      }
+ // ✅ MAGIE : hydrate depuis ch.magic (nouveau) + fallback anciens persos
+setMagic(() => {
+  if (ch.magic && typeof ch.magic === "object") {
+    return {
+      isMage: !!ch.magic.isMage,
+      deckSize: Number(ch.magic.deckSize) || 24,
+      deck: Array.isArray(ch.magic.deck) ? ch.magic.deck : [],
+      currentCard: ch.magic.currentCard || null,
+      used: Array.isArray(ch.magic.used) ? ch.magic.used : [],
+    };
+  }
+
+  // fallback anciens champs si tu avais ça avant
+  return {
+    isMage: !!ch.isMage,
+    deckSize: Number(ch.magicDeckSize) || 24,
+    deck: [],
+    currentCard: null,
+    used: [],
+  };
+});
+
 
       // ✅ validation point-buy
 setIsPointBuyValidated(true);
