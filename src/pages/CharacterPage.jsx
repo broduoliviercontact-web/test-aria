@@ -20,7 +20,7 @@ import Inventory from "../components/Inventory";
 import GoldPouch from "../components/GoldPouch";
 import HitPointsBadge from "../components/HitPointsBadge";
 import BlessureBadge from "../components/BlessureBadge";
-import ArmureBadge from "../components/BlessureBadge";
+import ArmureBadge from "../components/BlessureBadge"; // (je laisse comme ton fichier actuel)
 import WeaponList from "../components/WeaponList";
 import PhraseDeSynthese from "../components/PhraseDeSynthese";
 import EquipmentKitModal from "../components/EquipmentKitModal";
@@ -36,22 +36,6 @@ import html2canvas from "html2canvas";
 function getStatValue(stats, statId) {
   const found = stats?.find((s) => s.id === statId);
   return found?.value ?? 0;
-}
-
-// Mode "ready" : moyenne des 2 caracs × 5
-function computeReadyScore(stats, competence) {
-  const [a, b] = competence.keyAttributes;
-  const v1 = getStatValue(stats, a);
-  const v2 = getStatValue(stats, b);
-  return Math.round(((v1 + v2) / 2) * 5);
-}
-
-// Mode "custom" : base simple (sans bonus utilisateur)
-function computeCustomBase(stats, competence) {
-  const [a, b] = competence.keyAttributes;
-  const v1 = getStatValue(stats, a);
-  const v2 = getStatValue(stats, b);
-  return (v1 + v2) * 2;
 }
 
 /* ===========================
@@ -72,7 +56,6 @@ function CreationModal({
   isMageEnabled,
   onChangeIsMageEnabled,
 }) {
-  const isCustomSkills = skillMode === "custom";
   const isPointBuy = statMode === "point-buy";
 
   const handleToggleSkillMode = (event) => {
@@ -103,7 +86,7 @@ function CreationModal({
             compétences.
           </li>
           <li>
-            Ensuite, <strong>vous sauvegardez</strong> (pas besoin de valider).
+            Ensuite, <strong>vous sauvegardez</strong>.
           </li>
         </ol>
 
@@ -145,7 +128,7 @@ function CreationModal({
         <h3>Mode de calcul des compétences</h3>
 
         <div className="mode-switch">
-          <span className={`mode-label ${!isCustomSkills ? "active" : ""}`}>
+          <span className={`mode-label ${skillMode !== "custom" ? "active" : ""}`}>
             Calculs prêts à jouer
           </span>
 
@@ -153,14 +136,14 @@ function CreationModal({
             <input
               className="toggle"
               type="checkbox"
-              checked={isCustomSkills}
+              checked={skillMode === "custom"}
               onChange={handleToggleSkillMode}
             />
             <span className="slider" />
             <span className="card-side" />
           </label>
 
-          <span className={`mode-label ${isCustomSkills ? "active" : ""}`}>
+          <span className={`mode-label ${skillMode === "custom" ? "active" : ""}`}>
             Personnalisation
           </span>
         </div>
@@ -223,6 +206,14 @@ export default function CharacterPage({
   isStatsLockedForUi,
   statPointsPool,
 
+  // ✅ validation point-buy (réversible)
+  isPointBuyValidated,
+  setIsPointBuyValidated,
+
+  // ✅ validation compétences custom (pilotée par parent)
+  isCustomSkillsValidated,
+  setIsCustomSkillsValidated,
+
   // dés (3d6)
   statsRolled,
   setStatsRolled,
@@ -282,6 +273,10 @@ export default function CharacterPage({
   alchemyPotions,
   setAlchemyPotions,
 
+  // magie
+  magic,
+  setMagic,
+
   // XP
   xp,
   setXp,
@@ -307,14 +302,6 @@ export default function CharacterPage({
     getStatValue(stats, "int") ||
     0;
 
-  // State magie persistant (dans CharacterPage)
-  const [magic, setMagic] = useState({
-    isMage: false, // activé via le switch de création
-    deck: [],
-    currentCard: null,
-    used: [],
-  });
-
   // Mage effectif = option magie activée + INT >= 14
   const isMage = !!magic.isMage && intValue >= 14;
 
@@ -323,32 +310,99 @@ export default function CharacterPage({
     setIsMagicOpen(true);
   }
 
-  // "character" compatible avec MagicModal (qui attend character/setCharacter)
-  const magicCharacter = useMemo(
-    () => ({ intelligence: intValue, magic }),
-    [intValue, magic]
-  );
+  // ====== MAGIE : logique deck / tirage ======
+  function createDeck(deckSize = 24) {
+    const families = ["carreau", "coeur", "pique", "trefle"];
+    const full = [];
 
-  // Setter compatible (MagicModal fait setCharacter(prev => ({...prev, magic: {...}})))
-  function setMagicCharacter(updater) {
-    setMagic((prevMagic) => {
-      const prevChar = { intelligence: intValue, magic: prevMagic };
-      const nextChar =
-        typeof updater === "function" ? updater(prevChar) : updater;
-      return nextChar?.magic ?? prevMagic;
+    families.forEach((family) => {
+      for (let value = 1; value <= 13; value++) {
+        full.push({ family, value });
+      }
     });
+
+    const shuffled = full.sort(() => Math.random() - 0.5);
+    const size = Math.max(1, Math.min(52, Number(deckSize) || 24));
+    return shuffled.slice(0, size);
+  }
+
+  function drawMagicCard() {
+    setMagic((prev) => {
+      if (prev.currentCard) return prev;
+
+      const deck = prev.deck.length ? [...prev.deck] : createDeck(prev.deckSize);
+      const card = deck.shift();
+      if (!card) return prev;
+
+      return {
+        ...prev,
+        deck,
+        currentCard: card,
+      };
+    });
+  }
+
+  function resetMagic() {
+    setMagic((prev) => ({
+      ...prev,
+      deck: [],
+      currentCard: null,
+      used: [],
+    }));
+  }
+
+  function useCurrentCard() {
+    setMagic((prev) => {
+      if (!prev.currentCard) return prev;
+      return {
+        ...prev,
+        currentCard: null,
+        used: [...prev.used, prev.currentCard],
+      };
+    });
+  }
+
+  function discardCurrentCard() {
+    setMagic((prev) => {
+      if (!prev.currentCard) return prev;
+      return {
+        ...prev,
+        currentCard: null,
+      };
+    });
+  }
+
+  const remainingCards = useMemo(() => {
+    const total = Number(magic.deckSize) || 24;
+    const used = magic.used.length;
+    const inHand = magic.currentCard ? 1 : 0;
+    const deckKnown = magic.deck.length;
+
+    if (used === 0 && inHand === 0 && deckKnown === 0) return total;
+    return deckKnown;
+  }, [magic.deckSize, magic.used.length, magic.currentCard, magic.deck.length]);
+
+  // ✅ Save handlers : on valide automatiquement (caracs + compétences custom)
+  function handleSave() {
+    if (statMode === "point-buy") setIsPointBuyValidated(true);
+    if (skillMode === "custom") setIsCustomSkillsValidated(true);
+    onSave();
+  }
+
+  function handleSaveAndGo() {
+    if (statMode === "point-buy") setIsPointBuyValidated(true);
+    if (skillMode === "custom") setIsCustomSkillsValidated(true);
+    onSaveAndGoMyCharacters();
   }
 
   const handleExportPdf = async () => {
     if (!pdfSheetRef.current) return;
 
-    // ✅ coupe les backgrounds (parchemins) pendant l'export
     document.body.classList.add("pdf-exporting");
 
     try {
       const element = pdfSheetRef.current;
 
-      // ✅ attendre le chargement des images (portrait + icônes)
       const imgs = Array.from(element.querySelectorAll("img"));
       await Promise.all(
         imgs.map(
@@ -380,12 +434,9 @@ export default function CharacterPage({
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const imgWidthPx = canvas.width;
-      const imgHeightPx = canvas.height;
-
-      const ratio = Math.min(pdfWidth / imgWidthPx, pdfHeight / imgHeightPx);
-      const imgWidth = imgWidthPx * ratio;
-      const imgHeight = imgHeightPx * ratio;
+      const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+      const imgWidth = canvas.width * ratio;
+      const imgHeight = canvas.height * ratio;
 
       const x = (pdfWidth - imgWidth) / 2;
       const y = (pdfHeight - imgHeight) / 2;
@@ -399,6 +450,10 @@ export default function CharacterPage({
       document.body.classList.remove("pdf-exporting");
     }
   };
+
+  const showGlobalUnlock =
+    (statMode === "point-buy" && isPointBuyValidated) ||
+    (skillMode === "custom" && isCustomSkillsValidated);
 
   return (
     <DiceRollProvider>
@@ -439,16 +494,13 @@ export default function CharacterPage({
               isAlchemist={isAlchemist}
               onChangeIsAlchemist={setIsAlchemist}
               isMageEnabled={magic.isMage}
-              onChangeIsMageEnabled={(checked) =>
+              onChangeIsMageEnabled={(checked) => {
                 setMagic((prev) => ({
                   ...prev,
                   isMage: checked,
-                  // optionnel : reset deck si on désactive
-                  ...(checked
-                    ? {}
-                    : { deck: [], currentCard: null, used: [] }),
-                }))
-              }
+                  ...(checked ? {} : { deck: [], currentCard: null, used: [] }),
+                }));
+              }}
             />
           )}
 
@@ -520,14 +572,41 @@ export default function CharacterPage({
                   <CharacterStats
                     stats={stats}
                     onChangeStat={onChangeStat}
-                    isLocked={isStatsLockedForUi}
+                    isLocked={
+                      isStatsLockedForUi ||
+                      (statMode === "point-buy" && isPointBuyValidated)
+                    }
                   />
 
-                  {statMode === "point-buy" && (
-                    <p className="stat-points-info">
-                      Points à répartir restants :{" "}
-                      <strong>{statPointsPool}</strong>
-                    </p>
+                  {/* ✅ point-buy : Valider en haut, seulement quand pas validé */}
+                  {statMode === "point-buy" && !isPointBuyValidated && (
+                    <div
+                      className="stat-points-info"
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <p style={{ margin: 0 }}>
+                        Points à répartir restants : <strong>{statPointsPool}</strong>
+                      </p>
+
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() => setIsPointBuyValidated(true)}
+                        disabled={statPointsPool !== 0}
+                        title={
+                          statPointsPool !== 0
+                            ? "Il faut dépenser tous les points (0 restants) pour valider"
+                            : "Valider la répartition"
+                        }
+                      >
+                        Valider
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -545,7 +624,7 @@ export default function CharacterPage({
             )}
 
             {/* Starting gold */}
-            {!showCreationModal && statsRolled && purseFer === 0 && (
+       {!showCreationModal && (statsRolled || statMode === "point-buy") && purseFer === 0 && (
               <StartingGoldRoller
                 onConfirm={(couronnes) => setPurseFer(couronnes * 1000)}
               />
@@ -576,31 +655,36 @@ export default function CharacterPage({
                   )}
 
                   <WeaponList weapons={weapons} onChange={setWeapons} />
-
-  <div className="magic-btn-wrapper">
-
-  {magic.isMage && (
-  <button
-    type="button"
-    className="magic-btn"
-    onClick={openMagic}
-    disabled={!isMage}
-    title={!isMage ? "INT 14 minimum" : "Ouvrir la magie"}
-    aria-label="Ouvrir la magie"
-  >
-        <h2 className="magic-h2">Magie</h2>
-    <img src="/public/icons/satanic.gif" alt="" className="magic-btn__img" />
-  </button>
-)}
-
+       <div className="magic-btn-wrapper"> 
+                  {magic.isMage && (
+             
+                    <button
+                      type="button"
+                      className="magic-btn"
+                      onClick={openMagic}
+                      disabled={!isMage}
+                      title={!isMage ? "INT 14 minimum" : "Ouvrir la magie"}
+                      aria-label="Ouvrir la magie"
+                    >
+                      <img
+                        src="/icons/satanic.gif"
+                        alt=""
+                        className="magic-btn__img"
+                      />
+                    </button>
+                  )}
+                       </div>
                 </div>
-</div>
+
                 <div className="competences-column">
                   <CompetenceList
                     stats={stats}
                     mode={skillMode}
                     isLocked={false}
                     onCompetencesChange={setCompetences}
+                    initialCompetences={competences}
+                    isCustomValidated={isCustomSkillsValidated}
+                    setIsCustomValidated={setIsCustomSkillsValidated}
                   />
 
                   <SpecialCompetences
@@ -691,14 +775,14 @@ export default function CharacterPage({
 
             {/* Actions backend */}
             <div className="creation-validate">
-              <button type="button" className="btn-primary" onClick={onSave}>
+              <button type="button" className="btn-primary" onClick={handleSave}>
                 Sauvegarder le personnage
               </button>
 
               <button
                 type="button"
                 className="btn-secondary"
-                onClick={onSaveAndGoMyCharacters}
+                onClick={handleSaveAndGo}
               >
                 Sauvegarder et aller à “Mes personnages”
               </button>
@@ -710,6 +794,26 @@ export default function CharacterPage({
               >
                 Supprimer le personnage
               </button>
+
+              {/* ✅ Déverrouillage global (caracs + compétences) */}
+              {showGlobalUnlock && (
+                <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
+                  <div style={{ marginBottom: "0.35rem" }}>
+                    Répartitions validées ✅
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => {
+                      setIsPointBuyValidated(false);
+                      setIsCustomSkillsValidated(false);
+                    }}
+                  >
+                    Déverrouiller
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Retour accueil */}
@@ -717,11 +821,20 @@ export default function CharacterPage({
               ← Retour à l&apos;accueil
             </button>
 
+            {/* MagicModal */}
             <MagicModal
               isOpen={isMagicOpen}
               onClose={() => setIsMagicOpen(false)}
-              character={magicCharacter}
-              setCharacter={setMagicCharacter}
+              isMage={isMage}
+              intValue={intValue}
+              magicEnabled={magic.isMage}
+              remaining={remainingCards}
+              currentCard={magic.currentCard}
+              usedCards={magic.used}
+              onDraw={drawMagicCard}
+              onReset={resetMagic}
+              onUseCurrent={useCurrentCard}
+              onDiscardCurrent={discardCurrentCard}
             />
 
             {/* Modal kit */}

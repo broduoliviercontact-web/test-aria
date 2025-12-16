@@ -11,129 +11,126 @@ const COMPETENCES = [
     name: "Artisanat, construire",
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
-    description:
-      "Fabriquer, réparer, bricoler, construire. Tout ce qui relève de la technique et du savoir-faire manuel.",
+    description: "Fabriquer, réparer, bricoler, construire.",
   },
   {
     id: "combat_rapproche",
     name: "Combat rapproché",
     link: "FOR/DEX",
     keyAttributes: ["force", "dexterite"],
-    description:
-      "Se battre au corps-à-corps : armes de mêlée, bagarre, techniques de combat rapproché.",
+    description: "Combat au corps-à-corps.",
   },
   {
     id: "combat_distance",
     name: "Combat à distance",
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
-    description:
-      "Tirer, viser, utiliser des armes à distance (arc, arbalète, projectiles).",
+    description: "Tirer, viser, utiliser des armes à distance.",
   },
   {
     id: "connaissance_nature",
     name: "Connaissance de la nature",
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
-    description: "Reconnaître plantes, animaux, pistes, milieux naturels.",
+    description: "Plantes, animaux, milieux naturels.",
   },
   {
     id: "connaissance_secrets",
     name: "Connaissance des secrets",
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
-    description: "Histoire, mystères, traditions, rumeurs, ésotérisme.",
+    description: "Mystères, traditions, ésotérisme.",
   },
   {
     id: "courir_sauter",
     name: "Courir, sauter",
     link: "DEX/END",
     keyAttributes: ["dexterite", "endurance"],
-    description: "Athlétisme : course, saut, escalade rapide.",
+    description: "Athlétisme et déplacements.",
   },
   {
     id: "discretion",
     name: "Discrétion",
     link: "DEX/CHA",
     keyAttributes: ["dexterite", "charisme"],
-    description: "Se faufiler, se cacher, agir sans être remarqué.",
+    description: "Se cacher, agir sans être vu.",
   },
   {
     id: "droit",
     name: "Droit",
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
-    description: "Comprendre lois, procédures et contrats.",
+    description: "Lois et procédures.",
   },
   {
     id: "esquiver",
     name: "Esquiver",
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
-    description: "Éviter un coup, une attaque, un piège.",
+    description: "Éviter attaques et dangers.",
   },
   {
     id: "intimider",
     name: "Intimider",
     link: "FOR/CHA",
     keyAttributes: ["force", "charisme"],
-    description: "Faire pression ou menacer.",
+    description: "Menacer et imposer.",
   },
   {
     id: "lire_ecrire",
     name: "Lire, écrire",
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
-    description: "Lire, écrire et comprendre des textes.",
+    description: "Lecture et écriture.",
   },
   {
     id: "mentir_convaincre",
     name: "Mentir, convaincre",
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
-    description: "Persuader, baratiner, négocier.",
+    description: "Négociation et persuasion.",
   },
   {
     id: "perception",
     name: "Perception",
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
-    description: "Repérer des détails, sentir un danger.",
+    description: "Observer et détecter.",
   },
   {
     id: "piloter",
     name: "Piloter",
     link: "DEX/END",
     keyAttributes: ["dexterite", "endurance"],
-    description: "Conduire, manœuvrer, piloter.",
+    description: "Conduite et manœuvre.",
   },
   {
     id: "psychologie",
     name: "Psychologie",
     link: "END/INT",
     keyAttributes: ["endurance", "intelligence"],
-    description: "Comprendre les comportements humains.",
+    description: "Comprendre les comportements.",
   },
   {
     id: "reflexes",
     name: "Réflexes",
     link: "DEX/INT",
     keyAttributes: ["dexterite", "intelligence"],
-    description: "Réagir vite, agir sous pression.",
+    description: "Réactions rapides.",
   },
   {
     id: "serrures_pieges",
     name: "Serrures et pièges",
     link: "DEX/END",
     keyAttributes: ["dexterite", "endurance"],
-    description: "Crocheter, détecter, désamorcer.",
+    description: "Crochetage et pièges.",
   },
   {
     id: "soigner",
     name: "Soigner",
     link: "INT/CHA",
     keyAttributes: ["intelligence", "charisme"],
-    description: "Premiers soins et traitements.",
+    description: "Soins et traitements.",
   },
   {
     id: "survie",
@@ -154,32 +151,38 @@ const COMPETENCES = [
 /* ===========================
    HELPERS
    =========================== */
-function getStatValue(stats, statId) {
-  const found = stats?.find((s) => s.id === statId);
-  return found?.value ?? 0;
-}
+const getStatValue = (stats, id) =>
+  stats.find((s) => s.id === id)?.value ?? 0;
 
-function computeReadyScore(stats, comp) {
-  const [a, b] = comp.keyAttributes;
-  return Math.round(((getStatValue(stats, a) + getStatValue(stats, b)) / 2) * 5);
-}
+const computeReadyScore = (stats, comp) =>
+  Math.round(
+    ((getStatValue(stats, comp.keyAttributes[0]) +
+      getStatValue(stats, comp.keyAttributes[1])) /
+      2) *
+      5
+  );
 
-function computeCustomScore(stats, comp) {
-  const [a, b] = comp.keyAttributes;
-  return (getStatValue(stats, a) + getStatValue(stats, b)) * 2;
-}
+const computeCustomScore = (stats, comp) =>
+  (getStatValue(stats, comp.keyAttributes[0]) +
+    getStatValue(stats, comp.keyAttributes[1])) *
+  2;
 
-/**
- * Props:
- * - initialCompetences : snapshot backend (pour hydrater bonus en custom)
- * - isCustomValidated / setIsCustomValidated : lock global piloté par parent
- */
+const shallowEqualObj = (a, b) => {
+  const ak = Object.keys(a || {});
+  const bk = Object.keys(b || {});
+  if (ak.length !== bk.length) return false;
+  for (const k of ak) if (a[k] !== b[k]) return false;
+  return true;
+};
+
+/* ===========================
+   COMPONENT
+   =========================== */
 export default function CompetenceList({
   stats,
   mode,
   onCompetencesChange,
   isLocked = false,
-
   initialCompetences = [],
   isCustomValidated = false,
   setIsCustomValidated,
@@ -191,160 +194,112 @@ export default function CompetenceList({
   const [bonusById, setBonusById] = useState({});
   const [remainingPoints, setRemainingPoints] = useState(50);
 
-  const didInitCustomRef = useRef(false);
-
-  // ✅ pour éviter boucle : on n'appelle onCompetencesChange que si les scores ont changé
-  const lastSentKeyRef = useRef("");
+  const didInitRef = useRef(false);
+  const lastSnapshotSigRef = useRef("");
 
   const effectiveLocked =
-    !!isLocked ||
+    isLocked ||
     effectiveMode === "ready" ||
-    (effectiveMode === "custom" && !!isCustomValidated);
+    (effectiveMode === "custom" && isCustomValidated);
 
-  /* ===== inferred bonus depuis backend (custom) ===== */
+  /* ===== hydrate depuis backend (1 fois) ===== */
   const inferredBonusById = useMemo(() => {
     if (effectiveMode !== "custom") return {};
-    if (!Array.isArray(initialCompetences) || initialCompetences.length === 0)
-      return {};
-
     const map = {};
     for (const comp of COMPETENCES) {
       const saved = initialCompetences.find((c) => c?.id === comp.id);
       if (!saved) continue;
-
       const base = computeCustomScore(stats, comp);
-      const savedScore = Number(saved.score);
-      if (Number.isNaN(savedScore)) continue;
-
-      const rawBonus = savedScore - base;
-      const clamped = Math.max(0, Math.min(90 - base, rawBonus));
-      if (clamped !== 0) map[comp.id] = clamped;
+      const bonus = Number(saved.score) - base;
+      if (bonus > 0) map[comp.id] = Math.min(bonus, 90 - base);
     }
     return map;
   }, [effectiveMode, initialCompetences, stats]);
 
-  /* ===== reset quand on change de mode ===== */
   useEffect(() => {
     if (effectiveMode !== "custom") {
-      didInitCustomRef.current = false;
-      if (Object.keys(bonusById).length) setBonusById({});
-      if (remainingPoints !== 50) setRemainingPoints(50);
+      didInitRef.current = false;
+      setBonusById({});
+      setRemainingPoints(50);
       return;
     }
-  }, [effectiveMode]); // ✅ IMPORTANT: pas de deps qui changent tout le temps
+    if (didInitRef.current) return;
+    didInitRef.current = true;
 
-  /* ===== hydrate 1 fois en entrant en custom ===== */
-  useEffect(() => {
-    if (effectiveMode !== "custom") return;
-
-    if (didInitCustomRef.current) return;
-    didInitCustomRef.current = true;
-
-    if (Array.isArray(initialCompetences) && initialCompetences.length > 0) {
-      setBonusById(inferredBonusById);
-    } else {
-      setBonusById({});
+    if (initialCompetences.length > 0) {
+      setBonusById((prev) =>
+        shallowEqualObj(prev, inferredBonusById) ? prev : inferredBonusById
+      );
     }
-  }, [effectiveMode, initialCompetences, inferredBonusById]);
+  }, [effectiveMode, inferredBonusById, initialCompetences]);
 
-  /* ===== remaining points ===== */
+  /* ===== pool ===== */
   useEffect(() => {
     if (effectiveMode !== "custom") return;
-    const spent = Object.values(bonusById).reduce(
-      (sum, v) => sum + (Number(v) || 0),
-      0
-    );
+    const spent = Object.values(bonusById).reduce((s, v) => s + v, 0);
     setRemainingPoints(50 - spent);
   }, [bonusById, effectiveMode]);
 
-  /* ===== + / - ===== */
-  const changeScore = (id, baseScore, delta) => {
-    if (effectiveMode !== "custom") return;
-    if (effectiveLocked) return;
-
-    setBonusById((prev) => {
-      const currentBonus = prev[id] ?? 0;
-      const currentTotal = baseScore + currentBonus;
-
-      let newTotal = currentTotal + delta;
-
-      // pas sous la base
-      if (newTotal < baseScore) newTotal = baseScore;
-
-      // max 90
-      if (newTotal > 90) newTotal = 90;
-
-      const actualDelta = newTotal - currentTotal;
-      if (actualDelta === 0) return prev;
-
-      // si on augmente: respecter le pool (50)
-      if (actualDelta > 0) {
-        const spent = Object.values(prev).reduce(
-          (sum, v) => sum + (Number(v) || 0),
-          0
-        );
-        const remaining = 50 - spent;
-        if (actualDelta > remaining) return prev;
-      }
-
-      const newBonus = currentBonus + actualDelta;
-      return { ...prev, [id]: newBonus };
-    });
-  };
-
-  /* ===== sync vers parent (anti-boucle) ===== */
+  /* ===== sync parent ===== */
   useEffect(() => {
-    if (!onCompetencesChange) return;
-
     const snapshot = COMPETENCES.map((comp) => {
       const base =
         effectiveMode === "custom"
           ? computeCustomScore(stats, comp)
           : computeReadyScore(stats, comp);
-
       const bonus = bonusById[comp.id] ?? 0;
-      const score = base + bonus;
-
-      return {
-        id: comp.id,
-        name: comp.name,
-        link: comp.link,
-        score,
-      };
+      return { id: comp.id, name: comp.name, link: comp.link, score: base + bonus };
     });
 
-    // 🔒 clé stable: "id:score|id:score..."
-    const key = snapshot.map((c) => `${c.id}:${c.score}`).join("|");
-    if (key === lastSentKeyRef.current) return;
-    lastSentKeyRef.current = key;
+    const sig = snapshot.map((c) => `${c.id}:${c.score}`).join(",");
+    if (sig === lastSnapshotSigRef.current) return;
+    lastSnapshotSigRef.current = sig;
 
     onCompetencesChange(snapshot);
   }, [stats, bonusById, effectiveMode, onCompetencesChange]);
 
+  /* ===== edit ===== */
+  const changeScore = (id, base, delta) => {
+    if (effectiveLocked || effectiveMode !== "custom") return;
+
+    setBonusById((prev) => {
+      const current = prev[id] ?? 0;
+      const nextTotal = Math.min(90, Math.max(base, base + current + delta));
+      const deltaReal = nextTotal - (base + current);
+
+      if (deltaReal > 0) {
+        const spent = Object.values(prev).reduce((s, v) => s + v, 0);
+        if (deltaReal > 50 - spent) return prev;
+      }
+
+      const nextBonus = current + deltaReal;
+      if (nextBonus <= 0) {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      }
+      return { ...prev, [id]: nextBonus };
+    });
+  };
+
+  /* ===== render ===== */
   return (
     <section className="competence-section">
       <div className="com-tititle">
         <img src="/icons/books.gif" className="arme" alt="" />
-        <h2 className="inventory-title">Competences</h2>
+        <h2 className="inventory-title">Compétences</h2>
         <img src="/icons/books.gif" className="arme" alt="" />
       </div>
 
       {effectiveMode === "custom" && !effectiveLocked && (
         <div className="custom-points-header">
           <button
-            type="button"
             className="btn-validate-points"
             disabled={remainingPoints !== 0}
-            onClick={() => setIsCustomValidated?.(true)}
-            title={
-              remainingPoints !== 0
-                ? "Dépense tous les points (0 restants) pour valider"
-                : "Valider la répartition (verrouille les points)"
-            }
+            onClick={() => setIsCustomValidated(true)}
           >
             Valider
           </button>
-
           <p className="points-remaining">
             Points de personnalisation restants :{" "}
             <strong>{remainingPoints}</strong>
@@ -365,27 +320,16 @@ export default function CompetenceList({
             effectiveMode === "custom"
               ? computeCustomScore(stats, comp)
               : computeReadyScore(stats, comp);
-
           const bonus = bonusById[comp.id] ?? 0;
           const total = base + bonus;
-
-          const isOpen = openId === comp.id;
           const last = resultsByKey[comp.id];
+          const isOpen = openId === comp.id;
 
           return (
             <div key={comp.id} className="competence-row">
               <div
                 className={`row competence-row-main ${isOpen ? "is-open" : ""}`}
-                onClick={() => setOpenId((v) => (v === comp.id ? null : comp.id))}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setOpenId((v) => (v === comp.id ? null : comp.id));
-                  }
-                }}
-                aria-expanded={isOpen}
+                onClick={() => setOpenId(isOpen ? null : comp.id)}
               >
                 <span className="col-name">{comp.name}</span>
                 <span className="col-link">{comp.link}</span>
@@ -395,75 +339,50 @@ export default function CompetenceList({
 
               {isOpen && (
                 <div className="competence-tooltip">
-                  <h3>{comp.name}</h3>
-                  <p className="link-hint">Caractéristiques liées : {comp.link}</p>
                   <p>{comp.description}</p>
 
-                  <div className="competence-tooltip-actions">
-                    <button
-                      type="button"
-                      className="competence-test-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        requestRoll({
-                          mode: "competence",
-                          entityKey: comp.id,
-                          label: comp.name,
-                          target: total,
-                          notation: "d100",
-                        });
-                      }}
-                      title={
-                        last
-                          ? `Dernier jet : ${last.total}/${last.target}`
-                          : "Tester la compétence"
-                      }
-                      aria-label={`Tester ${comp.name} au d100`}
-                    >
-                      🎲 Tester
-                      {last && (
-                        <span
-                          className={`competence-test-result ${
-                            last.success ? "ok" : "ko"
-                          }`}
-                        >
-                          {last.total}/{last.target}
-                        </span>
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    className="competence-test-btn"
+                    onClick={() =>
+                      requestRoll({
+                        mode: "competence",
+                        entityKey: comp.id,
+                        label: comp.name,
+                        target: total,
+                        notation: "d100",
+                      })
+                    }
+                  >
+                    🎲 Tester
+                    {last && (
+                      <span
+                        className={`competence-test-result ${
+                          last.success ? "ok" : "ko"
+                        }`}
+                      >
+                        {last.total}/{last.target}
+                      </span>
+                    )}
+                  </button>
 
                   <div className="score-editor">
-                    <span className="score-label">Score :</span>
-
                     {!effectiveLocked && (
                       <>
                         <button
-                          type="button"
                           className="score-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            changeScore(comp.id, base, -1);
-                          }}
+                          onClick={() => changeScore(comp.id, base, -1)}
                         >
                           −
                         </button>
-
                         <span className="score-value">{total}%</span>
-
                         <button
-                          type="button"
                           className="score-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            changeScore(comp.id, base, +1);
-                          }}
+                          onClick={() => changeScore(comp.id, base, +1)}
                         >
                           +
                         </button>
                       </>
                     )}
-
                     {effectiveLocked && (
                       <span className="score-value">{total}%</span>
                     )}

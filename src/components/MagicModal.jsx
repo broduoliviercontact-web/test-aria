@@ -2,42 +2,19 @@ import React, { useEffect, useMemo } from "react";
 import "./MagicModal.css";
 
 /**
- * Attend :
- * character = { intelligence: number, magic: { isMage, deck, currentCard, used } }
- * setCharacter = (updaterFn) => void
+ * ✅ Compatible 2 APIs :
+ *
+ * A) Nouvelle API (state interne character)
+ *    <MagicModal isOpen onClose character setCharacter />
+ *
+ * B) Ancienne API (celle de CharacterPage)
+ *    <MagicModal
+ *      isOpen onClose
+ *      isMage intValue magicEnabled
+ *      remaining currentCard usedCards
+ *      onDraw onReset onUseCurrent onDiscardCurrent
+ *    />
  */
-
-const SUITS = ["carreau", "trefle", "pique", "coeur"];
-const VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]; // 11=Valet,12=Dame,13=Roi,14=As
-
-function buildDeck(withJoker = true) {
-  const deck = [];
-  for (const suit of SUITS) {
-    for (const value of VALUES) deck.push({ suit, value });
-  }
-  if (withJoker) deck.push({ suit: "joker", value: "joker" });
-  return deck;
-}
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function cardLabel(card) {
-  if (!card) return "";
-  if (card.suit === "joker") return "Joker";
-  const v = card.value;
-  const name =
-    v === 11 ? "Valet" : v === 12 ? "Dame" : v === 13 ? "Roi" : v === 14 ? "As" : String(v);
-  const suit =
-    card.suit === "carreau" ? "♦" : card.suit === "trefle" ? "♣" : card.suit === "pique" ? "♠" : "♥";
-  return `${name} ${suit}`;
-}
 
 /* ===========================
    CSS-PLAYING-CARDS mapping
@@ -46,11 +23,9 @@ function suitToCss(suit) {
   if (suit === "pique") return "spades";
   if (suit === "coeur") return "hearts";
   if (suit === "trefle") return "clubs";
-  // cards.css utilise la classe "diams"
-  if (suit === "carreau") return "diams";
+  if (suit === "carreau") return "diams"; // cards.css utilise "diams"
   return "";
 }
-// Entités HTML EXACTES utilisées dans les exemples du repo
 function suitToEntity(suit) {
   if (suit === "carreau") return "&diams;";
   if (suit === "coeur") return "&hearts;";
@@ -58,7 +33,6 @@ function suitToEntity(suit) {
   if (suit === "pique") return "&spades;";
   return "";
 }
-
 function valueToRank(value) {
   if (value === 14) return "a";
   if (value === 13) return "k";
@@ -66,16 +40,54 @@ function valueToRank(value) {
   if (value === 11) return "j";
   return String(value);
 }
-
 function rankToCornerText(rank) {
-  // Les exemples affichent A,K,Q,J ou chiffre
   return rank.toUpperCase();
 }
 
-function PlayingCard({ card }) {
+function normalizeCard(card) {
   if (!card) return null;
 
-  // Joker : fallback custom (le pack ne le gère pas toujours)
+  // ✅ support {family,value} (CharacterPage) et {suit,value} (MagicModal)
+  const suit = card.suit ?? card.family ?? card.famille ?? card.symbol ?? card.type;
+  const value = card.value;
+
+  if (suit === "joker") return { suit: "joker", value: "joker" };
+  return { suit, value };
+}
+
+function cardLabel(raw) {
+  const card = normalizeCard(raw);
+  if (!card) return "";
+  if (card.suit === "joker") return "Joker";
+
+  const v = card.value;
+  const name =
+    v === 11
+      ? "Valet"
+      : v === 12
+      ? "Dame"
+      : v === 13
+      ? "Roi"
+      : v === 14
+      ? "As"
+      : String(v);
+
+  const suit =
+    card.suit === "carreau"
+      ? "♦"
+      : card.suit === "trefle"
+      ? "♣"
+      : card.suit === "pique"
+      ? "♠"
+      : "♥";
+
+  return `${name} ${suit}`;
+}
+
+function PlayingCard({ card: raw }) {
+  const card = normalizeCard(raw);
+  if (!card) return null;
+
   if (card.suit === "joker") {
     return (
       <div className="aria-joker-card" title="Joker">
@@ -88,14 +100,10 @@ function PlayingCard({ card }) {
   const rank = valueToRank(card.value);
   const suitEntity = suitToEntity(card.suit);
 
-  // ✅ HTML conforme au pack : .card.rank-x.suit + span.rank + span.suit (avec entité)
   return (
     <div className={`card rank-${rank} ${suitClass}`} title={cardLabel(card)}>
       <span className="rank">{rankToCornerText(rank)}</span>
-      <span
-        className="suit"
-        dangerouslySetInnerHTML={{ __html: suitEntity }}
-      />
+      <span className="suit" dangerouslySetInnerHTML={{ __html: suitEntity }} />
     </div>
   );
 }
@@ -115,73 +123,123 @@ function suitExplain(suit) {
   }
 }
 
-export default function MagicModal({ isOpen, onClose, character, setCharacter }) {
-  const magic = character?.magic || {};
-  const intValue = character?.intelligence ?? 0;
+export default function MagicModal(props) {
+  const {
+    isOpen,
+    onClose,
 
-  const enabledByCreation = !!magic?.isMage;
+    // Nouvelle API
+    character,
+    setCharacter,
+
+    // Ancienne API (CharacterPage)
+    isMage: isMageProp,
+    intValue: intValueProp,
+    magicEnabled: magicEnabledProp,
+    remaining,
+    currentCard: currentCardProp,
+    usedCards: usedCardsProp,
+    onDraw,
+    onReset,
+    onUseCurrent,
+    onDiscardCurrent,
+  } = props;
+
+  // ✅ On détecte le mode
+  const usingCharacterApi = !!character && typeof setCharacter === "function";
+
+  // ===== lecture de l'état magie =====
+  const magic = usingCharacterApi ? character?.magic || {} : null;
+
+  const enabledByCreation = usingCharacterApi
+    ? !!magic?.isMage
+    : !!magicEnabledProp;
+
+  const intValue = usingCharacterApi ? character?.intelligence ?? 0 : intValueProp ?? 0;
   const meetsInt = intValue >= 14;
-  const isMage = enabledByCreation && meetsInt;
 
-  const deckCount = magic?.deck?.length || 0;
-  const currentCard = magic?.currentCard || null;
-  const usedCards = magic?.used || [];
+  const isMage = usingCharacterApi
+    ? enabledByCreation && meetsInt
+    : !!isMageProp;
 
-  // Init deck au 1er open (si magie activée)
+  const deckCount = usingCharacterApi
+    ? magic?.deck?.length || 0
+    : Number(remaining ?? 0);
+
+  const currentCard = usingCharacterApi ? magic?.currentCard || null : currentCardProp || null;
+  const usedCards = usingCharacterApi ? magic?.used || [] : usedCardsProp || [];
+
+  // ===== init deck (uniquement pour la nouvelle API) =====
   useEffect(() => {
+    if (!usingCharacterApi) return;
     if (!isOpen) return;
     if (!enabledByCreation) return;
 
+    // si deck déjà présent => rien
     setCharacter((prev) => {
       const prevMagic = prev.magic || {};
       if (prevMagic.deck?.length || prevMagic.currentCard) return prev;
 
-      // règle : 25 cartes au hasard + Joker garanti
-      const full = shuffle(buildDeck(true));
-      const picked = full.slice(0, 25);
-      const hasJoker = picked.some((c) => c.suit === "joker");
-      const deck = hasJoker ? picked : [...picked.slice(0, 24), { suit: "joker", value: "joker" }];
-
-      return {
-        ...prev,
-        magic: {
-          ...prevMagic,
-          isMage: true,
-          deck,
-          currentCard: null,
-          used: prevMagic.used || [],
-        },
-      };
+      // si tu veux un init deck ici, fais-le.
+      // Mais comme ton CharacterPage gère déjà deck+deckSize,
+      // on laisse vide pour éviter d'écraser.
+      return prev;
     });
-  }, [isOpen, enabledByCreation, setCharacter]);
+  }, [usingCharacterApi, isOpen, enabledByCreation, setCharacter]);
 
-  function drawCard() {
-    setCharacter((prev) => {
-      const m = prev.magic || {};
-      if (!m.deck?.length) return prev;
-      if (m.currentCard) return prev; // déjà une carte en main
+  // ===== actions =====
+  const draw = () => {
+    if (usingCharacterApi) {
+      // en mode character API : on tire depuis prev.magic.deck
+      setCharacter((prev) => {
+        const m = prev.magic || {};
+        if (!m.deck?.length) return prev;
+        if (m.currentCard) return prev;
 
-      const [top, ...rest] = m.deck;
-      return { ...prev, magic: { ...m, deck: rest, currentCard: top } };
-    });
-  }
+        const [top, ...rest] = m.deck;
+        return { ...prev, magic: { ...m, deck: rest, currentCard: top } };
+      });
+    } else if (typeof onDraw === "function") {
+      onDraw();
+    }
+  };
 
-  function consumeCurrentCard(action) {
-    setCharacter((prev) => {
-      const m = prev.magic || {};
-      if (!m.currentCard) return prev;
+  const reset = () => {
+    if (usingCharacterApi) {
+      setCharacter((prev) => {
+        const m = prev.magic || {};
+        return { ...prev, magic: { ...m, deck: [], currentCard: null, used: [] } };
+      });
+    } else if (typeof onReset === "function") {
+      onReset();
+    }
+  };
 
-      const used = [...(m.used || []), { ...m.currentCard, action }];
-      return { ...prev, magic: { ...m, currentCard: null, used } };
-    });
-  }
+  const useCard = () => {
+    if (usingCharacterApi) {
+      setCharacter((prev) => {
+        const m = prev.magic || {};
+        if (!m.currentCard) return prev;
+        const used = [...(m.used || []), { ...normalizeCard(m.currentCard), action: "use" }];
+        return { ...prev, magic: { ...m, currentCard: null, used } };
+      });
+    } else if (typeof onUseCurrent === "function") {
+      onUseCurrent();
+    }
+  };
 
-  function resetMagic() {
-    setCharacter((prev) => {
-      const m = prev.magic || {};
-      return { ...prev, magic: { ...m, deck: [], currentCard: null, used: [] } };
-    });
-  }
+  const discardCard = () => {
+    if (usingCharacterApi) {
+      setCharacter((prev) => {
+        const m = prev.magic || {};
+        if (!m.currentCard) return prev;
+        const used = [...(m.used || []), { ...normalizeCard(m.currentCard), action: "discard" }];
+        return { ...prev, magic: { ...m, currentCard: null, used } };
+      });
+    } else if (typeof onDiscardCurrent === "function") {
+      onDiscardCurrent();
+    }
+  };
 
   const helpText = useMemo(() => {
     if (!enabledByCreation) return "Magie désactivée (active-la dans la création).";
@@ -193,7 +251,12 @@ export default function MagicModal({ isOpen, onClose, character, setCharacter })
 
   return (
     <div className="magic-modal__backdrop" onMouseDown={onClose}>
-      <div className="magic-modal__panel" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+      <div
+        className="magic-modal__panel"
+        onMouseDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="magic-modal__header">
           <h2>Compétence : Magie</h2>
           <button className="magic-modal__close" onClick={onClose} aria-label="Fermer">
@@ -232,7 +295,7 @@ export default function MagicModal({ isOpen, onClose, character, setCharacter })
               <div className="magic-modal__deckactions">
                 <button
                   className="magic-modal__btn"
-                  onClick={drawCard}
+                  onClick={draw}
                   disabled={!isMage || deckCount === 0 || !!currentCard}
                   title={
                     !isMage
@@ -249,7 +312,7 @@ export default function MagicModal({ isOpen, onClose, character, setCharacter })
 
                 <button
                   className="magic-modal__btn ghost"
-                  onClick={resetMagic}
+                  onClick={reset}
                   disabled={deckCount === 0 && !currentCard && usedCards.length === 0}
                   title="Réinitialiser deck / historique"
                 >
@@ -262,15 +325,20 @@ export default function MagicModal({ isOpen, onClose, character, setCharacter })
               {!currentCard ? (
                 <div className="magic-modal__placeholder">Aucune carte tirée.</div>
               ) : (
-                <div className={`magic-modal__card ${currentCard.suit === "joker" ? "is-joker" : ""}`}>
+                <div
+                  className={`magic-modal__card ${
+                    normalizeCard(currentCard)?.suit === "joker" ? "is-joker" : ""
+                  }`}
+                >
                   <div className="magic-modal__cardHeader">
                     <div className="magic-modal__cardTitle">{cardLabel(currentCard)}</div>
                     <div className="magic-modal__cardTag">
-                      {currentCard.suit === "joker" ? "Tout est possible" : `Famille : ${currentCard.suit}`}
+                      {normalizeCard(currentCard)?.suit === "joker"
+                        ? "Tout est possible"
+                        : `Famille : ${normalizeCard(currentCard)?.suit}`}
                     </div>
                   </div>
 
-                  {/* ✅ Carte principale en CSS-Playing-Cards (entités HTML) */}
                   <div className="playingCards magic-modal__cardPreview">
                     <div className="magic-modal__cardPreviewInner">
                       <PlayingCard card={currentCard} />
@@ -278,23 +346,25 @@ export default function MagicModal({ isOpen, onClose, character, setCharacter })
                   </div>
 
                   <div className="magic-modal__cardmeta">
-                    {currentCard.suit === "joker" ? (
+                    {normalizeCard(currentCard)?.suit === "joker" ? (
                       <span className="magic-modal__jokerline">Tout est possible.</span>
                     ) : (
                       <>
                         <div className="magic-modal__familyline">
-                          <strong>Famille :</strong> {currentCard.suit}
+                          <strong>Famille :</strong> {normalizeCard(currentCard)?.suit}
                         </div>
-                        <div className="magic-modal__explain">{suitExplain(currentCard.suit)}</div>
+                        <div className="magic-modal__explain">
+                          {suitExplain(normalizeCard(currentCard)?.suit)}
+                        </div>
                       </>
                     )}
                   </div>
 
                   <div className="magic-modal__actions">
-                    <button className="magic-modal__btn" onClick={() => consumeCurrentCard("use")}>
+                    <button className="magic-modal__btn" onClick={useCard}>
                       Utiliser
                     </button>
-                    <button className="magic-modal__btn ghost" onClick={() => consumeCurrentCard("discard")}>
+                    <button className="magic-modal__btn ghost" onClick={discardCard}>
                       Jeter
                     </button>
                   </div>
@@ -302,7 +372,6 @@ export default function MagicModal({ isOpen, onClose, character, setCharacter })
               )}
             </div>
 
-            {/* Cimetière */}
             <div className="magic-used">
               <div className="magic-used__header">
                 <h3>Cartes utilisées</h3>
@@ -317,9 +386,14 @@ export default function MagicModal({ isOpen, onClose, character, setCharacter })
                     .slice()
                     .reverse()
                     .map((c, idx) => (
-                      <div key={`${c.suit}-${c.value}-${idx}`} className="magic-used__item">
+                      <div
+                        key={`${normalizeCard(c)?.suit}-${normalizeCard(c)?.value}-${idx}`}
+                        className="magic-used__item"
+                      >
                         <PlayingCard card={c} />
-                        <div className="magic-used__meta">{c.action === "use" ? "Utilisée" : "Jetée"}</div>
+                        <div className="magic-used__meta">
+                          {c.action === "use" ? "Utilisée" : "Jetée"}
+                        </div>
                       </div>
                     ))
                 )}
