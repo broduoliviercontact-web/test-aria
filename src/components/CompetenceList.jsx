@@ -151,8 +151,7 @@ const COMPETENCES = [
 /* ===========================
    HELPERS
    =========================== */
-const getStatValue = (stats, id) =>
-  stats.find((s) => s.id === id)?.value ?? 0;
+const getStatValue = (stats, id) => stats.find((s) => s.id === id)?.value ?? 0;
 
 const computeReadyScore = (stats, comp) =>
   Math.round(
@@ -186,8 +185,11 @@ export default function CompetenceList({
   initialCompetences = [],
   isCustomValidated = false,
   setIsCustomValidated,
-    minScoreById = {}, 
-  statMode = "point-buy", // <-- permet de détecter le mode 3d6
+
+  // ✅ NEW : plancher par compétence { id: min% }
+  minScoreById = {},
+
+  statMode = "point-buy",
 }) {
   const effectiveMode = mode || "ready";
   const { requestRoll, resultsByKey } = useDiceRoll();
@@ -263,12 +265,15 @@ export default function CompetenceList({
         effectiveMode === "custom"
           ? computeCustomScore(stats, comp)
           : computeReadyScore(stats, comp);
+
       const bonus = bonusById[comp.id] ?? 0;
-  const raw = base + bonus;
-const min = Number(minScoreById?.[comp.id] ?? 0);
-return { id: comp.id, name: comp.name, link: comp.link, score: Math.max(raw, min) };
+      const raw = base + bonus;
 
+      // ✅ plancher
+      const min = Number(minScoreById?.[comp.id] ?? 0);
+      const score = Math.max(raw, min);
 
+      return { id: comp.id, name: comp.name, link: comp.link, score };
     });
 
     const sig = snapshot.map((c) => `${c.id}:${c.score}`).join(",");
@@ -276,29 +281,44 @@ return { id: comp.id, name: comp.name, link: comp.link, score: Math.max(raw, min
     lastSnapshotSigRef.current = sig;
 
     onCompetencesChange(snapshot);
-}, [stats, bonusById, effectiveMode, onCompetencesChange, minScoreById]);
-
+  }, [stats, bonusById, effectiveMode, onCompetencesChange, minScoreById]);
 
   /* ===== edit ===== */
-  const changeScore = (id, base, delta) => {
+  const changeScore = (id, base, min, delta) => {
     if (effectiveLocked || effectiveMode !== "custom") return;
 
     setBonusById((prev) => {
       const current = prev[id] ?? 0;
-      const nextTotal = Math.min(90, Math.max(base, base + current + delta));
-      const deltaReal = nextTotal - (base + current);
 
+      // total "réel" basé sur bonus stocké
+      const currentRawTotal = base + current;
+      const floor = Number(min ?? 0);
+
+      // si déjà au plancher et on veut baisser => no-op
+      if (delta < 0 && currentRawTotal <= floor) return prev;
+
+      // nextTotal clampé : au moins base, au moins floor, max 90
+      const desired = currentRawTotal + delta;
+      const nextTotal = Math.min(90, Math.max(Math.max(base, floor), desired));
+
+      const deltaReal = nextTotal - currentRawTotal;
+      if (deltaReal === 0) return prev;
+
+      // coût en points uniquement pour les augmentations
       if (deltaReal > 0) {
         const spent = Object.values(prev).reduce((s, v) => s + v, 0);
         if (deltaReal > 50 - spent) return prev;
       }
 
       const nextBonus = current + deltaReal;
+
+      // si bonus <= 0 on supprime la clé (on garde le floor via minScoreById)
       if (nextBonus <= 0) {
         const copy = { ...prev };
         delete copy[id];
         return copy;
       }
+
       return { ...prev, [id]: nextBonus };
     });
   };
@@ -346,10 +366,13 @@ return { id: comp.id, name: comp.name, link: comp.link, score: Math.max(raw, min
             effectiveMode === "custom"
               ? computeCustomScore(stats, comp)
               : computeReadyScore(stats, comp);
+
           const bonus = bonusById[comp.id] ?? 0;
-      const rawTotal = baseScore + bonus;
-const min = Number(minScoreById?.[comp.id] ?? 0);
-const totalScore = Math.max(rawTotal, min);
+          const rawTotal = baseScore + bonus;
+
+          const min = Number(minScoreById?.[comp.id] ?? 0);
+          const totalScore = Math.max(rawTotal, min);
+
           const isOpen = openId === comp.id;
           const lastResult = resultsByKey[comp.id];
 
@@ -378,7 +401,9 @@ const totalScore = Math.max(rawTotal, min);
               {isOpen && (
                 <div className="competence-tooltip">
                   <h3>{comp.name}</h3>
-                  <p className="link-hint">Caractéristiques liées : {comp.link}</p>
+                  <p className="link-hint">
+                    Caractéristiques liées : {comp.link}
+                  </p>
                   <p>{comp.description}</p>
 
                   {/* ✅ Bouton test DANS la partie déroulante */}
@@ -419,7 +444,9 @@ const totalScore = Math.max(rawTotal, min);
                         <button
                           type="button"
                           className="score-btn"
-                          onClick={() => changeScore(comp.id, baseScore, -1)}
+                          onClick={() =>
+                            changeScore(comp.id, baseScore, min, -1)
+                          }
                         >
                           −
                         </button>
@@ -427,7 +454,9 @@ const totalScore = Math.max(rawTotal, min);
                         <button
                           type="button"
                           className="score-btn"
-                          onClick={() => changeScore(comp.id, baseScore, +1)}
+                          onClick={() =>
+                            changeScore(comp.id, baseScore, min, +1)
+                          }
                         >
                           +
                         </button>
@@ -438,8 +467,6 @@ const totalScore = Math.max(rawTotal, min);
                       <span className="score-value">{totalScore}%</span>
                     )}
                   </div>
-
-                 
                 </div>
               )}
             </div>

@@ -303,13 +303,13 @@ export default function CharacterPage({
 
   // Mage effectif = option magie activée + INT >= 14
   const isMage = !!magic.isMage && intValue >= 14;
+
+// ===========================
+// MAGIE : type de magicien → planchers de compétences
+// ===========================
 const minScoreById = useMemo(() => {
   const type = magic?.mageType || "outsider";
 
-  // outsider: pas de plancher
-  if (type === "outsider") return {};
-
-  // academy: Connaissance des secrets 60, Lire/écrire 80
   if (type === "academy") {
     return {
       connaissance_secrets: 60,
@@ -317,9 +317,6 @@ const minScoreById = useMemo(() => {
     };
   }
 
-  // misericordieux: Modélisation gérée en special skill (pas ici),
-  // mais planchers demandés :
-  // Connaissance des secrets 60, Lire/écrire 80, Voler 30, Combat rapproché 60
   if (type === "misericordieux") {
     return {
       connaissance_secrets: 60,
@@ -332,10 +329,65 @@ const minScoreById = useMemo(() => {
   return {};
 }, [magic?.mageType]);
 
-  function openMagic() {
-    if (!isMage) return;
-    setIsMagicOpen(true);
-  }
+const applyMageType = (type) => {
+  const normalized = type || "outsider";
+
+  // Règles du bouquin
+  // outsider: 52 + joker
+  // academy: 25 + joker
+  // misericordieux: 10 + joker
+  const mapping = {
+    outsider: { deckSize: 53, includeJoker: true },
+    academy: { deckSize: 26, includeJoker: true },
+    misericordieux: { deckSize: 11, includeJoker: true },
+  };
+
+  const cfg = mapping[normalized] || mapping.outsider;
+
+  // 1) Deck reset + paramètres
+  setMagic((prev) => ({
+    ...prev,
+    mageType: normalized,
+    includeJoker: cfg.includeJoker,
+    deckSize: cfg.deckSize,
+    deck: [],
+    currentCard: null,
+    used: [],
+  }));
+
+  // 2) Compétences spéciales imposées (locked)
+  setSpecialCompetences((prev) => {
+    const list = Array.isArray(prev) ? prev : [];
+
+    // on nettoie les compétences magiques qu’on impose
+    const cleaned = list.filter((c) => !String(c?.id || "").startsWith("magic-"));
+
+    if (normalized === "academy") {
+      return [
+        ...cleaned,
+        { id: "magic-modelisation", name: "Modélisation", score: 60, locked: true },
+      ];
+    }
+
+    if (normalized === "misericordieux") {
+      return [
+        ...cleaned,
+        { id: "magic-modelisation", name: "Modélisation", score: 80, locked: true },
+        { id: "magic-voler-magie", name: "Voler la magie", score: 30, locked: true },
+      ];
+    }
+
+    return cleaned; // outsider : rien imposé
+  });
+};
+
+function openMagic() {
+  // ✅ On peut ouvrir si la magie est activée,
+  // même si INT < 14 (le tirage restera bloqué)
+  if (!magic?.isMage) return;
+  setIsMagicOpen(true);
+}
+
 
   // ====== MAGIE : logique deck / tirage ======
 function createDeck(deckSize = 24, includeJoker = true) {
@@ -352,7 +404,7 @@ function createDeck(deckSize = 24, includeJoker = true) {
     full.push({ family: "joker", value: "joker" });
   }
 
-  // shuffle Fisher–Yates (plus propre que sort random)
+  // Shuffle Fisher–Yates
   for (let i = full.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [full[i], full[j]] = [full[j], full[i]];
@@ -366,7 +418,10 @@ function createDeck(deckSize = 24, includeJoker = true) {
     setMagic((prev) => {
       if (prev.currentCard) return prev;
 
-      const deck = prev.deck.length ? [...prev.deck] : createDeck(prev.deckSize);
+     const deck = prev.deck.length
+  ? [...prev.deck]
+  : createDeck(prev.deckSize, prev.includeJoker !== false);
+
       const card = deck.shift();
       if (!card) return prev;
 
@@ -716,17 +771,17 @@ function createDeck(deckSize = 24, includeJoker = true) {
                 </div>
 
                 <div className="competences-column">
-                  <CompetenceList
-                    stats={stats}
-                    mode={skillMode}
-                    isLocked={false}
-                    onCompetencesChange={setCompetences}
-                    initialCompetences={competences}
-                    isCustomValidated={isCustomSkillsValidated}
-                    setIsCustomValidated={setIsCustomSkillsValidated}
-                statMode={statMode} 
-               minScoreById={minScoreById}       
-                  />
+       <CompetenceList
+  stats={stats}
+  mode={skillMode}
+  isLocked={false}
+  onCompetencesChange={setCompetences}
+  initialCompetences={competences}
+  isCustomValidated={isCustomSkillsValidated}
+  setIsCustomValidated={setIsCustomSkillsValidated}
+  statMode={statMode}
+  minScoreById={minScoreById}
+/>
 
                   <SpecialCompetences
                     specialCompetences={specialCompetences}
@@ -865,21 +920,26 @@ function createDeck(deckSize = 24, includeJoker = true) {
             </button>
 
             {/* MagicModal */}
-            <MagicModal
-              isOpen={isMagicOpen}
-              onClose={() => setIsMagicOpen(false)}
-              isMage={isMage}
-              intValue={intValue}
-              
-              magicEnabled={magic.isMage}
-              remaining={remainingCards}
-              currentCard={magic.currentCard}
-              usedCards={magic.used}
-              onDraw={drawMagicCard}
-              onReset={resetMagic}
-              onUseCurrent={useCurrentCard}
-              onDiscardCurrent={discardCurrentCard}
-            />
+<MagicModal
+  isOpen={isMagicOpen}
+  onClose={() => setIsMagicOpen(false)}
+
+  isMage={isMage}
+  intValue={intValue}
+  magicEnabled={magic.isMage}
+
+  mageType={magic?.mageType || "outsider"}
+  onChangeMageType={applyMageType}
+
+  remaining={remainingCards}
+  currentCard={magic.currentCard}
+  usedCards={magic.used}
+  onDraw={drawMagicCard}
+  onReset={resetMagic}
+  onUseCurrent={useCurrentCard}
+  onDiscardCurrent={discardCurrentCard}
+/>
+
 
             {/* Modal kit */}
             <EquipmentKitModal
