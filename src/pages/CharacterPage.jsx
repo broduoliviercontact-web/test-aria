@@ -457,7 +457,8 @@ export default function CharacterPage({
 
   const showGlobalUnlock =
     (statMode === "point-buy" && isPointBuyValidated) ||
-    (skillMode === "custom" && isCustomSkillsValidated);
+    (skillMode === "custom" && isCustomSkillsValidated) ||
+    (statMode === "3d6" && statsRolled);
 
   return (
     <DiceRollProvider>
@@ -815,6 +816,7 @@ export default function CharacterPage({
                     onClick={() => {
                       setIsPointBuyValidated(false);
                       setIsCustomSkillsValidated(false);
+                      setStatsRolled(false);
                     }}
                   >
                     Déverrouiller

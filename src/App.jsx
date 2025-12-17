@@ -130,7 +130,7 @@ const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
   const screenSheetRef = useRef(null);
   const pdfSheetRef = useRef(null);
 
-  const isStatsLockedForUi = statMode === "3d6"; // en 3d6: pas de +/- sur les stats
+  const isStatsLockedForUi = statMode === "3d6" && statsRolled; // en 3d6: pas de +/- sur les stats seulement après un jet
 
   // =========================
   // HELPERS
@@ -250,11 +250,11 @@ const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
     setStatMode(mode);
     setStatsRolled(false);
 
-    // ✅ si on quitte point-buy, on enlève la validation
- if (skillMode === "custom") {
-  setIsCustomSkillsValidated(true);
-}
-
+    // ✅ si on change de mode stats en custom skills, on reset la validation custom et on vide les compétences pour recalcul
+    if (skillMode === "custom") {
+      setIsCustomSkillsValidated(false);
+      setCompetences([]);
+    }
 
     if (mode === "point-buy") {
       setStatBuy({
