@@ -1,4 +1,3 @@
-// src/components/SpecialCompetences.jsx
 import React from "react";
 import "./SpecialCompetences.css";
 import { useDiceRoll } from "./DiceRollContext";
@@ -32,6 +31,9 @@ function SpecialCompetences({ specialCompetences, onChange }) {
       };
     }
 
+    // ✅ si ligne verrouillée, pas d’édition
+    if (updated[index]?.locked) return;
+
     updated[index] = {
       ...updated[index],
       [field]: value,
@@ -54,6 +56,10 @@ function SpecialCompetences({ specialCompetences, onChange }) {
   };
 
   const handleDeleteRow = (indexToDelete) => {
+    // ✅ empêcher de supprimer une ligne verrouillée
+    const row = realRows[indexToDelete];
+    if (row?.locked) return;
+
     const updated = realRows.filter((_, i) => i !== indexToDelete);
     onChange(updated);
   };
@@ -73,36 +79,38 @@ function SpecialCompetences({ specialCompetences, onChange }) {
 
   return (
     <section className="special-competences">
-
- <div className="special-competences-tititle">
-
-         <img src="/icons/gem.gif" className="gem"alt="Armes" />
-          <h2 className="inventory-title">Compétences spéciales</h2>
-           <img src="/icons/gem.gif" className="gem"alt="Armes" />
-          </div>
-      {/* <h2>Compétences spéciales</h2> */}
+      <div className="special-competences-tititle">
+        <img src="/icons/gem.gif" className="gem" alt="Armes" />
+        <h2 className="inventory-title">Compétences spéciales</h2>
+        <img src="/icons/gem.gif" className="gem" alt="Armes" />
+      </div>
 
       <div className="special-competences-table">
         <div className="special-header row">
           <span className="special-col-name">Compétence</span>
           <span className="col-link">Lien</span>
           <span className="col-score">Score</span>
-  
           <span className="col-delete" />
         </div>
 
         {rows.map((row, index) => {
           const isReal = index < realRows.length;
+          const isLocked = !!row?.locked;
           const last = row?.id ? resultsByKey[row.id] : null;
 
           return (
-            <div key={row.id || index} className="special-row row">
+            <div
+              key={row.id || index}
+              className={`special-row row ${isLocked ? "is-locked" : ""}`}
+            >
               <input
                 type="text"
                 className="special-input special-name-input"
                 value={row.name}
                 placeholder="Nom de la compétence"
+                readOnly={isLocked}
                 onChange={(e) => handleFieldChange(index, "name", e.target.value)}
+                title={isLocked ? "Compétence accordée par le type (verrouillée)" : ""}
               />
 
               <input
@@ -110,7 +118,9 @@ function SpecialCompetences({ specialCompetences, onChange }) {
                 className="special-input special-link-input"
                 value={row.link}
                 placeholder="FOR/DEX"
+                readOnly={isLocked}
                 onChange={(e) => handleFieldChange(index, "link", e.target.value)}
+                title={isLocked ? "Compétence accordée par le type (verrouillée)" : ""}
               />
 
               <div className="score-wrapper">
@@ -121,22 +131,31 @@ function SpecialCompetences({ specialCompetences, onChange }) {
                   min={0}
                   max={100}
                   placeholder="0"
+                  readOnly={isLocked}
                   onChange={(e) => handleFieldChange(index, "score", e.target.value)}
+                  title={isLocked ? "Score imposé par le type (verrouillé)" : ""}
                 />
                 <span className="score-suffix">%</span>
               </div>
 
-   
+              {/* (optionnel) bouton test sur les compétences spéciales */}
+              {/* Tu peux décommenter si tu veux un test:
+              <button type="button" onClick={() => handleTest(row)}>🎲</button>
+              */}
 
               {isReal ? (
-                <button
-                  type="button"
-                  className="delete-special-btn"
-                  onClick={() => handleDeleteRow(index)}
-                  aria-label="Supprimer cette compétence spéciale"
-                >
-                  ✕
-                </button>
+                isLocked ? (
+                  <span className="col-delete" title="Verrouillé">🔒</span>
+                ) : (
+                  <button
+                    type="button"
+                    className="delete-special-btn"
+                    onClick={() => handleDeleteRow(index)}
+                    aria-label="Supprimer cette compétence spéciale"
+                  >
+                    ✕
+                  </button>
+                )
               ) : (
                 <span className="col-delete" />
               )}

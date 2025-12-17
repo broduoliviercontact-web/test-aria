@@ -340,6 +340,8 @@ const applyMageType = (type) => {
     outsider: { deckSize: 53, includeJoker: true },
     academy: { deckSize: 26, includeJoker: true },
     misericordieux: { deckSize: 11, includeJoker: true },
+    typeConfirmed: false,
+
   };
 
   const cfg = mapping[normalized] || mapping.outsider;
@@ -930,6 +932,9 @@ function createDeck(deckSize = 24, includeJoker = true) {
 
   mageType={magic?.mageType || "outsider"}
   onChangeMageType={applyMageType}
+
+typeConfirmed={!!magic?.typeConfirmed}
+onConfirmMageType={() => setMagic((prev) => ({ ...prev, typeConfirmed: true }))}
 
   remaining={remainingCards}
   currentCard={magic.currentCard}
