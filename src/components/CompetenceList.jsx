@@ -387,6 +387,18 @@ export default function CompetenceList({
                       <span className="score-value">{total}%</span>
                     )}
                   </div>
+
+                  {effectiveMode === "ready" && (
+                    <p className="rules-hint">
+                      Méthode : prêt à jouer (moyenne des caractéristiques × 5).
+                    </p>
+                  )}
+
+                  {effectiveMode === "custom" && !isCustomValidated && (
+                    <p className="rules-hint">
+                      Méthode : personnalisation (somme des caractéristiques × 2, puis 50 points à répartir).
+                    </p>
+                  )}
                 </div>
               )}
             </div>
