@@ -1,0 +1,30 @@
+/* src/components/CharacterStats.css */
+
+.character-stats {
+  display: flex;
+  flex-direction: column;
+    align-items: center;
+  border-radius: 12px;
+  background: rgba(249, 246, 239, 0.94);
+  border: 1px solid rgba(140, 105, 70, 0.7);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(120, 90, 60, 0.25);  
+
+  background-image: url("/parchment-bg2.jpg");
+    padding: 0.6rem;
+    flex: 1
+}
+
+.character-stats h2 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+
+
+H2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: black;
+}

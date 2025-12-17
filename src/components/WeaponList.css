@@ -1,0 +1,240 @@
+/* ===========================
+   SECTION ARME
+   =========================== */
+
+.weapon-section {
+  background: rgba(249, 243, 229, 0.9);
+  padding: 0.4rem;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 90, 60, 0.8);
+  box-shadow: 0 1px 0 #e0d2b8, 0 3px 6px rgba(0, 0, 0, 0.12);
+  background-image: url("/parchment-bg2.jpg");
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 10;
+}
+
+.weapon-title {
+  margin: 0 0 0.6rem;
+  font-size: 1.1rem;
+  font-family: "MedievalSharp";
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4a311e;
+}
+
+/* ===========================
+   LIGNE D’UNE ARME
+   =========================== */
+
+.weapon-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(255, 251, 240, 0.9);
+  border: 1px solid rgba(140, 105, 70, 0.6);
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 2px 4px rgba(0, 0, 0, 0.12);
+  position: relative;
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    border-color 0.15s ease-out;
+}
+
+.weapon-row:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 0 #e0d2b8,
+    0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.weapon-row--validated {
+  opacity: 0.95;
+}
+
+/* ===========================
+   ICÔNE / MÉDAILLON
+   =========================== */
+
+.weapon-icon-block {
+  flex: 0 0 86px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  position: relative;
+}
+
+.weapon-icon-button {
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.weapon-icon-frame {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.85);
+  background: linear-gradient(
+    to bottom,
+    #4c4c4c 0%,
+    #595959 25%,
+    #2c2c2c 60%,
+    #000000 100%
+  );
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 0 4px rgba(80, 50, 30, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.weapon-icon-preview {
+  width: 33px;
+  height: 333px;
+  object-fit: contain;
+  image-rendering: auto;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+
+/* ===========================
+   BLOCS TEXTE
+   =========================== */
+
+.weapon-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.weapon-name-input {
+  width: 100%;
+}
+
+.weapon-damage-input {
+  width: 130px;
+  text-align: center;
+  font-family: "MedievalSharp", serif;
+}
+.arme {
+  width: 15%;
+  height: 15%;
+  object-fit: contain;
+
+  image-rendering: auto;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+  
+}
+.arme-title {
+ display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
+  
+}
+/* ===========================
+   ACTIONS
+   =========================== */
+
+.weapon-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.weapon-validate {
+  background: #e0f4e0;
+  border: 1px solid rgba(60, 100, 60, 0.8);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.weapon-delete {
+  background: rgba(120, 0, 0, 0.45);
+  border: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+}
+
+/* ===========================
+   AJOUT
+   =========================== */
+
+.weapon-add {
+  margin-top: 0.6rem;
+  width: 100%;
+  background: #f5e5c7;
+  border: 1px solid rgba(140, 105, 70, 0.8);
+  padding: 0.35rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: "MedievalSharp", serif;
+}
+/* Menu déroulant des icônes d'armes (même style que inventory-icon-menu) */
+.weapon-icon-picker {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  z-index: 20;
+  background: rgba(249, 243, 229, 0.98);
+  border: 1px solid rgba(111, 77, 45, 0.8);
+  border-radius: 8px;
+  padding: 0.4rem;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.4);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
+  min-width: 650px;
+}
+
+/* Chaque entrée */
+.weapon-icon-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.2rem 0.25rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.7rem;
+  text-align: left;
+  color: #3a2412;
+}
+
+.weapon-icon-picker-item:hover {
+  background: rgba(183, 136, 70, 0.16);
+}
+
+
+/* Image + label */
+.weapon-icon-picker-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  background-color: black; /* si tu veux garder le style actuel */
+}
+
+.weapon-icon-picker-label {
+  flex: 1;
+  line-height: 1.1;
+}

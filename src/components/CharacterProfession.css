@@ -1,0 +1,42 @@
+.character-profession {
+  text-align: center;
+}
+
+.character-profession-label {
+  display: block;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.25rem;
+  color: #4a311e;
+  font-family: "MedievalSharp", "Georgia", serif;
+}
+
+/* Champ harmonisé comme Nom */
+.character-profession-input {
+  min-width: 180px;
+  padding: 0.4rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 60, 0.85);
+  background: transparent;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 0.95rem;
+  text-align: center;
+  color: #2f2115;
+  box-shadow:
+    0 1px 0 #e0d2b8,
+    0 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+.character-profession-input::placeholder {
+  color: rgba(120, 90, 60, 0.65);
+  font-style: italic;
+}
+
+.character-profession-input:focus {
+  outline: none;
+  border-color: #7c4a2a;
+  box-shadow:
+    0 0 0 2px rgba(124, 74, 42, 0.25),
+    0 3px 6px rgba(0, 0, 0, 0.16);
+}
