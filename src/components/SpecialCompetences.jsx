@@ -87,7 +87,7 @@ function SpecialCompetences({ specialCompetences, onChange }) {
           <span className="special-col-name">Compétence</span>
           <span className="col-link">Lien</span>
           <span className="col-score">Score</span>
-          <span className="col-test">Test</span>
+  
           <span className="col-delete" />
         </div>
 
@@ -126,25 +126,7 @@ function SpecialCompetences({ specialCompetences, onChange }) {
                 <span className="score-suffix">%</span>
               </div>
 
-              {isReal ? (
-                <button
-                  type="button"
-                  className="special-test-btn"
-                  onClick={() => handleTest(row)}
-                  disabled={!row.score || Number.isNaN(Number(row.score))}
-                  title={last ? `Dernier : ${last.total}/${last.target}` : "Lancer un d100"}
-                  aria-label={`Tester ${row.name || "la compétence"} au d100`}
-                >
-                  🎲
-                  {last ? (
-                    <span className={"special-test-result" + (last.success ? " ok" : " ko")}>
-                      {last.total}/{last.target}
-                    </span>
-                  ) : null}
-                </button>
-              ) : (
-                <span className="col-test" />
-              )}
+   
 
               {isReal ? (
                 <button

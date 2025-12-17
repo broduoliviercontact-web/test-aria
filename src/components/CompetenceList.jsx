@@ -186,6 +186,7 @@ export default function CompetenceList({
   initialCompetences = [],
   isCustomValidated = false,
   setIsCustomValidated,
+  statMode = "point-buy", // <-- permet de détecter le mode 3d6
 }) {
   const effectiveMode = mode || "ready";
   const { requestRoll, resultsByKey } = useDiceRoll();
@@ -201,6 +202,20 @@ export default function CompetenceList({
     isLocked ||
     effectiveMode === "ready" ||
     (effectiveMode === "custom" && isCustomValidated);
+
+  const handleToggleRow = (id) => {
+    setOpenId((current) => (current === id ? null : id));
+  };
+
+  const runTest = (comp, target) => {
+    requestRoll({
+      mode: "competence",
+      entityKey: comp.id,
+      label: comp.name,
+      target,
+      notation: "d100",
+    });
+  };
 
   /* ===== hydrate depuis backend (1 fois) ===== */
   const inferredBonusById = useMemo(() => {
@@ -283,6 +298,11 @@ export default function CompetenceList({
   };
 
   /* ===== render ===== */
+  // On cache TOUTE la rules-hint si statMode === "3d6"
+  const showCustomHint =
+    effectiveMode === "custom" && !isCustomValidated && statMode !== "3d6";
+  const showReadyHint = effectiveMode !== "custom" && statMode !== "3d6";
+
   return (
     <section className="competence-section">
       <div className="com-tititle">
@@ -316,77 +336,102 @@ export default function CompetenceList({
         </div>
 
         {COMPETENCES.map((comp) => {
-          const base =
+          const baseScore =
             effectiveMode === "custom"
               ? computeCustomScore(stats, comp)
               : computeReadyScore(stats, comp);
           const bonus = bonusById[comp.id] ?? 0;
-          const total = base + bonus;
-          const last = resultsByKey[comp.id];
+          const totalScore = baseScore + bonus;
           const isOpen = openId === comp.id;
+          const lastResult = resultsByKey[comp.id];
 
           return (
             <div key={comp.id} className="competence-row">
+              {/* ligne cliquable pour ouvrir la description */}
               <div
                 className={`row competence-row-main ${isOpen ? "is-open" : ""}`}
-                onClick={() => setOpenId(isOpen ? null : comp.id)}
+                onClick={() => handleToggleRow(comp.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleToggleRow(comp.id);
+                  }
+                }}
+                aria-expanded={isOpen}
               >
                 <span className="col-name">{comp.name}</span>
                 <span className="col-link">{comp.link}</span>
-                <span className="col-score">{total}%</span>
-                <span className="col-test" />
+                <span className="col-score">{totalScore}%</span>
+                <span className="col-test" aria-hidden="true" />
               </div>
 
               {isOpen && (
                 <div className="competence-tooltip">
+                  <h3>{comp.name}</h3>
+                  <p className="link-hint">Caractéristiques liées : {comp.link}</p>
                   <p>{comp.description}</p>
 
-                  <button
-                    className="competence-test-btn"
-                    onClick={() =>
-                      requestRoll({
-                        mode: "competence",
-                        entityKey: comp.id,
-                        label: comp.name,
-                        target: total,
-                        notation: "d100",
-                      })
-                    }
-                  >
-                    🎲 Tester
-                    {last && (
-                      <span
-                        className={`competence-test-result ${
-                          last.success ? "ok" : "ko"
-                        }`}
-                      >
-                        {last.total}/{last.target}
-                      </span>
-                    )}
-                  </button>
+                  {/* ✅ Bouton test DANS la partie déroulante */}
+                  <div className="competence-tooltip-actions">
+                    <button
+                      type="button"
+                      className="competence-test-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        runTest(comp, totalScore);
+                      }}
+                      title={
+                        lastResult
+                          ? `Dernier jet : ${lastResult.total}/${lastResult.target}`
+                          : "Tester la compétence"
+                      }
+                      aria-label={`Tester ${comp.name} au d100`}
+                    >
+                      🎲 Tester
+                      {lastResult && (
+                        <span
+                          className={
+                            "competence-test-result " +
+                            (lastResult.success ? "ok" : "ko")
+                          }
+                        >
+                          {lastResult.total}/{lastResult.target}
+                        </span>
+                      )}
+                    </button>
+                  </div>
 
                   <div className="score-editor">
+                    <span className="score-label">Score :</span>
+
                     {!effectiveLocked && (
                       <>
                         <button
+                          type="button"
                           className="score-btn"
-                          onClick={() => changeScore(comp.id, base, -1)}
+                          onClick={() => changeScore(comp.id, baseScore, -1)}
                         >
                           −
                         </button>
-                        <span className="score-value">{total}%</span>
+                        <span className="score-value">{totalScore}%</span>
                         <button
+                          type="button"
                           className="score-btn"
-                          onClick={() => changeScore(comp.id, base, +1)}
+                          onClick={() => changeScore(comp.id, baseScore, +1)}
                         >
                           +
                         </button>
                       </>
                     )}
+
                     {effectiveLocked && (
-                      <span className="score-value">{total}%</span>
+                      <span className="score-value">{totalScore}%</span>
                     )}
                   </div>
+
+                 
                 </div>
               )}
             </div>

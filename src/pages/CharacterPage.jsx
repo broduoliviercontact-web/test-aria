@@ -687,6 +687,7 @@ export default function CharacterPage({
                     initialCompetences={competences}
                     isCustomValidated={isCustomSkillsValidated}
                     setIsCustomValidated={setIsCustomSkillsValidated}
+                statMode={statMode}        
                   />
 
                   <SpecialCompetences
