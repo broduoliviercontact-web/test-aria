@@ -1,7 +1,5 @@
 // src/hooks/usePdfExport.js
 import { useRef, useCallback } from "react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 export function usePdfExport(filename = "fiche-personnage.pdf") {
   const exportRef = useRef(null);
@@ -12,6 +10,11 @@ export function usePdfExport(filename = "fiche-personnage.pdf") {
 
     // Optionnel : tu peux afficher un loader ici dans ton UI
     try {
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import("jspdf"),
+        import("html2canvas"),
+      ]);
+
       const canvas = await html2canvas(element, {
         scale: 2,       // meilleure qualité
         useCORS: true,  // au cas où tu utilises des images

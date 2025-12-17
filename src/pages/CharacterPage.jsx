@@ -1,4 +1,3 @@
-// src/pages/CharacterPage.jsx
 import React, { useMemo, useRef, useState } from "react";
 
 // Context dés
@@ -128,9 +127,7 @@ function CreationModal({
         <h3>Mode de calcul des compétences</h3>
 
         <div className="mode-switch">
-          <span
-            className={`mode-label ${skillMode !== "custom" ? "active" : ""}`}
-          >
+          <span className={`mode-label ${skillMode !== "custom" ? "active" : ""}`}>
             Calculs prêts à jouer
           </span>
 
@@ -145,9 +142,7 @@ function CreationModal({
             <span className="card-side" />
           </label>
 
-          <span
-            className={`mode-label ${skillMode === "custom" ? "active" : ""}`}
-          >
+          <span className={`mode-label ${skillMode === "custom" ? "active" : ""}`}>
             Personnalisation
           </span>
         </div>
@@ -815,6 +810,8 @@ export default function CharacterPage({
                     onClick={() => {
                       setIsPointBuyValidated(false);
                       setIsCustomSkillsValidated(false);
+                      // En 3d6 : on ne ré-affiche plus le roller après validation
+                      // donc on ne remet pas statsRolled à false ici.
                     }}
                   >
                     Déverrouiller

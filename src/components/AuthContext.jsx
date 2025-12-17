@@ -2,7 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const AUTH_ME_TIMEOUT_MS = 4000;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null); // { id, email, displayName }
@@ -11,6 +12,9 @@ export function AuthProvider({ children }) {
 
   // Au chargement de l'app : vérifier si l'utilisateur est déjà connecté
   useEffect(() => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AUTH_ME_TIMEOUT_MS);
+
     async function fetchMe() {
       try {
         setLoading(true);
@@ -19,6 +23,7 @@ export function AuthProvider({ children }) {
         const res = await fetch(`${API_URL}/auth/me`, {
           method: "GET",
           credentials: "include", // 🔑 important pour envoyer le cookie
+          signal: controller.signal,
         });
 
         if (!res.ok) {
@@ -34,6 +39,10 @@ export function AuthProvider({ children }) {
           displayName: data.displayName,
         });
       } catch (err) {
+        if (err?.name === "AbortError") {
+          setUser(null);
+          return;
+        }
         console.error("Erreur /auth/me :", err);
         setUser(null);
       } finally {
@@ -42,6 +51,11 @@ export function AuthProvider({ children }) {
     }
 
     fetchMe();
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, []);
 
   // 👉 Inscription

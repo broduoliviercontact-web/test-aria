@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import "./App.css";
 
@@ -70,15 +69,14 @@ function AppRoutes() {
   }, []);
 
   // ✅ MAGIE globale
-// ✅ MAGIE globale
-const [magic, setMagic] = useState(defaultMagic);
+  const [magic, setMagic] = useState(defaultMagic);
 
-// ✅ validation point-buy (réversible)
-const [isPointBuyValidated, setIsPointBuyValidated] = useState(false);
+  // ✅ validation point-buy (réversible)
+  const [isPointBuyValidated, setIsPointBuyValidated] = useState(false);
 
-// ✅ validation compétences custom (réversible)
-const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
-
+  // ✅ validation compétences custom (réversible)
+  const [isCustomSkillsValidated, setIsCustomSkillsValidated] =
+    useState(false);
 
   const [characterName, setCharacterName] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -130,7 +128,8 @@ const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
   const screenSheetRef = useRef(null);
   const pdfSheetRef = useRef(null);
 
-  const isStatsLockedForUi = statMode === "3d6"; // en 3d6: pas de +/- sur les stats
+  // En 3d6 : on verrouille les caracs seulement après avoir appliqué un jet
+  const isStatsLockedForUi = statMode === "3d6" && statsRolled;
 
   // =========================
   // HELPERS
@@ -244,17 +243,23 @@ const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
   // =========================
   // MODES (skill / stat)
   // =========================
-  const handleChangeSkillMode = (mode) => setSkillMode(mode);
+  const handleChangeSkillMode = (mode) => {
+    setSkillMode(mode);
+    setIsCustomSkillsValidated(false);
+    if (mode === "custom") {
+      setCompetences([]);
+    }
+  };
 
   const handleChangeStatMode = (mode) => {
     setStatMode(mode);
     setStatsRolled(false);
 
-    // ✅ si on quitte point-buy, on enlève la validation
- if (skillMode === "custom") {
-  setIsCustomSkillsValidated(true);
-}
-
+    // En changeant de mode de carac, si on était en perso, on déverrouille et on reset les compétences
+    if (skillMode === "custom") {
+      setIsCustomSkillsValidated(false);
+      setCompetences([]);
+    }
 
     if (mode === "point-buy") {
       setStatBuy({
@@ -349,7 +354,10 @@ const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
       kit.content.forEach((label) => {
         if (kit.id === "combattant" && label.includes("Arme à une main")) return;
 
-        if (kit.id === "erudit" && label.includes("Fioles (x5) ou Sablier")) {
+        if (
+          kit.id === "erudit" &&
+          label.includes("Fioles (x5) ou Sablier")
+        ) {
           let name;
           let quantity;
 
@@ -462,8 +470,7 @@ const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
     setInventory([]);
     setWeapons([]);
     setPurseFer(0);
-setIsCustomSkillsValidated(false);
-
+    setIsCustomSkillsValidated(false);
 
     setSkillMode("ready");
     setStatMode("3d6");
@@ -514,7 +521,6 @@ setIsCustomSkillsValidated(false);
     if (statMode === "point-buy") {
       setIsPointBuyValidated(true);
     }
-
 
     const payloadForBackend = {
       meta: { status: "draft" },
@@ -634,33 +640,31 @@ setIsCustomSkillsValidated(false);
 
       const ch = data || {};
 
-      // ✅ magie (rehydrate complète)
- // ✅ MAGIE : hydrate depuis ch.magic (nouveau) + fallback anciens persos
-setMagic(() => {
-  if (ch.magic && typeof ch.magic === "object") {
-    return {
-      isMage: !!ch.magic.isMage,
-      deckSize: Number(ch.magic.deckSize) || 24,
-      deck: Array.isArray(ch.magic.deck) ? ch.magic.deck : [],
-      currentCard: ch.magic.currentCard || null,
-      used: Array.isArray(ch.magic.used) ? ch.magic.used : [],
-    };
-  }
+      // ✅ MAGIE : hydrate depuis ch.magic (nouveau) + fallback anciens persos
+      setMagic(() => {
+        if (ch.magic && typeof ch.magic === "object") {
+          return {
+            isMage: !!ch.magic.isMage,
+            deckSize: Number(ch.magic.deckSize) || 24,
+            deck: Array.isArray(ch.magic.deck) ? ch.magic.deck : [],
+            currentCard: ch.magic.currentCard || null,
+            used: Array.isArray(ch.magic.used) ? ch.magic.used : [],
+          };
+        }
 
-  // fallback anciens champs si tu avais ça avant
-  return {
-    isMage: !!ch.isMage,
-    deckSize: Number(ch.magicDeckSize) || 24,
-    deck: [],
-    currentCard: null,
-    used: [],
-  };
-});
-
+        // fallback anciens champs si tu avais ça avant
+        return {
+          isMage: !!ch.isMage,
+          deckSize: Number(ch.magicDeckSize) || 24,
+          deck: [],
+          currentCard: null,
+          used: [],
+        };
+      });
 
       // ✅ validation point-buy
-setIsPointBuyValidated(true);
-setIsCustomSkillsValidated(true);
+      setIsPointBuyValidated(true);
+      setIsCustomSkillsValidated(true);
 
       setCurrentCharacterId(ch._id || ch.id || null);
       setCharacterName(ch.name || "");
@@ -787,9 +791,9 @@ setIsCustomSkillsValidated(true);
             // ✅ NEW: validation point-buy
             isPointBuyValidated={isPointBuyValidated}
             setIsPointBuyValidated={setIsPointBuyValidated}
-// ✅ validation compétences custom
-isCustomSkillsValidated={isCustomSkillsValidated}
-setIsCustomSkillsValidated={setIsCustomSkillsValidated}
+            // ✅ validation compétences custom
+            isCustomSkillsValidated={isCustomSkillsValidated}
+            setIsCustomSkillsValidated={setIsCustomSkillsValidated}
 
             // magie
             magic={magic}
