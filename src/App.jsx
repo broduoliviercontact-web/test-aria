@@ -244,16 +244,25 @@ const [isCustomSkillsValidated, setIsCustomSkillsValidated] = useState(false);
   // =========================
   // MODES (skill / stat)
   // =========================
-  const handleChangeSkillMode = (mode) => setSkillMode(mode);
+  const handleChangeSkillMode = (mode) => {
+    setSkillMode(mode);
+    
+    // ✅ When switching TO custom mode, reset validation and clear competences
+    // to avoid re-interpreting ready-mode scores as custom bonuses
+    if (mode === "custom") {
+      setIsCustomSkillsValidated(false);
+      setCompetences([]);
+    }
+  };
 
   const handleChangeStatMode = (mode) => {
     setStatMode(mode);
     setStatsRolled(false);
 
-    // ✅ si on quitte point-buy, on enlève la validation
- if (skillMode === "custom") {
-  setIsCustomSkillsValidated(true);
-}
+    // ✅ When changing stat mode while in custom skill mode, unlock custom skills
+    if (skillMode === "custom") {
+      setIsCustomSkillsValidated(false);
+    }
 
 
     if (mode === "point-buy") {
