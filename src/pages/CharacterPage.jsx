@@ -303,6 +303,34 @@ export default function CharacterPage({
 
   // Mage effectif = option magie activée + INT >= 14
   const isMage = !!magic.isMage && intValue >= 14;
+const minScoreById = useMemo(() => {
+  const type = magic?.mageType || "outsider";
+
+  // outsider: pas de plancher
+  if (type === "outsider") return {};
+
+  // academy: Connaissance des secrets 60, Lire/écrire 80
+  if (type === "academy") {
+    return {
+      connaissance_secrets: 60,
+      lire_ecrire: 80,
+    };
+  }
+
+  // misericordieux: Modélisation gérée en special skill (pas ici),
+  // mais planchers demandés :
+  // Connaissance des secrets 60, Lire/écrire 80, Voler 30, Combat rapproché 60
+  if (type === "misericordieux") {
+    return {
+      connaissance_secrets: 60,
+      lire_ecrire: 80,
+      voler: 30,
+      combat_rapproche: 60,
+    };
+  }
+
+  return {};
+}, [magic?.mageType]);
 
   function openMagic() {
     if (!isMage) return;
@@ -310,20 +338,29 @@ export default function CharacterPage({
   }
 
   // ====== MAGIE : logique deck / tirage ======
-  function createDeck(deckSize = 24) {
-    const families = ["carreau", "coeur", "pique", "trefle"];
-    const full = [];
+function createDeck(deckSize = 24, includeJoker = true) {
+  const families = ["carreau", "coeur", "pique", "trefle"];
+  const full = [];
 
-    families.forEach((family) => {
-      for (let value = 1; value <= 13; value++) {
-        full.push({ family, value });
-      }
-    });
+  families.forEach((family) => {
+    for (let value = 1; value <= 13; value++) {
+      full.push({ family, value });
+    }
+  });
 
-    const shuffled = full.sort(() => Math.random() - 0.5);
-    const size = Math.max(1, Math.min(52, Number(deckSize) || 24));
-    return shuffled.slice(0, size);
+  if (includeJoker) {
+    full.push({ family: "joker", value: "joker" });
   }
+
+  // shuffle Fisher–Yates (plus propre que sort random)
+  for (let i = full.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [full[i], full[j]] = [full[j], full[i]];
+  }
+
+  const size = Math.max(1, Math.min(full.length, Number(deckSize) || 24));
+  return full.slice(0, size);
+}
 
   function drawMagicCard() {
     setMagic((prev) => {
@@ -687,7 +724,8 @@ export default function CharacterPage({
                     initialCompetences={competences}
                     isCustomValidated={isCustomSkillsValidated}
                     setIsCustomValidated={setIsCustomSkillsValidated}
-                statMode={statMode}        
+                statMode={statMode} 
+               minScoreById={minScoreById}       
                   />
 
                   <SpecialCompetences
@@ -832,6 +870,7 @@ export default function CharacterPage({
               onClose={() => setIsMagicOpen(false)}
               isMage={isMage}
               intValue={intValue}
+              
               magicEnabled={magic.isMage}
               remaining={remainingCards}
               currentCard={magic.currentCard}

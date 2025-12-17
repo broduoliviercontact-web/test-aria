@@ -186,6 +186,7 @@ export default function CompetenceList({
   initialCompetences = [],
   isCustomValidated = false,
   setIsCustomValidated,
+    minScoreById = {}, 
   statMode = "point-buy", // <-- permet de détecter le mode 3d6
 }) {
   const effectiveMode = mode || "ready";
@@ -263,7 +264,11 @@ export default function CompetenceList({
           ? computeCustomScore(stats, comp)
           : computeReadyScore(stats, comp);
       const bonus = bonusById[comp.id] ?? 0;
-      return { id: comp.id, name: comp.name, link: comp.link, score: base + bonus };
+  const raw = base + bonus;
+const min = Number(minScoreById?.[comp.id] ?? 0);
+return { id: comp.id, name: comp.name, link: comp.link, score: Math.max(raw, min) };
+
+
     });
 
     const sig = snapshot.map((c) => `${c.id}:${c.score}`).join(",");
@@ -271,7 +276,8 @@ export default function CompetenceList({
     lastSnapshotSigRef.current = sig;
 
     onCompetencesChange(snapshot);
-  }, [stats, bonusById, effectiveMode, onCompetencesChange]);
+}, [stats, bonusById, effectiveMode, onCompetencesChange, minScoreById]);
+
 
   /* ===== edit ===== */
   const changeScore = (id, base, delta) => {
@@ -341,7 +347,9 @@ export default function CompetenceList({
               ? computeCustomScore(stats, comp)
               : computeReadyScore(stats, comp);
           const bonus = bonusById[comp.id] ?? 0;
-          const totalScore = baseScore + bonus;
+      const rawTotal = baseScore + bonus;
+const min = Number(minScoreById?.[comp.id] ?? 0);
+const totalScore = Math.max(rawTotal, min);
           const isOpen = openId === comp.id;
           const lastResult = resultsByKey[comp.id];
 

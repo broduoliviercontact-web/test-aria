@@ -139,11 +139,10 @@
   
 }
 .arme-title {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 4.8rem;
+ display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
   
 }
 /* ===========================

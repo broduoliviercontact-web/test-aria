@@ -40,6 +40,8 @@ const STAT_MAX = 18;
 // ✅ Magie : état par défaut
 const defaultMagic = {
   isMage: false,
+  mageType: "outsider", // "outsider" | "academy" | "misericordieux"
+  includeJoker: true,
   deckSize: 24,
   deck: [],
   currentCard: null,
