@@ -20,7 +20,8 @@ import Inventory from "../components/Inventory";
 import GoldPouch from "../components/GoldPouch";
 import HitPointsBadge from "../components/HitPointsBadge";
 import BlessureBadge from "../components/BlessureBadge";
-import ArmureBadge from "../components/BlessureBadge"; // (je laisse comme ton fichier actuel)
+import ArmureBadge from "../components/ArmureBadge";
+// (je laisse comme ton fichier actuel)
 import WeaponList from "../components/WeaponList";
 import PhraseDeSynthese from "../components/PhraseDeSynthese";
 import EquipmentKitModal from "../components/EquipmentKitModal";

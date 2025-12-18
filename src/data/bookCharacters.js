@@ -69,7 +69,7 @@ isMage: false,
       { name: "Fiole de potion vide", quantity: 1 },
     ],
 
-    weapons: [{ name: "Poings", damage: "1" }],
+    weapons: [{ name: "Poings", damage: "1", iconId: "fist" }],
   },
 
   // =========================
@@ -199,13 +199,13 @@ isMage: false,
     ],
 
     inventory: [
-      { name: "Veste de cuir", quantity: 1 },
-        { name: "Bourse de pièces d’or", quantity: 1 },     
+      { name: "Veste de cuir", quantity: 1, category: "armures" },
+ 
     ],
 
    weapons: [
-  { name: "Sabre", damage: "1d6+1", iconId: "sabre" },
-  { name: "Dague", damage: "1d4", iconId: "dague" },
+  { name: "Rapière", damage: "1d6+1", iconId: "curvy-knife" },
+  { name: "Dague au blason mystérieux", damage: "1d4", iconId: "dagger-rose" },
     ],
   },
 
@@ -269,7 +269,7 @@ isMage: false,
 
     inventory: [
    
-      { name: "Jeu de cartes complet", quantity: 1 },
+      { name: "Jeu de cartes complet", quantity: 1, category: "jeux" },
     ],
 
     weapons: [{ name: "Bâton", damage: "1d6" }],

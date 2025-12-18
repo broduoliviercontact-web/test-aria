@@ -27,6 +27,11 @@ export const weaponIcons =
     "url": "/icons/blade/archery-target.svg"
   },
   {
+    "id": "fist",
+    "label": "Poing",
+    "url": "/icons/blade/fist.svg"
+  },
+  {
     "id": "armored-boomerang",
     "label": "Boomerang Blindé",
     "url": "/icons/blade/armored-boomerang.svg"
@@ -916,11 +921,7 @@ export const weaponIcons =
     "label": "Fusil à Pompe",
     "url": "/icons/blade/shotgun.svg"
   },
-  {
-    "id": "shuriken copie",
-    "label": "Shuriken (Copie)",
-    "url": "/icons/blade/shuriken copie.svg"
-  },
+
   {
     "id": "shuriken",
     "label": "Shuriken",

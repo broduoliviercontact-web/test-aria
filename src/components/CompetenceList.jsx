@@ -188,6 +188,8 @@ export default function CompetenceList({
 
   // ✅ NEW : plancher par compétence { id: min% }
   minScoreById = {},
+    fixedScoresById = {},
+
 
   statMode = "point-buy",
 }) {
@@ -201,7 +203,13 @@ export default function CompetenceList({
   const didInitRef = useRef(false);
   const lastSnapshotSigRef = useRef("");
 
+  const hasFixedScores = useMemo(
+    () => fixedScoresById && Object.keys(fixedScoresById).length > 0,
+    [fixedScoresById]
+  );
+
   const effectiveLocked =
+    hasFixedScores ||
     isLocked ||
     effectiveMode === "ready" ||
     (effectiveMode === "custom" && isCustomValidated);

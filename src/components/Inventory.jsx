@@ -34,7 +34,7 @@ import minesIcon from "./assets/inventory/mines.svg";
 import forgeIcon from "./assets/inventory/forge.svg";
 import machineIcon from "./assets/inventory/machine.svg";
 import natureIcon from "./assets/inventory/nature-plantes.svg";
-
+import jeuxIcon from "./assets/inventory/jeux.svg"; 
 // ✅ Ajouts
 import bijouIcon from "./assets/inventory/bijou.svg";
 import soinIcon from "./assets/inventory/soin-medecin.svg";
@@ -56,7 +56,7 @@ const INVENTORY_CATEGORY_ICONS = {
   survie: survieIcon,
   valeur: valeurIcon,
   outils: outilsIcon,
-
+jeux : jeuxIcon,
   cles: clesIcon,
   cartes: cartesIcon,
   musique: musicIcon,
