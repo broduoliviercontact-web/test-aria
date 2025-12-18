@@ -186,10 +186,11 @@ export default function CompetenceList({
   isCustomValidated = false,
   setIsCustomValidated,
 
-  // ✅ NEW : plancher par compétence { id: min% }
+  // ✅ plancher par compétence { id: min% }
   minScoreById = {},
-    fixedScoresById = {},
 
+  // ✅ NEW : override total (bookCharacter) { id: score% }
+  fixedScoresById = {},
 
   statMode = "point-buy",
 }) {
@@ -269,6 +270,12 @@ export default function CompetenceList({
   /* ===== sync parent ===== */
   useEffect(() => {
     const snapshot = COMPETENCES.map((comp) => {
+      // ✅ bookCharacter : override total
+      const fixed = fixedScoresById?.[comp.id];
+      if (typeof fixed === "number") {
+        return { id: comp.id, name: comp.name, link: comp.link, score: fixed };
+      }
+
       const base =
         effectiveMode === "custom"
           ? computeCustomScore(stats, comp)
@@ -289,7 +296,14 @@ export default function CompetenceList({
     lastSnapshotSigRef.current = sig;
 
     onCompetencesChange(snapshot);
-  }, [stats, bonusById, effectiveMode, onCompetencesChange, minScoreById]);
+  }, [
+    stats,
+    bonusById,
+    effectiveMode,
+    onCompetencesChange,
+    minScoreById,
+    fixedScoresById,
+  ]);
 
   /* ===== edit ===== */
   const changeScore = (id, base, min, delta) => {
@@ -370,16 +384,30 @@ export default function CompetenceList({
         </div>
 
         {COMPETENCES.map((comp) => {
+          const fixed = fixedScoresById?.[comp.id];
+
+          const totalScore =
+            typeof fixed === "number"
+              ? fixed
+              : (() => {
+                  const baseScore =
+                    effectiveMode === "custom"
+                      ? computeCustomScore(stats, comp)
+                      : computeReadyScore(stats, comp);
+
+                  const bonus = bonusById[comp.id] ?? 0;
+                  const rawTotal = baseScore + bonus;
+
+                  const min = Number(minScoreById?.[comp.id] ?? 0);
+                  return Math.max(rawTotal, min);
+                })();
+
           const baseScore =
             effectiveMode === "custom"
               ? computeCustomScore(stats, comp)
               : computeReadyScore(stats, comp);
 
-          const bonus = bonusById[comp.id] ?? 0;
-          const rawTotal = baseScore + bonus;
-
           const min = Number(minScoreById?.[comp.id] ?? 0);
-          const totalScore = Math.max(rawTotal, min);
 
           const isOpen = openId === comp.id;
           const lastResult = resultsByKey[comp.id];

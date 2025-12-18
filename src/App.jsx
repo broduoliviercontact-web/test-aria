@@ -7,6 +7,7 @@ import {
   Route,
   Navigate,
   useNavigate,
+  useLocation, // ✅ NEW
 } from "react-router-dom";
 
 // Pages
@@ -50,6 +51,7 @@ const defaultMagic = {
 
 function AppRoutes() {
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ NEW
 
   const auth = useAuth();
   const { user } = auth;
@@ -104,6 +106,18 @@ function AppRoutes() {
 
   // 🔁 id du perso courant (pour PUT au lieu de POST)
   const [currentCharacterId, setCurrentCharacterId] = useState(null);
+
+  // ✅ NEW: sync id d’édition depuis localStorage quand on arrive sur /character
+  useEffect(() => {
+    if (location.pathname !== "/character") return;
+
+    try {
+      const editingId = localStorage.getItem("aria_edit_character_id");
+      setCurrentCharacterId(editingId ? String(editingId) : null);
+    } catch {
+      setCurrentCharacterId(null);
+    }
+  }, [location.pathname]);
 
   // ✅ one-shot: dés (3d6) → disparaît dès qu’on applique un jet
   const [statsRolled, setStatsRolled] = useState(false);
@@ -503,6 +517,14 @@ function AppRoutes() {
     } catch {
       // ignore
     }
+
+    // ✅ NEW: si on était en mode édition, on clean l’id
+    try {
+      localStorage.removeItem("aria_edit_character_id");
+      localStorage.removeItem("aria_prefill_character");
+    } catch {
+      // ignore
+    }
   };
 
   // =========================
@@ -564,12 +586,22 @@ function AppRoutes() {
       isPointBuyValidated: !!isPointBuyValidated,
     };
 
+    // ✅ NEW: si on vient de Home (prefill), l’id est dans localStorage
+    let editingId = currentCharacterId;
+    if (!editingId) {
+      try {
+        editingId = localStorage.getItem("aria_edit_character_id");
+      } catch {
+        editingId = null;
+      }
+    }
+
     try {
       let res;
       let data = null;
 
-      if (currentCharacterId) {
-        res = await fetch(`${API_URL}/characters/${currentCharacterId}`, {
+      if (editingId) {
+        res = await fetch(`${API_URL}/characters/${editingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -596,8 +628,15 @@ function AppRoutes() {
         return;
       }
 
-      if (!currentCharacterId && data && (data._id || data.id)) {
-        setCurrentCharacterId(data._id || data.id);
+      // ✅ NEW: on sync l’id dans le state et le localStorage (pour éviter le POST ensuite)
+      const savedId = editingId || (data && (data._id || data.id)) || null;
+      if (savedId) {
+        setCurrentCharacterId(String(savedId));
+        try {
+          localStorage.setItem("aria_edit_character_id", String(savedId));
+        } catch {
+          // ignore
+        }
       }
 
       if (redirectToMyCharacters) {

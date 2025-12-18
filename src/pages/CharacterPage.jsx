@@ -296,6 +296,9 @@ export default function CharacterPage({
   const screenSheetRef = useRef(null);
   const pdfSheetRef = useRef(null);
 
+
+  const [bookFixedScoresById, setBookFixedScoresById] = useState({});
+
   // ===========================
   // ✅ ETAPE 2 : PREFILL depuis Home (localStorage)
   // ===========================
@@ -349,19 +352,11 @@ if (Array.isArray(tpl?.stats) && tpl.stats.length) {
 
 
     // --- compétences : on applique un override par id, sans casser la structure existante
-    if (tpl?.competenceOverrides && typeof tpl.competenceOverrides === "object") {
-      setCompetences((prev) => {
-        const list = Array.isArray(prev) ? prev : [];
-        return list.map((c) => {
-          const id = String(c?.id || "");
-          if (!id) return c;
-          const forced = tpl.competenceOverrides[id];
-          return typeof forced === "number" ? { ...c, score: forced } : c;
-        });
-      });
-      // On considère "validé", sinon l'utilisateur voit des boutons +/-
-      setIsCustomSkillsValidated(true);
-    }
+   if (tpl?.competenceOverrides && typeof tpl.competenceOverrides === "object") {
+  setBookFixedScoresById(tpl.competenceOverrides);
+  setIsCustomSkillsValidated(true);
+}
+
 
     // --- compétences spéciales
     if (Array.isArray(tpl?.specialCompetences)) {
@@ -422,6 +417,8 @@ setMagic((prev) => ({
   used: [],
 }));
     // Consommation unique
+    if (!tpl?.competenceOverrides) setBookFixedScoresById({});
+
     localStorage.removeItem("aria_prefill_character");
   } catch (e) {
     console.warn("Prefill template invalide:", e);
@@ -486,6 +483,9 @@ const minScoreById = useMemo(() => {
 
   return {};
 }, [magic?.mageType]);
+
+const fixedScoresById = bookFixedScoresById;
+
 
 // ===========================
 // MAGIE : choix du type de magicien
@@ -971,6 +971,7 @@ const remainingCards = useMemo(() => {
                     setIsCustomValidated={setIsCustomSkillsValidated}
                     statMode={statMode}
                     minScoreById={minScoreById}
+                      fixedScoresById={fixedScoresById}
                   />
 
                   <SpecialCompetences
