@@ -37,7 +37,6 @@ function getCardImageSrc(card, { back = false } = {}) {
 
 /* ===========================
    Puissance (tiers)
-   2 / 3-6 / 7-8 / 9-10 / J / Q-K / A / Joker
    =========================== */
 
 function cardTier(card) {
@@ -47,14 +46,13 @@ function cardTier(card) {
   if (suit === "joker" || card.value === "joker") return 8;
 
   const v = Number(card.value);
-  // As possible 1 ou 14
-  if (v === 1 || v === 14) return 7;
+  if (v === 1 || v === 14) return 7; // As
   if (v === 13 || v === 12) return 6; // K/Q
   if (v === 11) return 5; // J
   if (v >= 9 && v <= 10) return 4;
   if (v >= 7 && v <= 8) return 3;
   if (v >= 3 && v <= 6) return 2;
-  return 1; // 2 et reste
+  return 1;
 }
 
 /* ===========================
@@ -84,10 +82,7 @@ function cardLabel(card) {
 }
 
 /* ===========================
-   Tilt (inspiré pokemon-cards-css)
-   - RAF pour fluidité
-   - Pas de transition pendant move
-   - Transition douce au leave
+   Tilt (pokemon-ish)
    =========================== */
 
 function MagicTilt({ suit, tier, children }) {
@@ -101,8 +96,8 @@ function MagicTilt({ suit, tier, children }) {
     if (!el) return;
 
     const r = el.getBoundingClientRect();
-    const px = (lastRef.current.x - r.left) / r.width;  // 0..1
-    const py = (lastRef.current.y - r.top) / r.height;  // 0..1
+    const px = (lastRef.current.x - r.left) / r.width;
+    const py = (lastRef.current.y - r.top) / r.height;
 
     const x = Math.max(0, Math.min(1, px));
     const y = Math.max(0, Math.min(1, py));
@@ -149,9 +144,7 @@ function MagicTilt({ suit, tier, children }) {
         onMouseMove={onMove}
         onMouseLeave={onLeave}
       >
-        <div className="magic-tilt-media">
-          {children}
-        </div>
+        <div className="magic-tilt-media">{children}</div>
       </div>
     </div>
   );
@@ -202,7 +195,6 @@ function CardFace({ card, size = "large" }) {
       />
     );
 
-    // Small = pas d’effet (perf + lisibilité)
     if (size === "small") return img;
 
     return (
@@ -212,12 +204,7 @@ function CardFace({ card, size = "large" }) {
     );
   }
 
-  // Fallback minimal si une image manque
-  return (
-    <div className="magic-fallback-card">
-      {cardLabel(card)}
-    </div>
-  );
+  return <div className="magic-fallback-card">{cardLabel(card)}</div>;
 }
 
 /* ===========================
@@ -229,6 +216,36 @@ function mageTypeLabel(type) {
   if (type === "misericordieux") return "Miséricordieux";
   return "Disciple étranger";
 }
+
+function spawnParticles(el, clientX, clientY, {
+  count = 12,
+  colors = ["#ffd27d", "#ff8fd4", "#7dd3ff", "#a7ffb5"],
+} = {}) {
+  if (!el) return;
+
+  const rect = el.getBoundingClientRect();
+  const x0 = clientX - rect.left;
+  const y0 = clientY - rect.top;
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("span");
+    p.className = "magic-particle";
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 30 + Math.random() * 55;
+
+    p.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
+    p.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
+    p.style.setProperty("--color", colors[(Math.random() * colors.length) | 0]);
+
+    p.style.left = `${x0}px`;
+    p.style.top = `${y0}px`;
+
+    el.appendChild(p);
+    p.addEventListener("animationend", () => p.remove());
+  }
+}
+
 
 export default function MagicModal({
   isOpen,
@@ -257,19 +274,21 @@ export default function MagicModal({
 }) {
   const [showMageInfo, setShowMageInfo] = useState(false);
 
-  // ✅ Anim CodePen-like
+  // Anim CodePen-like
   const [drawAnim, setDrawAnim] = useState(false);
   const [showcase, setShowcase] = useState(false);
-const [revealPhase, setRevealPhase] = useState("idle"); // idle | opening | opened
+  const [revealPhase, setRevealPhase] = useState("idle"); // idle | opening | opened
+
+  // 🔧 snap / no-transition au retour paquet
+  const [snapBack, setSnapBack] = useState(false);
+  const [deckReady, setDeckReady] = useState(true); // true => transitions ok
 
   const meetsInt = Number(intValue) >= 14;
 
   const hasEverDrawn =
     !!currentCard ||
     (Array.isArray(usedCards) && usedCards.length > 0) ||
-    (Number.isFinite(deckSize) &&
-      Number.isFinite(remaining) &&
-      remaining < deckSize);
+    (Number.isFinite(deckSize) && Number.isFinite(remaining) && remaining < deckSize);
 
   const hideTypeUI = typeConfirmed || hasEverDrawn;
 
@@ -289,61 +308,67 @@ const [revealPhase, setRevealPhase] = useState("idle"); // idle | opening | open
     return "Tire une carte : elle est consommée, utilisée ou jetée.";
   }, [magicEnabled, meetsInt]);
 
-  const canDraw = isMage && meetsInt && Number(remaining) > 0 && !currentCard && !drawAnim;
+  const canDraw =
+    isMage && meetsInt && Number(remaining) > 0 && !currentCard && !drawAnim;
 
   const confirmType = () => {
     if (typeof onConfirmMageType !== "function") return;
     onConfirmMageType();
   };
 
-  // ✅ quand une carte apparaît : on la met en “showcase” automatiquement
+  const handleDraw = () => {
+    if (!canDraw) return;
+
+    setDrawAnim(true);
+    setRevealPhase("opening");
+
+    // pioche au milieu du flip
+    setTimeout(() => {
+      onDraw?.();
+    }, 420);
+  };
+
+  // ✅ Reveal lifecycle (et retour paquet sans anim)
   useEffect(() => {
+    // On est sur le paquet
     if (!currentCard) {
+      setRevealPhase("idle");
+      setDrawAnim(false);
       setShowcase(false);
-      return;
+
+      // Coupe toutes transitions AU MOMENT où le paquet remonte
+      setDeckReady(false);
+      setSnapBack(true);
+
+      // Laisse le navigateur "poser" l'état, puis réactive transitions
+      const t = setTimeout(() => {
+        setSnapBack(false);
+        setDeckReady(true);
+      }, 120);
+
+      return () => clearTimeout(t);
     }
+
+    // Une carte arrive => on termine l'anim
     setShowcase(true);
-    const t = setTimeout(() => setDrawAnim(false), 220);
-    return () => clearTimeout(t);
+
+    const t1 = setTimeout(() => setRevealPhase("opened"), 520);
+    const t2 = setTimeout(() => setDrawAnim(false), 900);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [currentCard]);
 
-const handleDraw = () => {
-  if (!canDraw) return;
-
-  // démarre l'anim
-  setDrawAnim(true);
-  setRevealPhase("opening");
-
-  // on pioche au milieu du flip (pile au moment où la face va apparaître)
-  setTimeout(() => {
-    onDraw?.();
-  }, 420);
-};
-
-
-useEffect(() => {
-  // Quand on n'a plus de carte en main => on revient au paquet
-  if (!currentCard) {
+  // Reset hard quand on ferme
+  useEffect(() => {
+    if (isOpen) return;
     setRevealPhase("idle");
     setDrawAnim(false);
     setShowcase(false);
-    return;
-  }
-
-  // Quand une carte arrive => anim reveal
-  const t1 = setTimeout(() => setRevealPhase("opened"), 520);
-  const t2 = setTimeout(() => setDrawAnim(false), 900);
-  return () => { clearTimeout(t1); clearTimeout(t2); };
-}, [currentCard]);
-
-useEffect(() => {
-  if (!isOpen) {
-    setRevealPhase("idle");
-    setDrawAnim(false);
-    setShowcase(false);
-  }
-}, [isOpen]);
-
+    setSnapBack(false);
+    setDeckReady(true);
+  }, [isOpen]);
 
   const suit = currentCard ? normalizeSuit(currentCard.family ?? currentCard.suit) : null;
 
@@ -359,9 +384,7 @@ useEffect(() => {
       >
         <div className="magic-modal__header">
           <h2>Magie</h2>
-          <button className="magic-modal__close" onClick={onClose}>
-            ✕
-          </button>
+          <button className="magic-modal__close" onClick={onClose}>✕</button>
         </div>
 
         <div className="magic-modal__sub">
@@ -377,9 +400,7 @@ useEffect(() => {
         </div>
 
         {!magicEnabled ? (
-          <div className="magic-modal__locked">
-            Active la magie dans la création de personnage.
-          </div>
+          <div className="magic-modal__locked">Active la magie dans la création de personnage.</div>
         ) : (
           <>
             {showMageInfo && (
@@ -399,10 +420,7 @@ useEffect(() => {
                     Corps d’élite : puissant et combattant. Risque d’instabilité en fin de paquet.
                   </p>
                 </div>
-                <button
-                  className="magic-modal__btn magic-modal__btnTop"
-                  onClick={() => setShowMageInfo(false)}
-                >
+                <button className="magic-modal__btn magic-modal__btnTop" onClick={() => setShowMageInfo(false)}>
                   OK, je choisis mon type
                 </button>
               </div>
@@ -460,11 +478,7 @@ useEffect(() => {
               </div>
 
               <div className="magic-modal__deckactions">
-                <button
-                  className="magic-modal__btn"
-                  onClick={handleDraw}
-                  disabled={!canDraw}
-                >
+                <button className="magic-modal__btn" onClick={handleDraw} disabled={!canDraw}>
                   Tirer une carte
                 </button>
 
@@ -493,32 +507,42 @@ useEffect(() => {
                     <div className="magic-backstack__card" aria-hidden="true">
                       <CardBack size="large" />
                     </div>
-<button
-  type="button"
-  className={`magic-backstack__top ${drawAnim ? "is-drawing" : ""} ${revealPhase !== "idle" ? "is-revealing" : ""}`}
-  onClick={handleDraw}
-  disabled={!canDraw}
-  title={!canDraw ? "INT 14 + aucune carte en main" : "Tirer une carte"}
->
-  <div className={`magic-reveal ${revealPhase !== "idle" ? "is-active" : ""}`}>
-    <div className={`magic-reveal__card ${revealPhase === "opening" || revealPhase === "opened" ? "is-opened" : ""}`}>
-      {/* BACK */}
-      <div className="magic-reveal__face magic-reveal__back">
-        <CardBack size="large" />
-      </div>
 
-      {/* FRONT (pendant le flip, on met la face si dispo, sinon back) */}
-      <div className="magic-reveal__face magic-reveal__front">
-        {currentCard ? (
-          <CardFace card={currentCard} size="large" />
-        ) : (
-          <CardBack size="large" />
-        )}
-      </div>
-    </div>
-  </div>
-</button>
+                    <button
+                      type="button"
+                      className={[
+                        "magic-backstack__top",
+                        deckReady ? "is-ready" : "",
+                        drawAnim ? "is-drawing" : "",
+                        revealPhase !== "idle" ? "is-revealing" : "",
+                        snapBack ? "is-snap" : "",
+                      ].join(" ").trim()}
+                      onClick={handleDraw}
+                      disabled={!canDraw}
+                      title={!canDraw ? "INT 14 + aucune carte en main" : "Tirer une carte"}
+                    >
+                      <div className={`magic-reveal ${revealPhase !== "idle" ? "is-active" : ""}`}>
+                        <div
+                          className={[
+                            "magic-reveal__card",
+                            (revealPhase === "opening" || revealPhase === "opened") ? "is-opened" : "",
+                          ].join(" ").trim()}
+                        >
+                          <div className="magic-reveal__face magic-reveal__back">
+                            <CardBack size="large" />
+                          </div>
 
+                          <div className="magic-reveal__face magic-reveal__front">
+                            {/* pendant flip : face si dispo sinon back */}
+                            {currentCard ? (
+                              <CardFace card={currentCard} size="large" />
+                            ) : (
+                              <CardBack size="large" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -534,11 +558,16 @@ useEffect(() => {
                   </div>
 
                   <div className="magic-modal__cardPreviewImage">
-                    <div
-                      className={`magic-frontstage ${showcase ? "is-showcase" : "is-stowed"}`}
-                      onClick={() => setShowcase((v) => !v)}
-                      title={showcase ? "Cliquer pour ranger" : "Cliquer pour sortir"}
-                    >
+                 <div
+  className={`magic-frontstage ${showcase ? "is-showcase" : "is-stowed"}`}
+onClick={(e) => {
+  spawnParticles(e.currentTarget, e.clientX, e.clientY, {
+    count: currentCard && cardTier(currentCard) >= 7 ? 24 : 14,
+  });
+  setShowcase((v) => !v);
+}}
+>
+
                       <CardFace card={currentCard} size="large" />
                     </div>
                   </div>
