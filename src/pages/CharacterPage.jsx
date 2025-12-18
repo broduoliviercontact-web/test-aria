@@ -298,7 +298,7 @@ export default function CharacterPage({
 
 
   const [bookFixedScoresById, setBookFixedScoresById] = useState({});
-
+const [isFromBook, setIsFromBook] = useState(false);
   // ===========================
   // ✅ ETAPE 2 : PREFILL depuis Home (localStorage)
   // ===========================
@@ -314,6 +314,27 @@ useEffect(() => {
 
   try {
     const tpl = JSON.parse(raw);
+// 🔄 RESET COMPLET avant chargement (évite les "fuites" entre persos)
+setSpecialCompetences([]);
+setAlchemyPotions([]);
+setIsAlchemist(false);
+setIsFromBook(false);
+
+// ✅ on applique l’alchimie du template proprement (même si false)
+const nextIsAlchemist = !!tpl?.isAlchemist;
+setIsAlchemist(nextIsAlchemist);
+
+// ✅ si le template fournit des potions, on les prend, sinon on vide
+if (Array.isArray(tpl?.alchemyPotions)) {
+  setAlchemyPotions(tpl.alchemyPotions);
+} else {
+  setAlchemyPotions([]);
+}
+
+// ✅ si pas alchimiste, on s’assure de ne rien garder côté potions
+if (!nextIsAlchemist) {
+  setAlchemyPotions([]);
+}
 
     // --- identité
     if (tpl?.name) setCharacterName(tpl.name);
@@ -407,7 +428,8 @@ if (Array.isArray(tpl?.weapons)) {
     // Arrive direct dans l’éditeur
     setShowCreationModal(false);
 
-    
+    setIsFromBook(true);
+
 setMagic((prev) => ({
   ...prev,
   isMage: !!tpl?.isMage,
@@ -445,7 +467,26 @@ setMagic((prev) => ({
   setWounds,
   setArmor,
   setIsCustomSkillsValidated,
+  
 ]);
+
+useEffect(() => {
+  if (isAlchemist) return;
+
+  // retire uniquement les specials auto-ajoutés (pas ceux du perso)
+  setSpecialCompetences((prev) => {
+    const list = Array.isArray(prev) ? prev : [];
+    return list.filter(
+      (c) =>
+        c?.id !== "alch-identifier" &&
+        c?.id !== "alch-creer-potion"
+    );
+  });
+
+  // vide les potions
+  setAlchemyPotions([]);
+}, [isAlchemist, setSpecialCompetences, setAlchemyPotions]);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  // ===========================
 // MAGIE (modal + state)
@@ -563,7 +604,12 @@ const applyMageType = (type) => {
 // - ne duplique pas
 // ===========================
 useEffect(() => {
+  // ❌ pas d’alchimie → rien
   if (!isAlchemist) return;
+
+  // ❌ personnage du livre → on ne touche à rien (sinon doublons)
+  if (isFromBook) return;
+// 🧹 Si on désactive l’alchimie, on retire les éléments "alchimie" auto-ajoutés
 
   // 1) Compétences spéciales
   setSpecialCompetences((prev) => {
@@ -580,7 +626,7 @@ useEffect(() => {
     const toAdd = ALCHEMY_STARTER_POTIONS.filter((p) => !byId.has(p.id));
     return toAdd.length ? [...list, ...toAdd] : list;
   });
-}, [isAlchemist, setSpecialCompetences, setAlchemyPotions]);
+}, [isAlchemist, isFromBook, setSpecialCompetences, setAlchemyPotions]);
 
 // ===========================
 // OUVERTURE MODAL MAGIE
