@@ -21,15 +21,12 @@
 }
 .special-competences-tititle {   
 display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    width: 18%;
-    gap: 4rem;
 }
 
 .gem {
-  width: 90%;
+  width: 18%;
 }
 /* ===========================
    ENTÊTE

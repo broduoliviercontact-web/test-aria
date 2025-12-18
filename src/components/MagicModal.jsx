@@ -219,6 +219,8 @@ function mageTypeLabel(type) {
 
 function spawnParticles(el, clientX, clientY, {
   count = 12,
+  size = 6,
+  duration = 700,
   colors = ["#ffd27d", "#ff8fd4", "#7dd3ff", "#a7ffb5"],
 } = {}) {
   if (!el) return;
@@ -232,11 +234,13 @@ function spawnParticles(el, clientX, clientY, {
     p.className = "magic-particle";
 
     const angle = Math.random() * Math.PI * 2;
-    const distance = 30 + Math.random() * 55;
+    const distance = 28 + Math.random() * 62;
 
     p.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
     p.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
     p.style.setProperty("--color", colors[(Math.random() * colors.length) | 0]);
+    p.style.setProperty("--size", `${size}px`);
+    p.style.setProperty("--dur", `${duration}ms`);
 
     p.style.left = `${x0}px`;
     p.style.top = `${y0}px`;
@@ -245,6 +249,39 @@ function spawnParticles(el, clientX, clientY, {
     p.addEventListener("animationend", () => p.remove());
   }
 }
+
+
+function particleConfigForTierAndSuit(tier, suit) {
+  // couleurs par symbole
+  const palette =
+    suit === "coeur" ? ["#ff4d6d", "#ff8fab", "#ffd6e0", "#fff0f3"] :
+    suit === "carreau" ? ["#ffb703", "#ffd166", "#fff1b6", "#fff7d6"] :
+    suit === "trefle" ? ["#2a9d8f", "#7ae582", "#b7f7c7", "#eafff1"] :
+    suit === "pique" ? ["#4cc9f0", "#4895ef", "#bde0ff", "#eef8ff"] :
+    // back / unknown
+    ["#ffffff", "#cfe8ff", "#ffd6e0", "#fff7d6"];
+
+  // tier -> quantité / taille / durée
+  switch (tier) {
+    case 8: // Joker
+      return { count: 52, size: 8, duration: 900, colors: palette };
+    case 7: // As
+      return { count: 40, size: 7, duration: 820, colors: palette };
+    case 6: // K/Q
+      return { count: 30, size: 6, duration: 760, colors: palette };
+    case 5: // J
+      return { count: 24, size: 6, duration: 720, colors: palette };
+    case 4: // 9-10
+      return { count: 18, size: 5, duration: 660, colors: palette };
+    case 3: // 7-8
+      return { count: 14, size: 5, duration: 620, colors: palette };
+    case 2: // 3-6
+      return { count: 10, size: 4, duration: 580, colors: palette };
+    default: // 2
+      return { count: 8, size: 4, duration: 540, colors: palette };
+  }
+}
+
 
 
 export default function MagicModal({
@@ -284,6 +321,9 @@ export default function MagicModal({
   const [deckReady, setDeckReady] = useState(true); // true => transitions ok
 
   const meetsInt = Number(intValue) >= 14;
+
+const trailRef = useRef(0);
+
 
   const hasEverDrawn =
     !!currentCard ||
@@ -561,10 +601,29 @@ export default function MagicModal({
                  <div
   className={`magic-frontstage ${showcase ? "is-showcase" : "is-stowed"}`}
 onClick={(e) => {
-  spawnParticles(e.currentTarget, e.clientX, e.clientY, {
-    count: currentCard && cardTier(currentCard) >= 7 ? 24 : 14,
-  });
+  const tier = currentCard ? cardTier(currentCard) : 1;
+  const suit = currentCard ? normalizeSuit(currentCard.family ?? currentCard.suit) : "unknown";
+  const cfg = particleConfigForTierAndSuit(tier, suit);
+
+  spawnParticles(e.currentTarget, e.clientX, e.clientY, cfg);
   setShowcase((v) => !v);
+}}
+onMouseMove={(e) => {
+  const now = performance.now();
+  if (now - trailRef.current < 55) return; // un peu plus vivant
+  trailRef.current = now;
+
+  const tier = currentCard ? cardTier(currentCard) : 1;
+  const suit = currentCard ? normalizeSuit(currentCard.family ?? currentCard.suit) : "unknown";
+  const cfg = particleConfigForTierAndSuit(tier, suit);
+
+  // trail léger, mais cohérent avec la carte
+  spawnParticles(e.currentTarget, e.clientX, e.clientY, {
+    count: Math.max(2, Math.round(cfg.count / 16)),
+    size: Math.max(3, Math.round(cfg.size * 0.65)),
+    duration: Math.max(380, Math.round(cfg.duration * 0.65)),
+    colors: cfg.colors,
+  });
 }}
 >
 

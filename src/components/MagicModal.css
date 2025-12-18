@@ -1074,16 +1074,32 @@
 
 .magic-particle{
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: var(--size, 6px);
+  height: var(--size, 6px);
   border-radius: 50%;
   pointer-events: none;
 
   background: var(--color);
-  filter: blur(0.5px);
+  mix-blend-mode: screen;
 
-  animation: particle-fly 700ms cubic-bezier(.22,.61,.36,1) forwards;
+  /* ✅ CONTOURS / RINGS */
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.95) inset, /* contour interne blanc */
+    0 0 0 1px rgba(0,0,0,.18),            /* micro bord sombre (lisibilité) */
+    0 0 10px rgba(255,255,255,.35),       /* glow doux */
+    0 0 16px color-mix(in srgb, var(--color) 65%, transparent); /* glow coloré */
+
+  /* optionnel: rend plus “gem” */
+  background-image:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.75), transparent 45%),
+    radial-gradient(circle at 70% 75%, rgba(0,0,0,.12), transparent 55%);
+
+  filter: blur(.2px);
+ outline: 1px solid rgba(255,255,255,.85);
+  outline-offset: -1px;
+  animation: particle-fly var(--dur, 700ms) cubic-bezier(.22,.61,.36,1) forwards;
 }
+
 
 @keyframes particle-fly{
   from{
@@ -1094,4 +1110,8 @@
     transform: translate(var(--x), var(--y)) scale(0);
     opacity: 0;
   }
+}
+
+.magic-particle{
+  mix-blend-mode: screen;
 }
