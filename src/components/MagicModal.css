@@ -1,3 +1,7 @@
+/* =========================================================
+   BASE MODAL
+   ========================================================= */
+
 .magic-modal__backdrop{
   position: fixed;
   inset: 0;
@@ -17,7 +21,9 @@
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
   padding: 16px;
-  background-image:  url("/parchment-bg2.jpg");
+  background-image: url("/parchment-bg2.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 .magic-modal__header{
@@ -36,7 +42,7 @@
   line-height: 1;
 }
 
-/* ===== Sub header (pills + hint) ===== */
+/* ===== Sub header ===== */
 .magic-modal__sub{
   display: grid;
   gap: 8px;
@@ -74,6 +80,7 @@
   opacity: .85;
 }
 
+/* Buttons */
 .magic-modal__btn{
   border-radius: 10px;
   padding: 10px 12px;
@@ -92,6 +99,7 @@
   background: transparent;
 }
 
+/* Locked box */
 .magic-modal__locked{
   border: 1px dashed rgba(111, 77, 45, .55);
   border-radius: 12px;
@@ -99,6 +107,7 @@
   background: #fff6;
 }
 
+/* Deck row */
 .magic-modal__deckrow{
   display: flex;
   align-items: center;
@@ -123,20 +132,15 @@
   width: fit-content;
 }
 
-.magic-modal__tiny{
-  font-size: 12px;
-  opacity: .75;
-}
-
 .magic-modal__deckactions{
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
+/* Card zone */
 .magic-modal__cardzone{
   margin-top: 6px;
-  
 }
 
 .magic-modal__placeholder{
@@ -145,26 +149,136 @@
   padding: 18px;
   opacity: .9;
   background: #fff6;
+  display: grid;
+  place-items: center;
 }
 
-/* ===== CSS Playing Cards override (diamonds) ===== */
-.playingCards .card.diams,
-.playingCards .card.diamonds {
-  color: #c00 !important;
+/* =========================================================
+   TYPE UI / INFO (si tu l'utilises)
+   ========================================================= */
+
+.magic-modal__sectionBox{ margin-bottom: 12px; }
+.magic-modal__infoBox{ margin-bottom: 12px; }
+
+.magic-modal__infoText{
+  margin-top: 8px;
+  line-height: 1.35;
+  font-size: 13px;
 }
 
-/* ===== main card container ===== */
+.magic-modal__pFirst{ margin-top: 0; }
+.magic-modal__pLast{ margin-bottom: 0; }
+
+.magic-modal__btnTop{ margin-top: 10px; }
+
+.magic-modal__typeLine{
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.magic-modal__subtleLine{
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.magic-modal__select{
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(111,77,45,.8);
+  background: #fff;
+  cursor: pointer;
+}
+
+.magic-modal__btnFull{
+  margin-top: 10px;
+  width: 100%;
+}
+
+.magic-modal__note{
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* Tooltips (optionnels) */
+.magic-tooltip{
+  position: relative;
+  display: inline-block;
+}
+
+.magic-tooltip__label{
+  font-weight: 700;
+  font-size: 1.5rem;
+  cursor: crosshair;
+  text-decoration: underline;
+  text-decoration-style: none;
+  text-underline-offset: 3px;
+}
+
+.magic-tooltip__bubble{
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  width: min(420px, 78vw);
+  z-index: 50;
+
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(111, 77, 45, .75);
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,.18);
+
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #241b12;
+
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+}
+
+.magic-tooltip__bubble::before{
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 14px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-left: 1px solid rgba(111, 77, 45, .75);
+  border-top: 1px solid rgba(111, 77, 45, .75);
+  transform: rotate(45deg);
+}
+
+.magic-tooltip:hover .magic-tooltip__bubble,
+.magic-tooltip:focus-within .magic-tooltip__bubble{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* =========================================================
+   MAIN CARD PANEL
+   ========================================================= */
+
 .magic-modal__card{
   border: 1px solid rgba(111, 77, 45, .8);
   border-radius: 12px;
   padding: 14px;
-  background: radial-gradient(circle at 30% 20%, #ffffff, #f7edd6);
-  background-image:  url("/parchment-bg2.jpg");
-  background-size:contain;
-}
 
-.magic-modal__card.is-joker{
-  background: #fff6;
+  background-image: url("/parchment-bg2.jpg");
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .magic-modal__cardHeader{
@@ -173,6 +287,7 @@
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 10px;
+  width: 100%;
 }
 
 .magic-modal__cardTitle{
@@ -180,71 +295,14 @@
   font-weight: 800;
 }
 
-/* ✅ Title red/black depending on suit */
-.magic-modal__cardTitle.is-red {
-  color: #c00;
-}
-.magic-modal__cardTitle.is-black {
-  color: #111;
-}
+.magic-modal__cardTitle.is-red { color: #c00; }
+.magic-modal__cardTitle.is-black { color: #111; }
 
-.magic-modal__cardTag{
-  font-size: 12px;
-  opacity: .85;
-  border: 1px solid rgba(111,77,45,.25);
-  background: #fff6;
-  padding: 4px 10px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-/* ✅ Carte CSS-Playing-Cards en grand */
-.magic-modal__cardPreview{
+.magic-modal__cardPreviewImage {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px 0 6px;
-}
-.magic-modal__cardPreviewInner{ transform: scale(2) !important; }
-
-/* container pour scaler sans casser le CSS du pack */
-.magic-modal__cardPreviewInner{
-  --cardScale: 1.6;
-  transform: scale(var(--cardScale));
-  transform-origin: center top;
-  margin-bottom: 2rem;
-}
-
-@media (min-width: 800px){
-  .magic-modal__cardPreviewInner{ --cardScale: 1.85; }
-}
-
-@media (max-width: 420px){
-  .magic-modal__cardPreviewInner{ --cardScale: 1.3; }
-}
-
-
-/* ombre légère aux cartes du pack (dans notre modal) */
-.magic-modal__card .card{
-  box-shadow: 0 6px 18px rgba(0,0,0,.18);
-}
-
-.magic-modal__cardmeta{
-  margin-top: 8px;
-  font-size: 13px;
-  opacity: .9;
-}
-
-.magic-modal__jokerline{
-  font-weight: 700;
-}
-
-.magic-modal__familyline{
-  margin-bottom: 6px;
-}
-
-.magic-modal__explain{
-  opacity: .85;
+  padding: .5rem 0;
 }
 
 .magic-modal__actions{
@@ -253,7 +311,10 @@
   margin-top: 12px;
 }
 
-/* ===== Cartes utilisées ===== */
+/* =========================================================
+   USED CARDS
+   ========================================================= */
+
 .magic-used{
   margin-top: 14px;
   border-top: 1px solid rgba(111, 77, 45, .25);
@@ -297,180 +358,14 @@
 .magic-used__item{
   display: grid;
   justify-items: center;
-  gap: 6px;
 }
 
-.magic-used__meta{
-  font-size: 12px;
-  opacity: .8;
-}
-
-/* Joker fallback */
-.aria-joker-card{
-  width: 72px;
-  height: 96px;
-  border-radius: 10px;
-  border: 1px solid rgba(111, 77, 45, .8);
-  background: #fff;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 2px 4px #0002;
-}
-
-.aria-joker-card__inner{
-  font-weight: 900;
-  letter-spacing: 1px;
-  opacity: .85;
-}
-
-/* Responsive */
-@media (max-width: 640px){
-  .magic-modal__deckrow{
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .magic-modal__deckactions{
-    justify-content: flex-start;
-  }
-}
-
-/* ===== extracted inline styles (MagicModal.jsx) ===== */
-
-.magic-modal__sectionBox{
-  margin-bottom: 12px;
-}
-
-.magic-modal__infoBox{
-  margin-bottom: 12px;
-}
-
-.magic-modal__infoText{
-  margin-top: 8px;
-  line-height: 1.35;
-  font-size: 13px;
-}
-
-.magic-modal__pFirst{
-  margin-top: 0;
-}
-
-.magic-modal__pLast{
-  margin-bottom: 0;
-}
-
-.magic-modal__strong{
-  font-weight: 700;
-  font-size: 1.5rem;
-}
-
-.magic-modal__btnTop{
-  margin-top: 10px;
-}
-
-.magic-modal__typeLine{
-  margin-top: 6px;
-  font-size: 13px;
-  opacity: 0.9;
-}
-
-.magic-modal__subtleLine{
-  margin-top: 6px;
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.magic-modal__select{
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(111,77,45,.8);
-  background: #fff;
-  cursor: pointer;
-}
-
-.magic-modal__btnFull{
-  margin-top: 10px;
-  width: 100%;
-}
-
-.magic-modal__note{
-  margin-top: 8px;
-  font-size: 12px;
-  opacity: 0.85;
-}
-/* ===== Tooltips (types de magicien) ===== */
-
-.magic-tooltip{
-  position: relative;
-  display: inline-block;
-}
-
-.magic-tooltip__label{
-  font-weight: 700;
-  font-size: 1.5rem;
-  cursor:crosshair;
-  text-decoration:underline;
-  text-decoration-style:none;
-  text-underline-offset: 3px;
-}
-
-.magic-tooltip__bubble{
-  position: absolute;
-  left: 0;
-  top: calc(100% + 8px);
-  width: min(420px, 78vw);
-  z-index: 50;
-
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(111, 77, 45, .75);
-  background: #fff;
-  box-shadow: 0 10px 25px rgba(0,0,0,.18);
-
-  font-size: 12.5px;
-  line-height: 1.35;
-  color: #241b12;
-
-  opacity: 0;
-  transform: translateY(-4px);
-  pointer-events: none;
-  transition: opacity .12s ease, transform .12s ease;
-}
-
-/* flèche */
-.magic-tooltip__bubble::before{
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 14px;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-left: 1px solid rgba(111, 77, 45, .75);
-  border-top: 1px solid rgba(111, 77, 45, .75);
-  transform: rotate(45deg);
-}
-
-/* show on hover / focus */
-.magic-tooltip:hover .magic-tooltip__bubble,
-.magic-tooltip:focus-within .magic-tooltip__bubble{
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-
-.magic-modal__cardPreviewImage {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: .5rem 0;
-}
+/* =========================================================
+   IMAGES EXTRaites
+   ========================================================= */
 
 .magic-card-img {
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+  border-radius: 12px;
   display: block;
   user-select: none;
 }
@@ -479,6 +374,7 @@
   width: 180px;
   aspect-ratio: 2.5 / 3.5;
   object-fit: cover;
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
 }
 
 .magic-card-img.is-small {
@@ -487,11 +383,12 @@
   object-fit: cover;
   box-shadow: 0 6px 16px rgba(0,0,0,.25);
 }
+
 .magic-card-back-fallback.large,
 .magic-card-back-fallback.small {
   width: 180px;
   aspect-ratio: 2.5 / 3.5;
-  border-radius: 10px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
   background: #2a3a55;
@@ -502,4 +399,484 @@
 .magic-card-back-fallback.small {
   width: 70px;
   box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
+
+/* fallback minimal si une image manque */
+.magic-fallback-card{
+  width: 180px;
+  aspect-ratio: 2.5 / 3.5;
+  border-radius: 12px;
+  border: 1px dashed rgba(111,77,45,.7);
+  background: #fff6;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  text-align: center;
+  font-weight: 800;
+}
+
+/* =========================================================
+   MAGIC TILT (noms uniques = zéro conflit)
+   Variables:
+   --rx/--ry tilt
+   --px/--py pointer for glare/holo
+   ========================================================= */
+
+.magic-tilt-scene{
+  perspective: 900px;
+  display: inline-block;
+}
+
+.magic-tilt-card{
+  --rx: 0deg;
+  --ry: 0deg;
+  --px: 50%;
+  --py: 35%;
+
+  position: relative;
+  display: inline-block;
+  border-radius: 12px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: none; /* crucial: follow mouse with no lag */
+  will-change: transform;
+}
+
+.magic-tilt-card.is-resting{
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.magic-tilt-card:hover{
+  filter: drop-shadow(0 18px 30px rgba(0,0,0,.35));
+}
+
+/* wrapper de l'image pour overlays (sparkles etc.) */
+.magic-tilt-media{
+  position: relative;
+  border-radius: 12px;
+  transform: translateZ(22px);
+}
+
+/* on laisse l’image “flotter” */
+.magic-tilt-card .magic-card-img.is-large{
+  transform: translateZ(22px);
+}
+
+/* =========================================================
+   GLARE (couche 1) — ::after
+   ========================================================= */
+
+.magic-tilt-card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+
+  background:
+    radial-gradient(circle at var(--px) var(--py),
+      rgba(255,255,255,.55),
+      transparent 45%),
+    linear-gradient(135deg,
+      rgba(255,0,150,.12),
+      rgba(0,200,255,.12),
+      rgba(255,255,0,.08)
+    );
+
+  mix-blend-mode: screen;
+  transform: translateZ(40px);
+}
+
+.magic-tilt-card:hover::after{
+  opacity: 1;
+}
+
+/* =========================================================
+   HOLO LAYER (couche 2) — ::before
+   pokemon-like: mask-image + color-dodge + animation
+   ========================================================= */
+
+@keyframes holoFlow {
+  0%   { background-position: 0% 50%, 0% 0%, 0% 0%; }
+  50%  { background-position: 100% 50%, 100% 100%, 50% 50%; }
+  100% { background-position: 0% 50%, 0% 0%, 0% 0%; }
+}
+
+@keyframes holoGrain {
+  0%   { filter: hue-rotate(0deg) saturate(1.05) contrast(1.02); }
+  50%  { filter: hue-rotate(18deg) saturate(1.25) contrast(1.08); }
+  100% { filter: hue-rotate(0deg) saturate(1.05) contrast(1.02); }
+}
+
+.magic-tilt-card::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 160ms ease;
+  transform: translateZ(34px);
+
+  mix-blend-mode: color-dodge;
+
+  -webkit-mask-image:
+    radial-gradient(circle at var(--px) var(--py),
+      rgba(0,0,0,1) 0%,
+      rgba(0,0,0,.75) 28%,
+      rgba(0,0,0,.30) 55%,
+      rgba(0,0,0,0) 78%);
+  mask-image:
+    radial-gradient(circle at var(--px) var(--py),
+      rgba(0,0,0,1) 0%,
+      rgba(0,0,0,.75) 28%,
+      rgba(0,0,0,.30) 55%,
+      rgba(0,0,0,0) 78%);
+
+  background-repeat: no-repeat;
+  background-size: 220% 220%, 180% 180%, 140% 140%;
+  background-position: 50% 50%, 50% 50%, 50% 50%;
+  animation: holoFlow 2.6s ease-in-out infinite, holoGrain 3.2s ease-in-out infinite;
+
+  background-image: none; /* OFF par défaut */
+}
+
+.magic-tilt-card:hover::before{ opacity: 1; }
+
+/* =========================================================
+   TIERS (puissance)
+   1=2 ; 2=3-6 ; 3=7-8 ; 4=9-10 ; 5=J ; 6=Q/K ; 7=A ; 8=Joker
+   ========================================================= */
+
+/* Tier 5-6 : cosmos doux */
+
+/* =========================================================
+   Tier 5–6 : RAINBOW RARE (VMax / VStar)
+   - pastel gradients
+   - glitter / sparkles
+   - color-burn / hard-light
+   ========================================================= */
+/* =========================================================
+   Tier 3–4 : VMax Alternate / Rainbow
+   - vibrant
+   - glitter + texture
+   - gradients sandwichés
+   ========================================================= */
+
+.magic-tilt-card[data-tier="3"]::before,
+.magic-tilt-card[data-tier="4"]::before{
+  opacity: .70;
+
+  /* plus punchy que VStar, moins que Joker */
+  mix-blend-mode: color-dodge;
+
+  animation: holoFlow 3.0s ease-in-out infinite,
+             holoGrain 3.6s ease-in-out infinite;
+
+  background-image:
+    /* 1) glitter / sparkles (clé du VMax alt) */
+    repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.32) 0 1px,
+      transparent 1px 6px
+    ),
+
+    /* 2) texture “foil” */
+    repeating-linear-gradient(135deg,
+      rgba(255,255,255,.10) 0 2px,
+      transparent 2px 6px
+    ),
+
+    /* 3) rainbow film vibrant */
+    linear-gradient(120deg,
+      rgba(255, 0, 120, .32),
+      rgba(255, 180, 0, .28),
+      rgba(255, 255, 0, .24),
+      rgba(0, 220, 120, .28),
+      rgba(0, 200, 255, .32),
+      rgba(140, 120, 255, .32),
+      rgba(255, 0, 200, .32)
+    ),
+
+    /* 4) glare centré sur la souris */
+    radial-gradient(circle at var(--px) var(--py),
+      rgba(255,255,255,.45),
+      transparent 55%);
+
+  background-size:
+    90px 90px,     /* glitter */
+    8px 8px,       /* texture */
+    240% 240%,    /* rainbow */
+    140% 140%;    /* glare */
+
+  background-position:
+    0 0,
+    0 0,
+    0% 50%,
+    50% 50%;
+}
+
+.magic-tilt-card[data-tier="5"]::before,
+.magic-tilt-card[data-tier="6"]::before{
+  opacity: .75;
+
+  /* mode pastel (moins violent que Joker) */
+  mix-blend-mode: hard-light;
+
+  animation: holoFlow 3.8s ease-in-out infinite,
+             holoGrain 4.8s ease-in-out infinite;
+
+  background-image:
+    /* pastel rainbow film */
+    linear-gradient(120deg,
+      rgba(255, 190, 210, .35),
+      rgba(255, 235, 180, .35),
+      rgba(210, 255, 220, .35),
+      rgba(200, 225, 255, .35),
+      rgba(230, 210, 255, .35),
+      rgba(255, 190, 210, .35)
+    ),
+
+    /* glitter / sparkles (clé du Rainbow Rare) */
+    repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.25) 0 1px,
+      transparent 1px 7px
+    ),
+
+    /* sheen doux qui suit la souris */
+    radial-gradient(circle at var(--px) var(--py),
+      rgba(255,255,255,.45),
+      transparent 55%);
+
+  background-size:
+    260% 260%,   /* rainbow film */
+    120px 120px, /* glitter pattern */
+    140% 140%;   /* glare */
+
+  background-position:
+    0% 50%,
+    0 0,
+    50% 50%;
+}
+
+/* Tier 7 : radiant (As) */
+/* =========================================================
+   Tier 7 : Galaxy / Cosmos Holofoil (As)
+   - galaxy stars + nebula
+   - rainbow gradient
+   - color-dodge + color-burn
+   ========================================================= */
+
+.magic-tilt-card[data-tier="7"]::before{
+  opacity: .95;
+
+  /* combo signature du holofoil cosmos */
+  mix-blend-mode: color-dodge;
+
+  animation:
+    holoFlow 4.2s ease-in-out infinite,
+    holoGrain 6s ease-in-out infinite;
+
+  background-image:
+    /* 1) étoiles fines */
+    repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.22) 0 1px,
+      transparent 1px 6px
+    ),
+
+    /* 2) nébuleuse / galaxy */
+    radial-gradient(circle at calc(var(--px) + 10%) calc(var(--py) - 8%),
+      rgba(120, 180, 255, .28),
+      transparent 45%
+    ),
+    radial-gradient(circle at calc(var(--px) - 12%) calc(var(--py) + 14%),
+      rgba(255, 120, 220, .24),
+      transparent 48%
+    ),
+    radial-gradient(circle at 60% 70%,
+      rgba(140, 255, 200, .20),
+      transparent 50%
+    ),
+
+    /* 3) rainbow holo film */
+    linear-gradient(120deg,
+      rgba(255, 0, 150, .22),
+      rgba(255, 180, 0, .20),
+      rgba(255, 255, 0, .18),
+      rgba(0, 220, 120, .20),
+      rgba(0, 200, 255, .22),
+      rgba(140, 120, 255, .22),
+      rgba(255, 0, 200, .22)
+    );
+
+  background-size:
+    140px 140px,   /* étoiles */
+    220% 220%,    /* nébuleuse 1 */
+    220% 220%,    /* nébuleuse 2 */
+    220% 220%,    /* nébuleuse 3 */
+    260% 260%;    /* rainbow */
+
+  background-position:
+    0 0,
+    var(--px) var(--py),
+    calc(100% - var(--px)) calc(100% - var(--py)),
+    60% 70%,
+    0% 50%;
+}
+
+/* Boost léger du glare pour le cosmos */
+.magic-tilt-card[data-tier="7"]::after{
+  opacity: 1;
+  mix-blend-mode: color-burn;
+  filter: saturate(1.25) contrast(1.08);
+}
+
+
+/* Tier 8 : rainbow (Joker) */
+/* =========================================================
+   Tier 8 : Pokemon V (diagonal holo + opposite travel + noise)
+   - gradients en color-dodge
+   - background-position dépend de --px/--py et inverse (100% - px/py)
+   - bruit SVG subtil (data-uri)
+   ========================================================= */
+
+.magic-tilt-card[data-tier="8"]::before{
+  opacity: .95;
+  mix-blend-mode: color-dodge;
+
+  /* animation légère (grain/flow) + le "travel" vient du curseur */
+  animation: holoGrain 2.6s ease-in-out infinite;
+
+  /* NOTE: on "sandwich" :
+     1) bande diagonale A (suit souris)
+     2) bande diagonale B (inverse souris)
+     3) film coloré doux
+     4) noise svg subtil
+  */
+  background-image:
+    /* A - diagonale 1 */
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,.20) 20%,
+      rgba(255,255,255,0) 40%,
+      rgba(255,255,255,.10) 60%,
+      rgba(255,255,255,0) 80%,
+      rgba(255,255,255,.14) 100%
+    ),
+
+    /* B - diagonale 2 (sens opposé) */
+    linear-gradient(
+      45deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,.16) 25%,
+      rgba(255,255,255,0) 50%,
+      rgba(255,255,255,.10) 75%,
+      rgba(255,255,255,0) 100%
+    ),
+
+    /* film holo coloré (pas rainbow violent, plutôt "V") */
+    linear-gradient(
+      120deg,
+      rgba(255, 0, 150, .18),
+      rgba(0, 200, 255, .18),
+      rgba(255, 255, 0, .12),
+      rgba(0, 220, 120, .16),
+      rgba(140, 120, 255, .18)
+    ),
+
+    /* noise SVG très léger */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+
+  /* tailles différentes => effet vivant */
+  background-size:
+    260% 260%,
+    240% 240%,
+    220% 220%,
+    160px 160px;
+
+  /* positions : 1 suit la souris, 2 va à l'inverse, 3 suit, 4 fixe */
+  background-position:
+    var(--px) var(--py),
+    calc(100% - var(--px)) calc(100% - var(--py)),
+    var(--px) var(--py),
+    0 0;
+
+  background-repeat: no-repeat;
+
+  /* conserve ton mask (déjà défini dans le ::before de base)
+     et tes animations holoFlow si tu veux (ici pas nécessaire) */
+}
+
+
+/* Boost glare sur As/Joker */
+.magic-tilt-card[data-tier="7"]::after{
+  opacity: 1;
+  mix-blend-mode: color-burn;
+  filter: saturate(1.25) contrast(1.08);
+}
+
+.magic-tilt-card[data-tier="8"]::after{
+  opacity: 1;
+  mix-blend-mode: color-dodge;
+  filter: saturate(1.35) contrast(1.12);
+}
+
+
+/* =========================================================
+   SPARKLES (As/Joker) — sur .magic-tilt-media::before (valide)
+   ========================================================= */
+
+@keyframes sparkleDrift {
+  0%   { transform: translateZ(46px) translateY(0px); opacity: .35; }
+  50%  { transform: translateZ(46px) translateY(-2px); opacity: .55; }
+  100% { transform: translateZ(46px) translateY(0px); opacity: .35; }
+}
+
+.magic-tilt-card[data-tier="7"] .magic-tilt-media::before,
+.magic-tilt-card[data-tier="8"] .magic-tilt-media::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: .55;
+  transform: translateZ(46px);
+  animation: sparkleDrift 1.8s ease-in-out infinite;
+
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 30%),
+    radial-gradient(circle at 70% 40%, rgba(255,255,255,.18), transparent 28%),
+    radial-gradient(circle at 45% 75%, rgba(255,255,255,.16), transparent 30%),
+    repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.09) 0 2px,
+      transparent 2px 10px);
+
+  mix-blend-mode: screen;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 640px){
+  .magic-modal__deckrow{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .magic-modal__deckactions{
+    justify-content: flex-start;
+  }
+}
+/* Back card : pas de holo, juste 3D + glare léger */
+.magic-tilt-card[data-suit="back"]::before{
+  background-image: none !important;
+  opacity: 0 !important;
+}
+
+.magic-tilt-card[data-suit="back"]::after{
+  opacity: .85;
+  mix-blend-mode: screen;
 }

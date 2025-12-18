@@ -1,173 +1,228 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./MagicModal.css";
 
 /* ===========================
    Images (deck visuel)
    =========================== */
 
+function normalizeSuit(raw) {
+  if (!raw) return null;
+  const s = String(raw).toLowerCase();
+
+  if (s === "trèfle" || s === "trèfles" || s === "clubs") return "trefle";
+  if (s === "spades") return "pique";
+  if (s === "hearts") return "coeur";
+  if (s === "diamonds" || s === "diams") return "carreau";
+
+  return s;
+}
+
 function getCardImageSrc(card, { back = false } = {}) {
   if (back) return "/cards/back.png";
   if (!card) return null;
 
-  const suit = card.family ?? card.suit;
+  const suit = normalizeSuit(card.family ?? card.suit);
 
-  // Joker
-  if (suit === "joker" || card.value === "joker") {
+  // Joker (si ton modèle varie)
+  if (suit === "joker" || card.value === "joker" || card.rank === "joker") {
     return "/cards/joker.png";
   }
 
-  // Valeur -> fichier
   const v = Number(card.value);
-  const valueMap = {
-    1: "A",
-    11: "J",
-    12: "Q",
-    13: "K",
-    14: "A",
-  };
+  const valueMap = { 1: "A", 11: "J", 12: "Q", 13: "K", 14: "A" };
   const file = valueMap[v] ?? String(v);
 
   return `/cards/${suit}/${file}.png`;
 }
 
+/* ===========================
+   Puissance (tiers)
+   2 / 3-6 / 7-8 / 9-10 / J / Q-K / A / Joker
+   =========================== */
+
+function cardTier(card) {
+  if (!card) return 1;
+  const suit = normalizeSuit(card.family ?? card.suit);
+
+  if (suit === "joker" || card.value === "joker") return 8;
+
+  const v = Number(card.value);
+  // As possible 1 ou 14
+  if (v === 1 || v === 14) return 7;
+  if (v === 13 || v === 12) return 6; // K/Q
+  if (v === 11) return 5; // J
+  if (v >= 9 && v <= 10) return 4;
+  if (v >= 7 && v <= 8) return 3;
+  if (v >= 3 && v <= 6) return 2;
+  return 1; // 2 et reste
+}
+
+/* ===========================
+   Labels
+   =========================== */
+
+function cardLabel(card) {
+  const suit = normalizeSuit(card?.family ?? card?.suit);
+  if (!card) return "";
+  if (suit === "joker" || card.value === "joker") return "Joker";
+
+  const v = Number(card.value);
+  const name =
+    v === 11 ? "Valet" :
+    v === 12 ? "Dame" :
+    v === 13 ? "Roi" :
+    v === 14 || v === 1 ? "As" :
+    String(v);
+
+  const suitChar =
+    suit === "carreau" ? "♦" :
+    suit === "trefle" ? "♣" :
+    suit === "pique" ? "♠" :
+    "♥";
+
+  return `${name} ${suitChar}`;
+}
+
+/* ===========================
+   Tilt (inspiré pokemon-cards-css)
+   - RAF pour fluidité
+   - Pas de transition pendant move
+   - Transition douce au leave
+   =========================== */
+
+function MagicTilt({ suit, tier, children }) {
+  const ref = useRef(null);
+  const rafRef = useRef(0);
+  const lastRef = useRef({ x: 0, y: 0 });
+
+  const apply = () => {
+    rafRef.current = 0;
+    const el = ref.current;
+    if (!el) return;
+
+    const r = el.getBoundingClientRect();
+    const px = (lastRef.current.x - r.left) / r.width;  // 0..1
+    const py = (lastRef.current.y - r.top) / r.height;  // 0..1
+
+    const x = Math.max(0, Math.min(1, px));
+    const y = Math.max(0, Math.min(1, py));
+
+    const rotY = (x - 0.5) * 18;
+    const rotX = (0.5 - y) * 18;
+
+    el.style.setProperty("--rx", `${rotX}deg`);
+    el.style.setProperty("--ry", `${rotY}deg`);
+    el.style.setProperty("--px", `${x * 100}%`);
+    el.style.setProperty("--py", `${y * 100}%`);
+  };
+
+  const onMove = (e) => {
+    lastRef.current = { x: e.clientX, y: e.clientY };
+    if (!rafRef.current) rafRef.current = requestAnimationFrame(apply);
+  };
+
+  const onEnter = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.classList.remove("is-resting");
+  };
+
+  const onLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+
+    el.classList.add("is-resting");
+    el.style.setProperty("--rx", `0deg`);
+    el.style.setProperty("--ry", `0deg`);
+    el.style.setProperty("--px", `50%`);
+    el.style.setProperty("--py", `35%`);
+  };
+
+  return (
+    <div className="magic-tilt-scene">
+      <div
+        ref={ref}
+        className="magic-tilt-card is-resting"
+        data-suit={suit || "unknown"}
+        data-tier={tier}
+        onMouseEnter={onEnter}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+      >
+     <div className="magic-tilt-media">
+  {children}
+</div>
+      </div>
+    </div>
+  );
+}
+
+/* ===========================
+   Face / Back
+   =========================== */
 
 function CardBack({ size = "large" }) {
-  const [imgOk, setImgOk] = useState(true);
+  const [ok, setOk] = useState(true);
   const src = "/cards/back.png";
 
-  if (imgOk) {
+  if (ok) {
     return (
       <img
         src={src}
         alt="Dos de carte"
         className={`magic-card-img ${size === "small" ? "is-small" : "is-large"}`}
         draggable="false"
-        onError={() => setImgOk(false)}
+        onError={() => setOk(false)}
       />
     );
   }
 
-  // fallback si back.png absent
   return <div className={`magic-card-back-fallback ${size}`}>BACK</div>;
 }
-/**
- * CardFace
- * Affiche une image si dispo, sinon fallback sur PlayingCard (CSS playing cards)
- */
+
 function CardFace({ card, size = "large" }) {
-  const [imgOk, setImgOk] = useState(true);
+  const [ok, setOk] = useState(true);
   const src = useMemo(() => getCardImageSrc(card), [card]);
 
-  useEffect(() => setImgOk(true), [src]);
+  useEffect(() => setOk(true), [src]);
 
   if (!card) return null;
 
-  if (src && imgOk) {
-    return (
+  const suit = normalizeSuit(card.family ?? card.suit);
+  const tier = cardTier(card);
+
+  if (src && ok) {
+    const img = (
       <img
         src={src}
         alt={cardLabel(card)}
         className={`magic-card-img ${size === "small" ? "is-small" : "is-large"}`}
         draggable="false"
-        onError={() => setImgOk(false)}
+        onError={() => setOk(false)}
       />
     );
-  }
 
-  // fallback CSS si image manquante
-  return <PlayingCard card={card} />;
-}
+    // Small = pas d’effet (perf + lisibilité)
+    if (size === "small") return img;
 
-/* ===========================
-   Helpers cartes (CSS Playing Cards)
-   =========================== */
-
-function suitToCss(suit) {
-  if (suit === "pique") return "spades";
-  if (suit === "coeur") return "hearts";
-  if (suit === "trefle") return "clubs";
-  if (suit === "carreau") return "diams";
-  return "";
-}
-
-function suitToEntity(suit) {
-  if (suit === "carreau") return "&diams;";
-  if (suit === "coeur") return "&hearts;";
-  if (suit === "trefle") return "&clubs;";
-  if (suit === "pique") return "&spades;";
-  return "";
-}
-
-function valueToRank(value) {
-  if (value === 14) return "a";
-  if (value === 13) return "k";
-  if (value === 12) return "q";
-  if (value === 11) return "j";
-  return String(value);
-}
-
-function normalizeCard(card) {
-  if (!card) return null;
-  const suit = card.family ?? card.suit;
-  const value = card.value;
-
-  if (suit === "joker") return { suit: "joker", value: "joker" };
-  return { suit, value };
-}
-
-function cardLabel(card) {
-  const c = normalizeCard(card);
-  if (!c) return "";
-  if (c.suit === "joker") return "Joker";
-
-  const name =
-    c.value === 11
-      ? "Valet"
-      : c.value === 12
-      ? "Dame"
-      : c.value === 13
-      ? "Roi"
-      : c.value === 14
-      ? "As"
-      : c.value === 1
-      ? "As"
-      : String(c.value);
-
-  const suit =
-    c.suit === "carreau"
-      ? "♦"
-      : c.suit === "trefle"
-      ? "♣"
-      : c.suit === "pique"
-      ? "♠"
-      : "♥";
-
-  return `${name} ${suit}`;
-}
-
-function PlayingCard({ card }) {
-  const c = normalizeCard(card);
-  if (!c) return null;
-
-  if (c.suit === "joker") {
     return (
-      <div className="aria-joker-card">
-        <div className="aria-joker-card__inner">JOKER</div>
-      </div>
+      <MagicTilt suit={suit} tier={tier}>
+        {img}
+      </MagicTilt>
     );
   }
 
-  const rank = valueToRank(c.value);
-  const suitClass = suitToCss(c.suit);
-  const suitEntity = suitToEntity(c.suit);
-
+  // Fallback minimal si une image manque
   return (
-    <div className={`card rank-${rank} ${suitClass}`}>
-      <span className="rank">{rank.toUpperCase()}</span>
-      <span className="suit" dangerouslySetInnerHTML={{ __html: suitEntity }} />
+    <div className="magic-fallback-card">
+      {cardLabel(card)}
     </div>
   );
 }
+
+/* ===========================
+   MagicModal (UI)
+   =========================== */
 
 function mageTypeLabel(type) {
   if (type === "academy") return "Couronne / Académie";
@@ -175,15 +230,10 @@ function mageTypeLabel(type) {
   return "Disciple étranger";
 }
 
-/* ===========================
-   MagicModal
-   =========================== */
-
 export default function MagicModal({
   isOpen,
   onClose,
 
-  // magie
   isMage,
   intValue,
   magicEnabled,
@@ -191,7 +241,6 @@ export default function MagicModal({
   mageType,
   onChangeMageType,
 
-  // ✅ validation du type
   typeConfirmed = false,
   onConfirmMageType,
 
@@ -210,7 +259,6 @@ export default function MagicModal({
 
   const meetsInt = Number(intValue) >= 14;
 
-  // 🔒 déjà tiré au moins une carte ?
   const hasEverDrawn =
     !!currentCard ||
     (Array.isArray(usedCards) && usedCards.length > 0) ||
@@ -218,23 +266,15 @@ export default function MagicModal({
       Number.isFinite(remaining) &&
       remaining < deckSize);
 
-  // ✅ on cache le menu dès que:
-  // - type validé, ou
-  // - une carte a été tirée
   const hideTypeUI = typeConfirmed || hasEverDrawn;
 
-  // Affiche l'écran d'info seulement au "premier open"
   useEffect(() => {
     if (!isOpen) return;
     if (!magicEnabled) return;
-
-    // si le type est déjà validé, pas besoin
     if (hideTypeUI) {
       setShowMageInfo(false);
       return;
     }
-
-    // 1ère fois : on le montre
     setShowMageInfo(true);
   }, [isOpen, magicEnabled, hideTypeUI]);
 
@@ -253,7 +293,7 @@ export default function MagicModal({
 
   if (!isOpen) return null;
 
-  const currentSuit = currentCard ? (currentCard.family ?? currentCard.suit) : null;
+  const suit = currentCard ? normalizeSuit(currentCard.family ?? currentCard.suit) : null;
 
   return (
     <div className="magic-modal__backdrop" onMouseDown={onClose}>
@@ -263,7 +303,6 @@ export default function MagicModal({
         role="dialog"
         aria-modal="true"
       >
-        {/* Header */}
         <div className="magic-modal__header">
           <h2>Magie</h2>
           <button className="magic-modal__close" onClick={onClose}>
@@ -271,7 +310,6 @@ export default function MagicModal({
           </button>
         </div>
 
-        {/* Status */}
         <div className="magic-modal__sub">
           <div className="magic-modal__status">
             <span className={`magic-pill ${magicEnabled ? "on" : "off"}`}>
@@ -290,59 +328,23 @@ export default function MagicModal({
           </div>
         ) : (
           <>
-            {/* ===========================
-                INFO (première ouverture)
-                =========================== */}
             {showMageInfo && (
               <div className="magic-modal__locked magic-modal__infoBox">
                 <strong>Jouer un magicien</strong>
-
                 <div className="magic-modal__infoText">
                   <p className="magic-modal__pFirst">
-                    <span className="magic-tooltip">
-                      <span className="magic-tooltip__label" tabIndex={0}>
-                        • Disciple étranger à l’académie
-                      </span>
-                      <span className="magic-tooltip__bubble">
-                        Aucun apprentissage des principes de la noble magie (ni de l’éthique),
-                        mais un potentiel magique immense.
-                      </span>
-                    </span>
-                    <br />
-                    Pas formé à l’académie : gros potentiel magique, aucune compétence magique acquise par défaut.
+                    <strong>• Disciple étranger</strong><br />
+                    Gros potentiel magique, peu de compétences acquises par défaut.
                   </p>
-
                   <p>
-                    <span className="magic-tooltip">
-                      <span className="magic-tooltip__label" tabIndex={0}>
-                        • Magicien de la couronne / disciple de l’académie
-                      </span>
-                      <span className="magic-tooltip__bubble">
-                        Bonne capacité à modéliser la magie, mais moins de potentiel que les autres types.
-                        Reconnu publiquement : accès à de nombreux lieux. Doit suivre un code moral
-                        et obéir à la couronne.
-                      </span>
-                    </span>
-                    <br />
-                    Reconnu publiquement : plus de portes ouvertes, mais potentiel magique moindre. Suit un code moral strict.
+                    <strong>• Couronne / Académie</strong><br />
+                    Accès/Reconnaissance, mais potentiel moindre et code moral strict.
                   </p>
-
                   <p className="magic-modal__pLast">
-                    <span className="magic-tooltip">
-                      <span className="magic-tooltip__label" tabIndex={0}>
-                        • Miséricordieux
-                      </span>
-                      <span className="magic-tooltip__bubble">
-                        Corps d’élite chargé de traquer ceux qui approchent de la fin.
-                        Mage très talentueux et combattant. Quand le paquet s’épuise,
-                        les pouvoirs deviennent incontrôlables.
-                      </span>
-                    </span>
-                    <br />
-                    Corps d’élite : mage très talentueux et combattant. Pouvoirs dangereux quand le paquet s’épuise.
+                    <strong>• Miséricordieux</strong><br />
+                    Corps d’élite : puissant et combattant. Risque d’instabilité en fin de paquet.
                   </p>
                 </div>
-
                 <button
                   className="magic-modal__btn magic-modal__btnTop"
                   onClick={() => setShowMageInfo(false)}
@@ -352,28 +354,17 @@ export default function MagicModal({
               </div>
             )}
 
-            {/* ===========================
-                TYPE DE MAGICIEN
-                =========================== */}
             {!showMageInfo && (
               <>
                 {hideTypeUI ? (
                   <div className="magic-modal__locked magic-modal__sectionBox">
                     <strong>Type</strong>
-
                     <div className="magic-modal__typeLine">
                       {mageTypeLabel(mageType)} <span title="Type verrouillé">🔒</span>
                     </div>
-
                     {hasEverDrawn && (
                       <div className="magic-modal__subtleLine">
                         Une carte a déjà été tirée : le type est verrouillé.
-                      </div>
-                    )}
-
-                    {typeConfirmed && !hasEverDrawn && (
-                      <div className="magic-modal__subtleLine">
-                        Type validé : tu peux maintenant utiliser la magie.
                       </div>
                     )}
                   </div>
@@ -395,11 +386,6 @@ export default function MagicModal({
                       className="magic-modal__btn magic-modal__btnFull"
                       onClick={confirmType}
                       disabled={typeof onConfirmMageType !== "function"}
-                      title={
-                        typeof onConfirmMageType !== "function"
-                          ? "Brancher onConfirmMageType côté CharacterPage"
-                          : "Valider le type"
-                      }
                     >
                       Valider le type
                     </button>
@@ -412,9 +398,6 @@ export default function MagicModal({
               </>
             )}
 
-            {/* ===========================
-                DECK
-                =========================== */}
             <div className="magic-modal__deckrow">
               <div className="magic-modal__deckinfo">
                 <div className="magic-modal__deckcount">
@@ -427,17 +410,6 @@ export default function MagicModal({
                   className="magic-modal__btn"
                   onClick={onDraw}
                   disabled={!canDraw}
-                  title={
-                    !isMage
-                      ? "Magie inactive ou INT insuffisante"
-                      : !meetsInt
-                      ? "INT 14 minimum"
-                      : currentCard
-                      ? "Une carte est déjà révélée"
-                      : remaining === 0
-                      ? "Plus de cartes"
-                      : "Tirer une carte"
-                  }
                 >
                   Tirer une carte
                 </button>
@@ -450,34 +422,32 @@ export default function MagicModal({
                     !currentCard &&
                     (!usedCards || usedCards.length === 0)
                   }
-                  title="Reset deck / historique (ne change pas le type)"
                 >
                   Reset
                 </button>
               </div>
             </div>
 
-            {/* ===========================
-                CARTE COURANTE
-                =========================== */}
             <div className="magic-modal__cardzone">
-  {!currentCard ? (
-  <div className="magic-modal__placeholder">
+              {!currentCard ? (
+              <div className="magic-modal__placeholder">
+  <MagicTilt suit="back" tier={2}>
     <CardBack size="large" />
-  </div>
+  </MagicTilt>
+</div>
+
               ) : (
                 <div className="magic-modal__card">
                   <div className="magic-modal__cardHeader">
                     <div
                       className={`magic-modal__cardTitle ${
-                        ["coeur", "carreau"].includes(currentSuit) ? "is-red" : "is-black"
+                        suit === "coeur" || suit === "carreau" ? "is-red" : "is-black"
                       }`}
                     >
                       {cardLabel(currentCard)}
                     </div>
                   </div>
 
-                  {/* ✅ ICI : affichage image (fallback PlayingCard si manquante) */}
                   <div className="magic-modal__cardPreviewImage">
                     <CardFace card={currentCard} size="large" />
                   </div>
@@ -494,9 +464,6 @@ export default function MagicModal({
               )}
             </div>
 
-            {/* ===========================
-                CARTES UTILISÉES
-                =========================== */}
             <div className="magic-used">
               <div className="magic-used__header">
                 <h3>Cartes utilisées</h3>
