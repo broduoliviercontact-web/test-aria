@@ -5,10 +5,12 @@ import { bookCharacters } from "../data/bookCharacters";
 
 export default function BookCharacterGallery({
   onOpenInEditor,
+  onDeleteCharacter,                // ✅ NEW
+  canDeleteCharacter = () => false, // ✅ NEW (fonction: (char) => boolean)
   characters: charactersProp,
   title = "Personnages du livre",
   subtitle = "Survole pour retourner la carte. Clique pour ouvrir la fiche stylée.",
-  itemsPerPage = 4, // ✅ 4 cartes par page
+  itemsPerPage = 4,
 }) {
   const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(0);
@@ -19,21 +21,13 @@ export default function BookCharacterGallery({
     return bookCharacters || [];
   }, [charactersProp]);
 
-  // ✅ pagination
   const totalPages = useMemo(() => {
     const per = Math.max(1, Number(itemsPerPage) || 4);
     return Math.max(1, Math.ceil(characters.length / per));
   }, [characters.length, itemsPerPage]);
 
-  // si la liste change (login/logout), on revient page 0
-  useEffect(() => {
-    setPage(0);
-  }, [characters]);
-
-  // clamp page si jamais
-  useEffect(() => {
-    setPage((p) => Math.min(Math.max(0, p), totalPages - 1));
-  }, [totalPages]);
+  useEffect(() => setPage(0), [characters]);
+  useEffect(() => setPage((p) => Math.min(Math.max(0, p), totalPages - 1)), [totalPages]);
 
   const pagedCharacters = useMemo(() => {
     const per = Math.max(1, Number(itemsPerPage) || 4);
@@ -42,19 +36,13 @@ export default function BookCharacterGallery({
   }, [characters, page, itemsPerPage]);
 
   const goToPage = (nextPage) => {
-    setSelected(null); // ferme overlay si on change de page
-    setPage(() => {
-      const clamped = Math.min(Math.max(0, nextPage), totalPages - 1);
-      return clamped;
-    });
-
-    // remonte à la galerie (petit confort)
+    setSelected(null);
+    setPage(() => Math.min(Math.max(0, nextPage), totalPages - 1));
     requestAnimationFrame(() => {
       topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   };
 
-  // Shine + tilt pour la version holo (overlay)
   const handleCardMouseMove = (event) => {
     const card = event.currentTarget;
     const rect = card.getBoundingClientRect();
@@ -97,12 +85,22 @@ export default function BookCharacterGallery({
     };
   }, [selected]);
 
+  const handleDeleteClick = async () => {
+    if (!selected) return;
+    const ok = window.confirm(
+      `Supprimer définitivement “${selected.name}” ?\n\nCette action est irréversible.`
+    );
+    if (!ok) return;
+
+    await onDeleteCharacter?.(selected);
+    setSelected(null);
+  };
+
   return (
     <section className="book-gallery" ref={topRef}>
       <h3 className="book-gallery__title">{title}</h3>
       <p className="book-gallery__subtitle">{subtitle}</p>
 
-      {/* ✅ Pagination UI (haut) */}
       {totalPages > 1 && (
         <div className="gallery-pagination">
           <button
@@ -144,36 +142,22 @@ export default function BookCharacterGallery({
               title="Cliquer pour ouvrir"
             >
               <div className="flip-card-inner">
-                {/* FRONT */}
                 <div className="flip-face flip-front">
                   <div className="pokemon-card pokemon-card--small">
                     <div className="pokemon-card-inner">
-                      <img
-                        className="pokemon-card-img"
-                        src={c.frontImage}
-                        alt={c.name}
-                        draggable="false"
-                      />
+                      <img className="pokemon-card-img" src={c.frontImage} alt={c.name} draggable="false" />
                     </div>
                   </div>
                 </div>
 
-                {/* BACK */}
                 <div className="flip-face flip-back">
                   <div className="pokemon-card pokemon-card--small pokemon-card--back">
                     <div className="pokemon-card-inner">
-                      <img
-                        className="pokemon-card-img"
-                        src={c.backImage}
-                        alt={`Dos de carte ${c.name}`}
-                        draggable="false"
-                      />
+                      <img className="pokemon-card-img" src={c.backImage} alt={`Dos de carte ${c.name}`} draggable="false" />
 
                       <div className="card-back-overlay">
                         <div className="card-back-title">{c.name}</div>
-                        {c.description && (
-                          <div className="card-back-desc">{c.description}</div>
-                        )}
+                        {c.description && <div className="card-back-desc">{c.description}</div>}
                       </div>
                     </div>
                   </div>
@@ -186,7 +170,6 @@ export default function BookCharacterGallery({
         ))}
       </div>
 
-      {/* ✅ Pagination UI (bas) */}
       {totalPages > 1 && (
         <div className="gallery-pagination gallery-pagination--bottom">
           <button
@@ -203,11 +186,7 @@ export default function BookCharacterGallery({
               <button
                 key={idx}
                 type="button"
-                className={
-                  idx === page
-                    ? "gallery-dot gallery-dot--active"
-                    : "gallery-dot"
-                }
+                className={idx === page ? "gallery-dot gallery-dot--active" : "gallery-dot"}
                 onClick={() => goToPage(idx)}
                 aria-label={`Aller à la page ${idx + 1}`}
               />
@@ -225,37 +204,19 @@ export default function BookCharacterGallery({
         </div>
       )}
 
-      {/* OVERLAY */}
       {selected && (
         <div className="detail-overlay" onClick={closeDetail}>
-          <div
-            className="detail-overlay-inner"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              className="detail-close"
-              onClick={closeDetail}
-              aria-label="Fermer la fiche"
-            >
+          <div className="detail-overlay-inner" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="detail-close" onClick={closeDetail} aria-label="Fermer la fiche">
               ×
             </button>
 
             <div className="detail-layout">
               <div className="detail-media">
                 <div className="pokemon-card-wrapper">
-                  <div
-                    className="pokemon-card pokemon-card--holo"
-                    onMouseMove={handleCardMouseMove}
-                    onMouseLeave={handleCardMouseLeave}
-                  >
+                  <div className="pokemon-card pokemon-card--holo" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
                     <div className="pokemon-card-inner">
-                      <img
-                        className="pokemon-card-img"
-                        src={selected.frontImage}
-                        alt={selected.name}
-                        draggable="false"
-                      />
+                      <img className="pokemon-card-img" src={selected.frontImage} alt={selected.name} draggable="false" />
                     </div>
                   </div>
                 </div>
@@ -263,21 +224,27 @@ export default function BookCharacterGallery({
 
               <div className="detail-content">
                 <h2 className="detail-title">{selected.name}</h2>
-                {selected.description?.trim() && (
-                  <p className="detail-desc">{selected.description}</p>
-                )}
+                {selected.description?.trim() && <p className="detail-desc">{selected.description}</p>}
 
                 <div className="detail-actions">
-                  <button
-                    type="button"
-                    className="btn-primary"
-                    onClick={() => onOpenInEditor?.(selected)}
-                  >
+                  <button type="button" className="btn-primary" onClick={() => onOpenInEditor?.(selected)}>
                     Ouvrir dans l’éditeur
                   </button>
+
+                  {/* ✅ NEW: supprimer */}
+                  {canDeleteCharacter?.(selected) && (
+                    <button
+                      type="button"
+                      className="btn-secondary book-delete-btn"
+                      onClick={handleDeleteClick}
+                      title="Supprimer ce personnage"
+                    >
+                      Supprimer le personnage
+                    </button>
+                  )}
                 </div>
 
-           
+                <div className="detail-hint">Astuce : tu peux ensuite modifier la fiche comme un personnage normal.</div>
               </div>
             </div>
           </div>

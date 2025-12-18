@@ -25,6 +25,7 @@ export const bookCharacters = [
       { id: "INT", value: 13 },
       { id: "CHA", value: 11 },
     ],
+isMage: false,
 
     competenceOverrides: {
       artisanat: 70,
@@ -118,6 +119,7 @@ export const bookCharacters = [
       survie: 40,
       voler: 50,
     },
+isMage: false,
 
     specialCompetences: [
       {
@@ -161,6 +163,7 @@ export const bookCharacters = [
       { id: "INT", value: 10 },
       { id: "CHA", value: 13 },
     ],
+isMage: false,
 
     competenceOverrides: {
       artisanat: 40,
@@ -230,7 +233,7 @@ export const bookCharacters = [
       { id: "INT", value: 15 },
       { id: "CHA", value: 13 },
     ],
-
+    isMage: true,
     competenceOverrides: {
       artisanat: 45,
       combat_rapproche: 40,
@@ -265,12 +268,12 @@ export const bookCharacters = [
     ],
 
     inventory: [
-      { name: "Bâton", quantity: 1 },
+   
       { name: "Jeu de cartes complet", quantity: 1 },
     ],
 
     weapons: [{ name: "Bâton", damage: "1d6" }],
 
-    isMage: true,
+
   },
 ];

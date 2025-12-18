@@ -42,7 +42,7 @@ const defaultMagic = {
   isMage: false,
   mageType: "outsider", // "outsider" | "academy" | "misericordieux"
   includeJoker: true,
-  deckSize: 24,
+  deckSize: 53,
   deck: [],
   currentCard: null,
   used: [],
@@ -550,7 +550,7 @@ function AppRoutes() {
       // ✅ magie complète (deck/current/used)
       magic: {
         isMage: !!magic?.isMage,
-        deckSize: Number(magic?.deckSize) || 24,
+        deckSize: Number(magic?.deckSize) || 53,
         deck: Array.isArray(magic?.deck) ? magic.deck : [],
         currentCard: magic?.currentCard ?? null,
         used: Array.isArray(magic?.used) ? magic.used : [],
@@ -558,7 +558,7 @@ function AppRoutes() {
 
       // ✅ compat: anciens champs (tu peux les garder si tu veux)
       isMage: !!magic?.isMage,
-      magicDeckSize: Number(magic?.deckSize) || 24,
+      magicDeckSize: Number(magic?.deckSize) || 53,
 
       // ✅ NEW: validation réversible point-buy
       isPointBuyValidated: !!isPointBuyValidated,

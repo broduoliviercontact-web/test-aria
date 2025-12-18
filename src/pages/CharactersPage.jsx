@@ -80,16 +80,42 @@ export default function MyCharactersPage({
     });
   }, [myChars]);
 
-  const handleOpenInEditor = (template) => {
-    try {
-      localStorage.setItem("aria_prefill_character", JSON.stringify(template));
-      localStorage.setItem("aria_edit_character_id", String(template?.id || ""));
-    } catch (e) {
-      console.warn("localStorage error:", e);
-    }
+ const handleOpenInEditor = (template) => {
+  try {
+    localStorage.setItem("aria_prefill_character", JSON.stringify(template));
+    localStorage.setItem("aria_edit_character_id", String(template?.id || ""));
+  } catch (e) {
+    console.warn("localStorage error:", e);
+  }
 
-    onLoadCharacter(template);
-  };
+  // ✅ Passe un id, pas un objet
+  if (template?.id) onLoadCharacter(template.id);
+};
+const handleDelete = async (ch) => {
+  if (!ch?.id) return;
+
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/characters/${ch.id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!res.ok) throw new Error("DELETE /characters/:id failed");
+
+    // retire de la liste locale
+    setMyChars((prev) => prev.filter((x) => x._id !== ch.id));
+
+    // si on était en train d’éditer ce perso → cleanup
+    const editingId = localStorage.getItem("aria_edit_character_id");
+    if (editingId && String(editingId) === String(ch.id)) {
+      localStorage.removeItem("aria_edit_character_id");
+      localStorage.removeItem("aria_prefill_character");
+    }
+  } catch (e) {
+    console.warn("Erreur suppression personnage:", e);
+    alert("Impossible de supprimer le personnage.");
+  }
+};
 
   return (
     <div className="characters-page">
@@ -122,6 +148,9 @@ export default function MyCharactersPage({
           characters={myCharsForGallery}
           onOpenInEditor={handleOpenInEditor}
           itemsPerPage={4}
+            onDeleteCharacter={handleDelete}
+  canDeleteCharacter={() => true}
+
         />
       </div>
     </div>

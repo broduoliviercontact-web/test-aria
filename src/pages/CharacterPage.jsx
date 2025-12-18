@@ -408,6 +408,18 @@ if (Array.isArray(tpl?.weapons)) {
     // Arrive direct dans l’éditeur
     setShowCreationModal(false);
 
+    
+setMagic((prev) => ({
+  ...prev,
+  isMage: !!tpl?.isMage,
+  mageType: tpl?.isMage ? (tpl?.mageType || "outsider") : "outsider",
+  includeJoker: true,
+  deckSize: tpl?.isMage ? (tpl?.deckSize || 53) : 53,
+  typeConfirmed: false,
+  deck: [],
+  currentCard: null,
+  used: [],
+}));
     // Consommation unique
     localStorage.removeItem("aria_prefill_character");
   } catch (e) {
@@ -433,194 +445,210 @@ if (Array.isArray(tpl?.weapons)) {
   setArmor,
   setIsCustomSkillsValidated,
 ]);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ // ===========================
+// MAGIE (modal + state)
+// ===========================
+const [isMagicOpen, setIsMagicOpen] = useState(false);
 
-  // ===========================
-  // MAGIE (modal + state)
-  // ===========================
-  const [isMagicOpen, setIsMagicOpen] = useState(false);
+// INT : on couvre plusieurs id possibles
+const intValue =
+  getStatValue(stats, "INT") ||
+  getStatValue(stats, "intelligence") ||
+  getStatValue(stats, "int") ||
+  0;
 
-  // INT : on couvre plusieurs id possibles
-  const intValue =
-    getStatValue(stats, "INT") ||
-    getStatValue(stats, "intelligence") ||
-    getStatValue(stats, "int") ||
-    0;
+// Mage effectif = magie activée + INT >= 14
+const isMage = !!magic.isMage && intValue >= 14;
 
-  // Mage effectif = option magie activée + INT >= 14
-  const isMage = !!magic.isMage && intValue >= 14;
+// ===========================
+// MAGIE : type de magicien → planchers de compétences
+// ===========================
+const minScoreById = useMemo(() => {
+  const type = magic?.mageType || "outsider";
 
-  // ===========================
-  // MAGIE : type de magicien → planchers de compétences
-  // ===========================
-  const minScoreById = useMemo(() => {
-    const type = magic?.mageType || "outsider";
-
-    if (type === "academy") {
-      return {
-        connaissance_secrets: 60,
-        lire_ecrire: 80,
-      };
-    }
-
-    if (type === "misericordieux") {
-      return {
-        connaissance_secrets: 60,
-        lire_ecrire: 80,
-        voler: 30,
-        combat_rapproche: 60,
-      };
-    }
-
-    return {};
-  }, [magic?.mageType]);
-
-  const applyMageType = (type) => {
-    const normalized = type || "outsider";
-
-    // Règles du bouquin
-    // outsider: 52 + joker
-    // academy: 25 + joker
-    // misericordieux: 10 + joker
-    const mapping = {
-      outsider: { deckSize: 53, includeJoker: true },
-      academy: { deckSize: 26, includeJoker: true },
-      misericordieux: { deckSize: 11, includeJoker: true },
-      typeConfirmed: false,
+  if (type === "academy") {
+    return {
+      connaissance_secrets: 60,
+      lire_ecrire: 80,
     };
+  }
 
-    const cfg = mapping[normalized] || mapping.outsider;
+  if (type === "misericordieux") {
+    return {
+      connaissance_secrets: 60,
+      lire_ecrire: 80,
+      voler: 30,
+      combat_rapproche: 60,
+    };
+  }
 
-    // 1) Deck reset + paramètres
-// --- magie (reset systématique)
-setMagic((prev) => {
-  const enabled = !!tpl?.isMage;
-  return {
+  return {};
+}, [magic?.mageType]);
+
+// ===========================
+// MAGIE : choix du type de magicien
+// ===========================
+const applyMageType = (type) => {
+  const normalized = type || "outsider";
+
+  const mapping = {
+    outsider: { deckSize: 53, includeJoker: true },
+    academy: { deckSize: 26, includeJoker: true },
+    misericordieux: { deckSize: 11, includeJoker: true },
+  };
+
+  const cfg = mapping[normalized] || mapping.outsider;
+
+  // 1) Deck reset + paramètres
+  setMagic((prev) => ({
     ...prev,
-    isMage: enabled,
-    mageType: enabled ? (tpl?.mageType || prev.mageType || "outsider") : "outsider",
+    mageType: normalized,
+    deckSize: cfg.deckSize,
+    includeJoker: cfg.includeJoker,
     typeConfirmed: false,
     deck: [],
     currentCard: null,
     used: [],
-  };
-});
+  }));
 
-    // 2) Compétences spéciales imposées (locked)
-    setSpecialCompetences((prev) => {
-      const list = Array.isArray(prev) ? prev : [];
+  // 2) Compétences spéciales imposées (locked)
+  setSpecialCompetences((prev) => {
+    const list = Array.isArray(prev) ? prev : [];
+    const cleaned = list.filter(
+      (c) => !String(c?.id || "").startsWith("magic-")
+    );
 
-      // on nettoie les compétences magiques qu’on impose
-      const cleaned = list.filter((c) => !String(c?.id || "").startsWith("magic-"));
-
-      if (normalized === "academy") {
-        return [
-          ...cleaned,
-          { id: "magic-modelisation", name: "Modélisation", score: 60, locked: true },
-        ];
-      }
-
-      if (normalized === "misericordieux") {
-        return [
-          ...cleaned,
-          { id: "magic-modelisation", name: "Modélisation", score: 80, locked: true },
-          { id: "magic-voler-magie", name: "Voler la magie", score: 30, locked: true },
-        ];
-      }
-
-      return cleaned; // outsider : rien imposé
-    });
-  };
-
-  function openMagic() {
-    // ✅ On peut ouvrir si la magie est activée,
-    // même si INT < 14 (le tirage restera bloqué)
-    if (!magic?.isMage) return;
-    setIsMagicOpen(true);
-  }
-
-  // ====== MAGIE : logique deck / tirage ======
-  function createDeck(deckSize = 24, includeJoker = true) {
-    const families = ["carreau", "coeur", "pique", "trefle"];
-    const full = [];
-
-    families.forEach((family) => {
-      for (let value = 1; value <= 13; value++) {
-        full.push({ family, value });
-      }
-    });
-
-    if (includeJoker) {
-      full.push({ family: "joker", value: "joker" });
+    if (normalized === "academy") {
+      return [
+        ...cleaned,
+        {
+          id: "magic-modelisation",
+          name: "Modélisation",
+          score: 60,
+          locked: true,
+        },
+      ];
     }
 
-    // Shuffle Fisher–Yates
-    for (let i = full.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [full[i], full[j]] = [full[j], full[i]];
+    if (normalized === "misericordieux") {
+      return [
+        ...cleaned,
+        {
+          id: "magic-modelisation",
+          name: "Modélisation",
+          score: 80,
+          locked: true,
+        },
+        {
+          id: "magic-voler-magie",
+          name: "Voler la magie",
+          score: 30,
+          locked: true,
+        },
+      ];
     }
 
-    const size = Math.max(1, Math.min(full.length, Number(deckSize) || 24));
-    return full.slice(0, size);
+    return cleaned;
+  });
+};
+
+// ===========================
+// OUVERTURE MODAL MAGIE
+// ===========================
+function openMagic() {
+  if (!magic?.isMage) return;
+  setIsMagicOpen(true);
+}
+
+// ===========================
+// MAGIE : logique deck / tirage
+// ===========================
+function createDeck(deckSize = 53, includeJoker = true) {
+  const families = ["carreau", "coeur", "pique", "trefle"];
+  const full = [];
+
+  families.forEach((family) => {
+    for (let value = 1; value <= 13; value++) {
+      full.push({ family, value });
+    }
+  });
+
+  if (includeJoker) {
+    full.push({ family: "joker", value: "joker" });
   }
 
-  function drawMagicCard() {
-    setMagic((prev) => {
-      if (prev.currentCard) return prev;
-
-      const deck = prev.deck.length
-        ? [...prev.deck]
-        : createDeck(prev.deckSize, prev.includeJoker !== false);
-
-      const card = deck.shift();
-      if (!card) return prev;
-
-      return {
-        ...prev,
-        deck,
-        currentCard: card,
-      };
-    });
+  // Shuffle Fisher–Yates
+  for (let i = full.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [full[i], full[j]] = [full[j], full[i]];
   }
 
-  function resetMagic() {
-    setMagic((prev) => ({
+  const size = Math.max(1, Math.min(full.length, Number(deckSize) || 53));
+  return full.slice(0, size);
+}
+
+function drawMagicCard() {
+  setMagic((prev) => {
+    if (prev.currentCard) return prev;
+
+    const deck = prev.deck.length
+      ? [...prev.deck]
+      : createDeck(prev.deckSize, prev.includeJoker !== false);
+
+    const card = deck.shift();
+    if (!card) return prev;
+
+    return {
       ...prev,
-      deck: [],
+      deck,
+      currentCard: card,
+    };
+  });
+}
+
+function resetMagic() {
+  setMagic((prev) => ({
+    ...prev,
+    deck: [],
+    currentCard: null,
+    used: [],
+  }));
+}
+
+function useCurrentCard() {
+  setMagic((prev) => {
+    if (!prev.currentCard) return prev;
+    return {
+      ...prev,
       currentCard: null,
-      used: [],
-    }));
-  }
+      used: [...prev.used, prev.currentCard],
+    };
+  });
+}
 
-  function useCurrentCard() {
-    setMagic((prev) => {
-      if (!prev.currentCard) return prev;
-      return {
-        ...prev,
-        currentCard: null,
-        used: [...prev.used, prev.currentCard],
-      };
-    });
-  }
+function discardCurrentCard() {
+  setMagic((prev) => {
+    if (!prev.currentCard) return prev;
+    return {
+      ...prev,
+      currentCard: null,
+    };
+  });
+}
 
-  function discardCurrentCard() {
-    setMagic((prev) => {
-      if (!prev.currentCard) return prev;
-      return {
-        ...prev,
-        currentCard: null,
-      };
-    });
-  }
+const remainingCards = useMemo(() => {
+  const total = Number(magic.deckSize) || 53;
+  const used = magic.used.length;
+  const inHand = magic.currentCard ? 1 : 0;
+  const deckKnown = magic.deck.length;
 
-  const remainingCards = useMemo(() => {
-    const total = Number(magic.deckSize) || 24;
-    const used = magic.used.length;
-    const inHand = magic.currentCard ? 1 : 0;
-    const deckKnown = magic.deck.length;
+  if (used === 0 && inHand === 0 && deckKnown === 0) return total;
+  return deckKnown;
+}, [magic.deckSize, magic.used.length, magic.currentCard, magic.deck.length]);
 
-    if (used === 0 && inHand === 0 && deckKnown === 0) return total;
-    return deckKnown;
-  }, [magic.deckSize, magic.used.length, magic.currentCard, magic.deck.length]);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   // ✅ Save handlers : on valide automatiquement (caracs + compétences custom)
   function handleSave() {
@@ -733,14 +761,26 @@ setMagic((prev) => {
               onClose={() => setShowCreationModal(false)}
               isAlchemist={isAlchemist}
               onChangeIsAlchemist={setIsAlchemist}
-              isMageEnabled={magic.isMage}
               onChangeIsMageEnabled={(checked) => {
-                setMagic((prev) => ({
-                  ...prev,
-                  isMage: checked,
-                  ...(checked ? {} : { deck: [], currentCard: null, used: [] }),
-                }));
-              }}
+  setMagic((prev) => {
+    // 🔒 Si déjà défini par un template (ex: Clodomir), on ne force pas à false
+    if (prev.isMage && !checked) {
+      return {
+        ...prev,
+        deck: [],
+        currentCard: null,
+        used: [],
+      };
+    }
+
+    return {
+      ...prev,
+      isMage: checked,
+      ...(checked ? {} : { deck: [], currentCard: null, used: [] }),
+    };
+  });
+}}
+
             />
           )}
 
