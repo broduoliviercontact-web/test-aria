@@ -149,9 +149,9 @@ function MagicTilt({ suit, tier, children }) {
         onMouseMove={onMove}
         onMouseLeave={onLeave}
       >
-     <div className="magic-tilt-media">
-  {children}
-</div>
+        <div className="magic-tilt-media">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -257,6 +257,11 @@ export default function MagicModal({
 }) {
   const [showMageInfo, setShowMageInfo] = useState(false);
 
+  // ✅ Anim CodePen-like
+  const [drawAnim, setDrawAnim] = useState(false);
+  const [showcase, setShowcase] = useState(false);
+const [revealPhase, setRevealPhase] = useState("idle"); // idle | opening | opened
+
   const meetsInt = Number(intValue) >= 14;
 
   const hasEverDrawn =
@@ -284,16 +289,65 @@ export default function MagicModal({
     return "Tire une carte : elle est consommée, utilisée ou jetée.";
   }, [magicEnabled, meetsInt]);
 
-  const canDraw = isMage && meetsInt && remaining !== 0 && !currentCard;
+  const canDraw = isMage && meetsInt && Number(remaining) > 0 && !currentCard && !drawAnim;
 
   const confirmType = () => {
     if (typeof onConfirmMageType !== "function") return;
     onConfirmMageType();
   };
 
-  if (!isOpen) return null;
+  // ✅ quand une carte apparaît : on la met en “showcase” automatiquement
+  useEffect(() => {
+    if (!currentCard) {
+      setShowcase(false);
+      return;
+    }
+    setShowcase(true);
+    const t = setTimeout(() => setDrawAnim(false), 220);
+    return () => clearTimeout(t);
+  }, [currentCard]);
+
+const handleDraw = () => {
+  if (!canDraw) return;
+
+  // démarre l'anim
+  setDrawAnim(true);
+  setRevealPhase("opening");
+
+  // on pioche au milieu du flip (pile au moment où la face va apparaître)
+  setTimeout(() => {
+    onDraw?.();
+  }, 420);
+};
+
+
+useEffect(() => {
+  // Quand on n'a plus de carte en main => on revient au paquet
+  if (!currentCard) {
+    setRevealPhase("idle");
+    setDrawAnim(false);
+    setShowcase(false);
+    return;
+  }
+
+  // Quand une carte arrive => anim reveal
+  const t1 = setTimeout(() => setRevealPhase("opened"), 520);
+  const t2 = setTimeout(() => setDrawAnim(false), 900);
+  return () => { clearTimeout(t1); clearTimeout(t2); };
+}, [currentCard]);
+
+useEffect(() => {
+  if (!isOpen) {
+    setRevealPhase("idle");
+    setDrawAnim(false);
+    setShowcase(false);
+  }
+}, [isOpen]);
+
 
   const suit = currentCard ? normalizeSuit(currentCard.family ?? currentCard.suit) : null;
+
+  if (!isOpen) return null;
 
   return (
     <div className="magic-modal__backdrop" onMouseDown={onClose}>
@@ -408,7 +462,7 @@ export default function MagicModal({
               <div className="magic-modal__deckactions">
                 <button
                   className="magic-modal__btn"
-                  onClick={onDraw}
+                  onClick={handleDraw}
                   disabled={!canDraw}
                 >
                   Tirer une carte
@@ -430,12 +484,43 @@ export default function MagicModal({
 
             <div className="magic-modal__cardzone">
               {!currentCard ? (
-              <div className="magic-modal__placeholder">
-  <MagicTilt suit="back" tier={2}>
-    <CardBack size="large" />
-  </MagicTilt>
-</div>
+                <div className="magic-modal__placeholder">
+                  <div className="magic-backstack">
+                    <div className="magic-backstack__card" aria-hidden="true">
+                      <CardBack size="large" />
+                    </div>
 
+                    <div className="magic-backstack__card" aria-hidden="true">
+                      <CardBack size="large" />
+                    </div>
+<button
+  type="button"
+  className={`magic-backstack__top ${drawAnim ? "is-drawing" : ""} ${revealPhase !== "idle" ? "is-revealing" : ""}`}
+  onClick={handleDraw}
+  disabled={!canDraw}
+  title={!canDraw ? "INT 14 + aucune carte en main" : "Tirer une carte"}
+>
+  <div className={`magic-reveal ${revealPhase !== "idle" ? "is-active" : ""}`}>
+    <div className={`magic-reveal__card ${revealPhase === "opening" || revealPhase === "opened" ? "is-opened" : ""}`}>
+      {/* BACK */}
+      <div className="magic-reveal__face magic-reveal__back">
+        <CardBack size="large" />
+      </div>
+
+      {/* FRONT (pendant le flip, on met la face si dispo, sinon back) */}
+      <div className="magic-reveal__face magic-reveal__front">
+        {currentCard ? (
+          <CardFace card={currentCard} size="large" />
+        ) : (
+          <CardBack size="large" />
+        )}
+      </div>
+    </div>
+  </div>
+</button>
+
+                  </div>
+                </div>
               ) : (
                 <div className="magic-modal__card">
                   <div className="magic-modal__cardHeader">
@@ -449,7 +534,13 @@ export default function MagicModal({
                   </div>
 
                   <div className="magic-modal__cardPreviewImage">
-                    <CardFace card={currentCard} size="large" />
+                    <div
+                      className={`magic-frontstage ${showcase ? "is-showcase" : "is-stowed"}`}
+                      onClick={() => setShowcase((v) => !v)}
+                      title={showcase ? "Cliquer pour ranger" : "Cliquer pour sortir"}
+                    >
+                      <CardFace card={currentCard} size="large" />
+                    </div>
                   </div>
 
                   <div className="magic-modal__actions">

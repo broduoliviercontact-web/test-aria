@@ -880,3 +880,155 @@
   opacity: .85;
   mix-blend-mode: screen;
 }
+
+
+/* =========================================================
+   Back stack (inspiré du CodePen : pile inclinée + lift)
+   ========================================================= */
+
+.magic-backstack{
+  position: relative;
+  width: 220px;
+  height: 340px;
+  perspective: 900px;
+}
+
+.magic-backstack__card,
+.magic-backstack__top{
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: default;
+}
+
+/* carte du dessus cliquable */
+.magic-backstack__top{
+  cursor: pointer;
+  transition: transform 700ms ease, filter 700ms ease;
+}
+
+.magic-backstack__top:disabled{
+  cursor: not-allowed;
+  opacity: .6;
+}
+
+/* style “pile inclinée” proche du pen */
+.magic-backstack__card:nth-child(1){
+  transform: rotateX(60deg) rotateZ(-46deg) translateZ(0px) translateY(10px);
+  opacity: .55;
+  filter: blur(.2px);
+}
+.magic-backstack__card:nth-child(2){
+  transform: rotateX(60deg) rotateZ(-45deg) translateZ(10px) translateY(6px);
+  opacity: .75;
+}
+
+/* top card : base */
+.magic-backstack__top{
+  transform: rotateX(60deg) rotateZ(-44deg) translateZ(18px) translateY(0px);
+  transition: transform 300ms ease, filter 300ms ease;
+  filter: drop-shadow(-10px 40px 20px rgba(0,0,0,0.0));
+}
+
+/* hover lift (comme translateZ(50px) du pen) */
+.magic-backstack__top:hover{
+  transform: rotateX(60deg) rotateZ(-44deg) translateZ(60px) translateY(-2px);
+  filter: drop-shadow(-10px 40px 20px rgba(0,0,0,0.22));
+}
+
+/* petit “click feel” */
+.magic-backstack__top:active{
+  transform: rotateX(60deg) rotateZ(-44deg) translateZ(44px) translateY(2px);
+}
+
+/* =========================================================
+   Draw animation (back -> avance vers nous)
+   ========================================================= */
+
+.magic-backstack__top.is-drawing{
+  transform: rotateX(60deg) rotateZ(-44deg) translateZ(120px) translateY(-6px);
+  filter: drop-shadow(-10px 45px 26px rgba(0,0,0,0.28));
+}
+
+/* =========================================================
+   Frontstage (face card : avancer / ranger au clic)
+   ========================================================= */
+
+.magic-frontstage{
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 320ms ease, filter 320ms ease;
+  will-change: transform;
+}
+
+/* “avance vers nous” */
+.magic-frontstage.is-showcase{
+  transform: translateZ(0) scale(1.06) translateY(-4px);
+  filter: drop-shadow(0 18px 26px rgba(0,0,0,0.28));
+}
+
+/* “rangée” (revient normal) */
+.magic-frontstage.is-stowed{
+  transform: translateZ(0) scale(1.00) translateY(0);
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.18));
+}
+
+/* =========================================================
+   Flip reveal (style CodePen : rotateX(60) -> opened scale + rotateY(180))
+   ========================================================= */
+
+.magic-reveal{
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  perspective: 1200px;
+}
+
+.magic-reveal__card{
+  position: relative;
+  width: 180px;
+  aspect-ratio: 2.5 / 3.5;
+  transform-style: preserve-3d;
+  transition: transform 900ms ease, box-shadow 900ms ease;
+  border-radius: 12px;
+
+  /* IMPORTANT: pas de tilt ici (sinon double tilt) */
+  transform: rotateY(0deg);
+  box-shadow: -10px 40px 20px 2px rgba(0,0,0,0);
+}
+
+
+/* état "opened" = avance + flip */
+.magic-reveal__card.is-opened{
+  transform: rotateY(180deg);
+}
+
+
+.magic-reveal__face{
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+/* back visible au départ */
+.magic-reveal__back{ transform: rotateY(0deg); }
+
+/* front tournée de 180 (sera visible après flip) */
+.magic-reveal__front{ transform: rotateY(180deg); }
+
+.magic-backstack__card { z-index: 1; }
+.magic-backstack__top { z-index: 3; }
+
+
+/* Quand on révèle, c’est le TOP qui se redresse + avance */
+.magic-backstack__top.is-revealing{
+  transform: rotateX(0deg) rotateZ(0deg) translateZ(0px) scale(1.45) translateY(-8px);
+  filter: drop-shadow(0 18px 26px rgba(0,0,0,0.28));
+}
