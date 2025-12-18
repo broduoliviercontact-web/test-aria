@@ -8,7 +8,7 @@ export default function BookCharacterGallery({
   onDeleteCharacter,                // ✅ NEW
   canDeleteCharacter = () => false, // ✅ NEW (fonction: (char) => boolean)
   characters: charactersProp,
-  title = "Personnages du livre",
+  title = "",
   subtitle = "Survole pour retourner la carte. Clique pour ouvrir la fiche stylée.",
   itemsPerPage = 4,
 }) {
@@ -151,7 +151,7 @@ export default function BookCharacterGallery({
   return (
     <section className="book-gallery" ref={topRef}>
       <h3 className="book-gallery__title">{title}</h3>
-      <p className="book-gallery__subtitle">{subtitle}</p>
+  
 
       {totalPages > 1 && (
         <div className="gallery-pagination">

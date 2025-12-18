@@ -7,7 +7,7 @@ export const bookCharacters = [
   {
     id: "book-niklas",
     name: "Niklas Von Trunkel",
-    description: "Alchimiste en disgrâce.",
+    description: "Alchimiste en disgrâce.Niklas doit trouver le «Sceptre Herméneutique», le rapporter à l'université de Kniga et ainsi laver son honneur. Alchimiste étudiant à l'Academie d'alchimie de Kniga, est, selon ses propres dires, l'un des premiers à avoir réussi à transformer du plomb en or. Après quelques célébrations un peu excessives, ses professeurs lui demandent de partir à la recherche d'un sceptre, ce qu'il considère alors comme une ultime épreuve pour affirmer son génie. Il quitte ainsi son pays pour rejoindre le Royaume d'Aria, où il découvrira que son allure et son attitude ne sont pas forcément appréciées des locaux. Il risque de se faire brûler vif alors qu'il fait la rencontre d'Atlan, qui vient à son secours.",
     frontImage: "/cards/600px-Niklas_by_Kayende.jpg",
     backImage: "/cards/niklas-back.png",
 
@@ -82,7 +82,7 @@ isMage: false,
   {
     id: "book-kaitra",
     name: "Keitra",
-    description: "Gladiatrice mise à prix.",
+    description: "Gladiatrice mise à prix. Kaitra veut trouver la gloire et la fortune, tout en espérant oublier son passé. Kaitra veut trouver la gloire et la fortune Née d'une famille très pauvre dans la cité d'Ashanul, elle a été vendue par ses parents et devint une esclave destinée à périr dans une arène. Malgré son petit gabarit, elle se découvre un don pour le combat. Elle survit dans l'arène et devient une gladiatrice expérimentée, en témoignent ses cicatrices. Elle voyage alors un peu et se rend à Irem, attirée par la rumeur d'un certain trésor. La chasse au trésor échoue et Kaitra se fait arrêter par les gardes du sultan. Elle réussit néanmoins à s'échapper et après avoir pu quitter le sultanat d'Aqabah, elle finit par rencontrer Atlan, Niklas et Clodomir alors qu'ils se font attaquer par des bandits dans une forêt. Elle les aident à s'en sortir et décide de rejoindre le groupe.",
     frontImage: "/cards/600px-Kaitra_by_Kayende.jpg",
     backImage: "/cards/keitra-back.png",
 
@@ -140,24 +140,7 @@ isMage: false,
   phraseSociete: "Je suis recherchée.",
 
 
-alchemyPotions: [
-  {
-    id: "potion-ingramus",
-    name: "Essence du feu d’Ingramus",
-    components: "Soufre, braise ancienne",
-    effect: "Enflamme un objet ou une arme pendant quelques minutes.",
-    difficulty: 50,
-    quantity: 1,
-  },
-  {
-    id: "potion-karloff",
-    name: "Passe-Muraille de Karloff",
-    components: "Poussière de pierre, mercure",
-    effect: "Permet de traverser un mur fin ou une cloison.",
-    difficulty: 60,
-    quantity: 1,
-  },
-],
+
 
 
     inventory: [{ }],
@@ -178,7 +161,7 @@ alchemyPotions: [
   {
     id: "book-atlan",
     name: "Atlan Grethen de Quirk",
-    description: "Noble en exil.",
+    description: "Noble en exil. Atlan veut découvrir son origine. Né dans une famille noble, il est en fuite depuis 5 ans après que Zlasko, son valet, l'ait averti qu'une organisation voulait attenter à sa vie. Pris de court, il n'a pu emporter avec lui qu'une dague portant un étrange symbole sur la poignée de cette dernière. Il fait la rencontre de Niklas alors que celui ci était acculé par des villageois et sur le point d'être brûlé comme on brûlerait des sorcières. Atlan prend la défense de l'inconnu et lui sauve la vie. Par la suite, ils essaieront tout les deux de vendre les potions confectionnées par Niklas au fil de leurs voyages.",
     frontImage: "/cards/600px-Atlan_by_Kayende.jpg",
     backImage: "/cards/atla-back.png",
 
@@ -252,7 +235,7 @@ isMage: false,
   {
     id: "book-clodomir",
     name: "Clodomir de Cuivrechamps",
-    description: "Magicien illicite.",
+    description: "Magicien illicite. Clodomir recherche son maître de magie après avoir fait un voyage initiatique d'un an, et cherche à devenir sorcier à part entière. Clodomir est un jeune homme frêle, peu assuré, avec le teint pâle. Il rencontre Atlan et Niklas lors de son voyage alors qu'ils tentent de vendre des potions pour se faire de l'argent. Il est un apprenti sorcier au début de l'aventure, disciple non officiel de Melanda.",
     frontImage: "/cards/600px-Clodomir_by_Kayende.jpg",
     backImage: "/cards/clodomir-back.png",
 

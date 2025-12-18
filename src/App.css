@@ -430,9 +430,11 @@ body {
 }
 
 .home-section h3 {
-  margin-bottom: 0.75rem;
+text-align: center;
 }
-
+.home-section-text {
+  text-align: center;
+}
 .home-steps {
   margin: 0;
   padding-left: 1.2rem;
@@ -888,7 +890,7 @@ body.pdf-exporting * {
 .magic-btn-wrapper{
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+
   justify-content: center;
   align-items: center;
 }
@@ -908,40 +910,32 @@ body.pdf-exporting * {
 }
 .auth-mode-switch {
   display: flex;
-  gap: 0.5rem;
+
   align-items: center;
   justify-content: center;
 }
-.auth-form-inline .btn-primary{
-  margin-top: 1rem;
-  padding: 0.35rem 1rem;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.9);
-display: flex;
-align-items: center;
-justify-content: center;
-  cursor: pointer;
-  font-weight: 600;
-  
 
-  
-}
 
-.auth-form-inline .btn-primary {
-  grid-column: 1 / -1;     /* prend toute la largeur de la grille */
-  justify-self: center;    /* se centre */
-  margin-top: 10px;        /* optionnel */
-}
+
 /* Aligne labels + inputs */
 .auth-form-inline {
-  display: grid;
-  margin: 1.5rem;
-  grid-template-columns: 120px 280px; /* label | input */
-  column-gap: 14px;
-  row-gap: 10px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* ✅ centre les enfants (inputs + bouton) */
+  justify-content: center;
+  margin: 1rem auto;     /* ✅ centre le bloc dans la page */
+     /* spacing entre lignes */
+  width: fit-content;      /* le form se cale sur son contenu */
 }
 
+.btn-primary-1 {
+  background: #8b4513;
+  color: #fdf3df;
+  box-shadow: 0 4px 0 #4e2607;
+  display: flex;  
+  align-items: center;
+  justify-content: center;
+}
 /* Chaque ligne du form devient “transparent” pour la grille */
 .auth-form-inline .auth-field {
   display: contents;
@@ -960,7 +954,24 @@ justify-content: center;
 }
 
 /* Bouton sous les inputs */
-.auth-form-inline .btn-primary {
-  grid-column: 2;
-  justify-self: start;
+
+
+.auth-form-inline > .btn-primary {
+  grid-column: 1 / -1 !important;
+  justify-self: center !important;
+}
+
+.auth-form-inline .auth-submit-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.auth-form-inline .auth-submit-row > .btn-primary {
+  margin: 0;            /* évite des marges bizarres */
+  justify-self: unset;  /* on laisse flex gérer */
 }

@@ -128,9 +128,10 @@ function HomeAuthPanel({
 
             {error && <div className="auth-error-banner">{error}</div>}
 
-            <button type="submit" className="btn-primary">
-              {mode === "login" ? "Se connecter" : "Créer mon compte"}
-            </button>
+          <div className="auth-submit-row">
+  <button type="submit" className="btn-primary-1">Se connecter</button>
+</div>
+
           </form>
         </div>
       )}
@@ -266,7 +267,7 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
         <main className="home-main">
           <section className="hero-parchment">
             <div className="hero-inner">
-              <h2 className="hero-title">Préparation de la campagne</h2>
+              <h2 className="hero-title">Hòla Mon Brave</h2>
               <p className="hero-text">
                 Cette application te permet de créer un personnage pour Aria,
                 ajuster ses caractéristiques, ses compétences, son inventaire et
