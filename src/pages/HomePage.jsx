@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import BookCharacterGallery from "../components/BookCharacterGallery";
 import { bookCharacters } from "../data/bookCharacters";
+import Footer from "../components/Footer";
 
 function HomeAuthPanel({
   user,
@@ -316,14 +317,19 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
             </ul>
           </section>
               {/* ✅ Galerie : livre (anon) OU mes persos (logué) */}
+              
           <BookCharacterGallery
             title={galleryTitle}
             subtitle={gallerySubtitle}
             characters={galleryCharacters}
             onOpenInEditor={handleOpenInEditor}
           />
+
         </main>
+        <Footer />
       </div>
+      
     </div>
+    
   );
 }
