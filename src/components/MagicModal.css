@@ -313,7 +313,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: .5rem 0;
+  padding: 1.5rem 0;
 }
 
 .magic-modal__actions{
@@ -382,7 +382,7 @@
 }
 
 .magic-card-img.is-large {
-  width: 180px;
+  width: 220px;
   aspect-ratio: 2.5 / 3.5;
   object-fit: cover;
   box-shadow: 0 10px 25px rgba(0,0,0,.35);
@@ -451,6 +451,14 @@
   transform: rotateX(var(--rx)) rotateY(var(--ry));
   transition: none; /* crucial: follow mouse with no lag */
   will-change: transform;
+  
+
+      --holo-color1: #00e7ff;
+    --holo-color2: #ff00e7;
+
+    border-radius: 5% / 3.5%;
+    box-shadow: -5px -5px 5px -5px var(--holo-color1), 5px 5px 5px -5px var(--holo-color2), 0 35px 30px -20px rgba(0, 0, 0, 0.7);
+    transition: transform 0.12s ease-out;
 }
 
 .magic-tilt-card.is-resting{
@@ -528,24 +536,25 @@
   border-radius: 12px;
   pointer-events: none;
 
-  opacity: 0;
+  opacity: 0.55;
   transition: opacity 160ms ease;
   transform: translateZ(34px);
 
   mix-blend-mode: color-dodge;
 
-  -webkit-mask-image:
-    radial-gradient(circle at var(--px) var(--py),
-      rgba(0,0,0,1) 0%,
-      rgba(0,0,0,.75) 28%,
-      rgba(0,0,0,.30) 55%,
-      rgba(0,0,0,0) 78%);
-  mask-image:
-    radial-gradient(circle at var(--px) var(--py),
-      rgba(0,0,0,1) 0%,
-      rgba(0,0,0,.75) 28%,
-      rgba(0,0,0,.30) 55%,
-      rgba(0,0,0,0) 78%);
+-webkit-mask-image:
+  radial-gradient(circle at var(--px) var(--py),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,.75) 18%,
+    rgba(0,0,0,.30) 36%,
+    rgba(0,0,0,0) 50%);
+mask-image:
+  radial-gradient(circle at var(--px) var(--py),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,.75) 18%,
+    rgba(0,0,0,.30) 36%,
+    rgba(0,0,0,0) 50%);
+
 
   background-repeat: no-repeat;
   background-size: 220% 220%, 180% 180%, 140% 140%;
@@ -555,7 +564,7 @@
   background-image: none; /* OFF par défaut */
 }
 
-.magic-tilt-card:hover::before{ opacity: 1; }
+.magic-tilt-card:hover::before{ opacity: 0.75; }
 
 /* =========================================================
    TIERS (puissance)
@@ -899,7 +908,7 @@
 
 .magic-backstack{
   position: relative;
-  width: 220px;
+  width: 240px;
   height: 340px;
   perspective: 900px;
 }
@@ -1008,15 +1017,12 @@
 
 .magic-reveal__card{
   position: relative;
-  width: 180px;
-  aspect-ratio: 2.5 / 3.5;
+  width: auto;              /* ✅ suit le contenu */
+  height: auto;
+  display: inline-block;    /* ✅ se cale sur l'image */
   transform-style: preserve-3d;
   transition: transform 900ms ease, box-shadow 900ms ease;
   border-radius: 12px;
-
-  /* IMPORTANT: pas de tilt ici (sinon double tilt) */
-  transform: rotateY(0deg);
-  box-shadow: -10px 40px 20px 2px rgba(0,0,0,0);
 }
 
 
@@ -1029,13 +1035,16 @@
 .magic-reveal__face{
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
   border-radius: 12px;
   overflow: hidden;
-  display: grid;
-  place-items: center;
+  backface-visibility: hidden;
 }
+.magic-card-img.is-large{ width: 220px; height: auto; }
 
+/* ✅ La carte "mesure" la taille de l'image back */
+.magic-reveal__back{
+  position: relative; /* <-- important : donne une hauteur au wrapper */
+}
 /* back visible au départ */
 .magic-reveal__back{ transform: rotateY(0deg); }
 
