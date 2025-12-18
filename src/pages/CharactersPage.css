@@ -1,0 +1,36 @@
+/* src/pages/CharactersPage.css */
+
+.characters-page {
+  padding-top: 1rem;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.characters-page__topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.characters-page__btn {
+  min-width: 200px;
+}
+
+.characters-page__content {
+  width: 100%;
+}
+
+/* petit confort mobile */
+@media (max-width: 520px) {
+  .characters-page__btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .characters-page__topbar {
+    gap: 10px;
+  }
+}
