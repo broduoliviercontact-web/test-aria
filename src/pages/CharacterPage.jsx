@@ -349,6 +349,9 @@ if (Array.isArray(tpl?.stats) && tpl.stats.length) {
   setStats(normalized);
   setStatsRolled(true);
 }
+// --- phrases de synthèse
+if (typeof tpl?.phraseGenial === "string") setPhraseGenial(tpl.phraseGenial);
+if (typeof tpl?.phraseSociete === "string") setPhraseSociete(tpl.phraseSociete);
 
 
     // --- compétences : on applique un override par id, sans casser la structure existante
@@ -553,6 +556,31 @@ const applyMageType = (type) => {
     return cleaned;
   });
 };
+// ===========================
+// ✅ ALCHIMIE : auto-setup quand on active
+// - ajoute les 2 compétences spéciales
+// - pré-remplit les 2 potions de base (avec difficulté)
+// - ne duplique pas
+// ===========================
+useEffect(() => {
+  if (!isAlchemist) return;
+
+  // 1) Compétences spéciales
+  setSpecialCompetences((prev) => {
+    const list = Array.isArray(prev) ? prev : [];
+    const byId = new Set(list.map((x) => x?.id));
+    const toAdd = ALCHEMY_SPECIALS.filter((s) => !byId.has(s.id));
+    return toAdd.length ? [...list, ...toAdd] : list;
+  });
+
+  // 2) Potions
+  setAlchemyPotions((prev) => {
+    const list = Array.isArray(prev) ? prev : [];
+    const byId = new Set(list.map((p) => p?.id));
+    const toAdd = ALCHEMY_STARTER_POTIONS.filter((p) => !byId.has(p.id));
+    return toAdd.length ? [...list, ...toAdd] : list;
+  });
+}, [isAlchemist, setSpecialCompetences, setAlchemyPotions]);
 
 // ===========================
 // OUVERTURE MODAL MAGIE
@@ -724,6 +752,37 @@ const remainingCards = useMemo(() => {
     (statMode === "point-buy" && isPointBuyValidated) ||
     (skillMode === "custom" && isCustomSkillsValidated);
 
+
+// ===========================
+// ALCHIMIE : presets (création)
+// ===========================
+const ALCHEMY_SPECIALS = [
+  { id: "alch-identifier", name: "Identifier une substance", score: 60, locked: true },
+  { id: "alch-creer-potion", name: "Créer une potion", score: 100, locked: true },
+];
+
+const ALCHEMY_STARTER_POTIONS = [
+  {
+    id: "alch-potion-ingramus",
+    name: "Essence du feu d’Ingramus",
+    components: "Soufre, braise ancienne",
+    effect: "Enflamme un objet ou une arme pendant quelques minutes.",
+    difficulty: 50,
+    quantity: 1,
+    locked: true,
+  },
+  {
+    id: "alch-potion-karloff",
+    name: "Passe-Muraille de Karloff",
+    components: "Poussière de pierre, mercure",
+    effect: "Permet de traverser un mur fin ou une cloison.",
+    difficulty: 60,
+    quantity: 1,
+    locked: true,
+  },
+];
+
+    
   return (
     <DiceRollProvider>
       <div className="character-page">

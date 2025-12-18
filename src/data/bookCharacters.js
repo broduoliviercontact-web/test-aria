@@ -64,6 +64,10 @@ isMage: false,
 
     isAlchemist: true,
 
+ phraseGenial: "Un alchimiste brillant, mais instable : ses potions finissent rarement comme prévu.",
+  phraseSociete: "Traqué par ses anciens pairs, il se vend au plus offrant pour retrouver sa place.",
+
+    
     inventory: [
       { name: "Armure de cuir usée", quantity: 1 },
       { name: "Fiole de potion vide", quantity: 1 },
@@ -131,11 +135,40 @@ isMage: false,
       },
     ],
 
+
+ phraseGenial: "Je suis une gladiatrice très connue...",
+  phraseSociete: "Je suis recherchée.",
+
+
+alchemyPotions: [
+  {
+    id: "potion-ingramus",
+    name: "Essence du feu d’Ingramus",
+    components: "Soufre, braise ancienne",
+    effect: "Enflamme un objet ou une arme pendant quelques minutes.",
+    difficulty: 50,
+    quantity: 1,
+  },
+  {
+    id: "potion-karloff",
+    name: "Passe-Muraille de Karloff",
+    components: "Poussière de pierre, mercure",
+    effect: "Permet de traverser un mur fin ou une cloison.",
+    difficulty: 60,
+    quantity: 1,
+  },
+],
+
+
     inventory: [{ }],
 
    weapons: [
       { name: "Sabre croisés", damage: "1d6+1" , iconId: "crossed-sabres" },
       { name: "Sabre croisés", damage: "1d6+1" , iconId: "crossed-sabres" },
+
+
+
+      
    ],
   },
 
@@ -202,6 +235,10 @@ isMage: false,
       { name: "Veste de cuir", quantity: 1, category: "armures" },
  
     ],
+
+ phraseGenial: "Je suis un noble beau parleur.",
+  phraseSociete: "Je vis en exil à la suite de la perte de mers titres et de mes biens.",
+
 
    weapons: [
   { name: "Rapière", damage: "1d6+1", iconId: "curvy-knife" },
@@ -271,6 +308,10 @@ isMage: false,
    
       { name: "Jeu de cartes complet", quantity: 1, category: "jeux" },
     ],
+
+ phraseGenial: "Je suis un magicien premietteur.",
+  phraseSociete: "Je n'ai pas étudié la magie selon les règles.",
+
 
     weapons: [{ name: "Bâton", damage: "1d6" }],
 

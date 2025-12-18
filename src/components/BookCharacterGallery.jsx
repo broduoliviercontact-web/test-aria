@@ -96,6 +96,58 @@ export default function BookCharacterGallery({
     setSelected(null);
   };
 
+  // ============================
+  // ✅ AJOUT: synthèse book chars
+  // ============================
+  const toLines = (v) => {
+    if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
+    if (typeof v === "string" && v.trim()) {
+      return v
+        .split(/\r?\n|•|;|—/g)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+    return [];
+  };
+
+  const buildSynthese = (c) => {
+    // 1) si tu as déjà mis un champ synthèse dans bookCharacters.js, on le respecte
+    const existing =
+      toLines(c?.summaryLines) ||
+      toLines(c?.summary) ||
+      toLines(c?.synthese) ||
+      toLines(c?.syntheses);
+
+    const keep = Array.isArray(existing) ? existing : [];
+    if (keep.length) return keep;
+
+    // 2) sinon, on génère des phrases simples à partir des champs existants
+    const lines = [];
+
+    if (c?.description?.trim()) lines.push(c.description.trim());
+    if (c?.profession?.trim()) lines.push(`Profession : ${c.profession.trim()}`);
+    if (Number.isFinite(c?.age)) lines.push(`Âge : ${c.age} ans`);
+    if (Number.isFinite(c?.armor)) lines.push(`Armure : ${c.armor}`);
+    if (c?.isMage === true) lines.push("Type : Magicien");
+    if (c?.isMage === false) lines.push("Type : Non-magicien");
+    if (c?.isAlchemist) lines.push("Trait : Alchimiste");
+
+    // Option: petit fallback si rien
+    if (!lines.length) lines.push("Personnage du livre.");
+
+    return lines;
+  };
+
+  const withSynthese = (c) => {
+    const syntheseLines = buildSynthese(c);
+    return {
+      ...c,
+      // deux noms pour être compatible avec ce que tu affiches ailleurs
+      synthese: syntheseLines,
+      summaryLines: syntheseLines,
+    };
+  };
+
   return (
     <section className="book-gallery" ref={topRef}>
       <h3 className="book-gallery__title">{title}</h3>
@@ -214,7 +266,11 @@ export default function BookCharacterGallery({
             <div className="detail-layout">
               <div className="detail-media">
                 <div className="pokemon-card-wrapper">
-                  <div className="pokemon-card pokemon-card--holo" onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave}>
+                  <div
+                    className="pokemon-card pokemon-card--holo"
+                    onMouseMove={handleCardMouseMove}
+                    onMouseLeave={handleCardMouseLeave}
+                  >
                     <div className="pokemon-card-inner">
                       <img className="pokemon-card-img" src={selected.frontImage} alt={selected.name} draggable="false" />
                     </div>
@@ -227,11 +283,14 @@ export default function BookCharacterGallery({
                 {selected.description?.trim() && <p className="detail-desc">{selected.description}</p>}
 
                 <div className="detail-actions">
-                  <button type="button" className="btn-primary" onClick={() => onOpenInEditor?.(selected)}>
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={() => onOpenInEditor?.(withSynthese(selected))}  // ✅ ICI: on injecte la synthèse
+                  >
                     Ouvrir dans l’éditeur
                   </button>
 
-                  {/* ✅ NEW: supprimer */}
                   {canDeleteCharacter?.(selected) && (
                     <button
                       type="button"
