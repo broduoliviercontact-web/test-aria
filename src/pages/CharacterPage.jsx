@@ -326,11 +326,26 @@ useEffect(() => {
     if (typeof tpl?.wounds === "number") setWounds(tpl.wounds);
     if (typeof tpl?.armor === "number") setArmor(tpl.armor);
 
-    // --- stats
-    if (Array.isArray(tpl?.stats) && tpl.stats.length) {
-      setStats(tpl.stats);
-      setStatsRolled(true);
-    }
+ // --- stats (normalisation IDs)
+if (Array.isArray(tpl?.stats) && tpl.stats.length) {
+  const map = {
+    FOR: "force",
+    DEX: "dexterite",
+    END: "endurance",
+    INT: "intelligence",
+    CHA: "charisme",
+  };
+
+  const normalized = tpl.stats.map((s) => {
+    const id = String(s?.id || "");
+    const nextId = map[id] || id; // si déjà "force", ça passe
+    return { ...s, id: nextId };
+  });
+
+  setStats(normalized);
+  setStatsRolled(true);
+}
+
 
     // --- compétences : on applique un override par id, sans casser la structure existante
     if (tpl?.competenceOverrides && typeof tpl.competenceOverrides === "object") {

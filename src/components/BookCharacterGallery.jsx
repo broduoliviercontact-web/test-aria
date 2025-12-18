@@ -1,12 +1,58 @@
 // src/components/BookCharacterGallery.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./BookCharacterGallery.css";
 import { bookCharacters } from "../data/bookCharacters";
 
-export default function BookCharacterGallery({ onOpenInEditor }) {
+export default function BookCharacterGallery({
+  onOpenInEditor,
+  characters: charactersProp,
+  title = "Personnages du livre",
+  subtitle = "Survole pour retourner la carte. Clique pour ouvrir la fiche stylée.",
+  itemsPerPage = 4, // ✅ 4 cartes par page
+}) {
   const [selected, setSelected] = useState(null);
+  const [page, setPage] = useState(0);
+  const topRef = useRef(null);
 
-  const characters = useMemo(() => bookCharacters || [], []);
+  const characters = useMemo(() => {
+    if (Array.isArray(charactersProp)) return charactersProp;
+    return bookCharacters || [];
+  }, [charactersProp]);
+
+  // ✅ pagination
+  const totalPages = useMemo(() => {
+    const per = Math.max(1, Number(itemsPerPage) || 4);
+    return Math.max(1, Math.ceil(characters.length / per));
+  }, [characters.length, itemsPerPage]);
+
+  // si la liste change (login/logout), on revient page 0
+  useEffect(() => {
+    setPage(0);
+  }, [characters]);
+
+  // clamp page si jamais
+  useEffect(() => {
+    setPage((p) => Math.min(Math.max(0, p), totalPages - 1));
+  }, [totalPages]);
+
+  const pagedCharacters = useMemo(() => {
+    const per = Math.max(1, Number(itemsPerPage) || 4);
+    const start = page * per;
+    return characters.slice(start, start + per);
+  }, [characters, page, itemsPerPage]);
+
+  const goToPage = (nextPage) => {
+    setSelected(null); // ferme overlay si on change de page
+    setPage(() => {
+      const clamped = Math.min(Math.max(0, nextPage), totalPages - 1);
+      return clamped;
+    });
+
+    // remonte à la galerie (petit confort)
+    requestAnimationFrame(() => {
+      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   // Shine + tilt pour la version holo (overlay)
   const handleCardMouseMove = (event) => {
@@ -52,14 +98,39 @@ export default function BookCharacterGallery({ onOpenInEditor }) {
   }, [selected]);
 
   return (
-    <section className="book-gallery">
-      <h3 className="book-gallery__title">Personnages du livre</h3>
-      <p className="book-gallery__subtitle">
-        Survole pour retourner la carte. Clique pour ouvrir la fiche stylée.
-      </p>
+    <section className="book-gallery" ref={topRef}>
+      <h3 className="book-gallery__title">{title}</h3>
+      <p className="book-gallery__subtitle">{subtitle}</p>
+
+      {/* ✅ Pagination UI (haut) */}
+      {totalPages > 1 && (
+        <div className="gallery-pagination">
+          <button
+            type="button"
+            className="btn-secondary gallery-pagination__btn"
+            onClick={() => goToPage(page - 1)}
+            disabled={page <= 0}
+          >
+            ← Précédent
+          </button>
+
+          <div className="gallery-pagination__info">
+            Page <strong>{page + 1}</strong> / <strong>{totalPages}</strong>
+          </div>
+
+          <button
+            type="button"
+            className="btn-secondary gallery-pagination__btn"
+            onClick={() => goToPage(page + 1)}
+            disabled={page >= totalPages - 1}
+          >
+            Suivant →
+          </button>
+        </div>
+      )}
 
       <div className="book-gallery__grid">
-        {characters.map((c) => (
+        {pagedCharacters.map((c) => (
           <article key={c.id} className="book-card">
             <div
               className="flip-card"
@@ -97,6 +168,13 @@ export default function BookCharacterGallery({ onOpenInEditor }) {
                         alt={`Dos de carte ${c.name}`}
                         draggable="false"
                       />
+
+                      <div className="card-back-overlay">
+                        <div className="card-back-title">{c.name}</div>
+                        {c.description && (
+                          <div className="card-back-desc">{c.description}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -108,10 +186,52 @@ export default function BookCharacterGallery({ onOpenInEditor }) {
         ))}
       </div>
 
+      {/* ✅ Pagination UI (bas) */}
+      {totalPages > 1 && (
+        <div className="gallery-pagination gallery-pagination--bottom">
+          <button
+            type="button"
+            className="btn-secondary gallery-pagination__btn"
+            onClick={() => goToPage(page - 1)}
+            disabled={page <= 0}
+          >
+            ← Précédent
+          </button>
+
+          <div className="gallery-pagination__dots" aria-label="Pagination">
+            {Array.from({ length: totalPages }).map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className={
+                  idx === page
+                    ? "gallery-dot gallery-dot--active"
+                    : "gallery-dot"
+                }
+                onClick={() => goToPage(idx)}
+                aria-label={`Aller à la page ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="btn-secondary gallery-pagination__btn"
+            onClick={() => goToPage(page + 1)}
+            disabled={page >= totalPages - 1}
+          >
+            Suivant →
+          </button>
+        </div>
+      )}
+
       {/* OVERLAY */}
       {selected && (
         <div className="detail-overlay" onClick={closeDetail}>
-          <div className="detail-overlay-inner" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="detail-overlay-inner"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               className="detail-close"

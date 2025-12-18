@@ -1,6 +1,7 @@
 // src/pages/HomePage.jsx
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import BookCharacterGallery from "../components/BookCharacterGallery";
+import { bookCharacters } from "../data/bookCharacters";
 
 function HomeAuthPanel({
   user,
@@ -66,14 +67,22 @@ function HomeAuthPanel({
             <button
               type="button"
               onClick={() => setMode("login")}
-              className={mode === "login" ? "btn-primary auth-mode-btn" : "btn-secondary auth-mode-btn"}
+              className={
+                mode === "login"
+                  ? "btn-primary auth-mode-btn"
+                  : "btn-secondary auth-mode-btn"
+              }
             >
               Connexion
             </button>
             <button
               type="button"
               onClick={() => setMode("register")}
-              className={mode === "register" ? "btn-primary auth-mode-btn" : "btn-secondary auth-mode-btn"}
+              className={
+                mode === "register"
+                  ? "btn-primary auth-mode-btn"
+                  : "btn-secondary auth-mode-btn"
+              }
             >
               Inscription
             </button>
@@ -132,14 +141,116 @@ function HomeAuthPanel({
 export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
   const { user, loading, error, login, register, logout, setError } = auth;
 
+  const [myChars, setMyChars] = useState([]);
+  const [myCharsLoading, setMyCharsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setMyChars([]);
+      setMyCharsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setMyCharsLoading(true);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/characters`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error("fetch /characters failed");
+
+        const data = await res.json();
+        if (!cancelled) setMyChars(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.warn("Impossible de charger mes personnages:", e);
+        if (!cancelled) setMyChars([]);
+      } finally {
+        if (!cancelled) setMyCharsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const myCharsForGallery = useMemo(() => {
+    return (myChars || []).map((ch) => {
+      // map competences array -> overrides {id: score}
+      const competenceOverrides = {};
+      (ch.competences || []).forEach((c) => {
+        if (c?.id && typeof c?.score === "number") competenceOverrides[c.id] = c.score;
+      });
+
+      const portrait =
+        ch.portraitDataUrl ||
+        ch.portraitUrl ||
+        ch.portrait ||
+        "/aria-background.webp";
+
+      return {
+        // ✅ important: on garde l’id serveur pour l’édition réelle
+        id: ch._id,
+
+        name: ch.name || "Sans nom",
+        description: ch.profession || "",
+        frontImage: portrait,
+        backImage: "/aria-background2.webp",
+
+        age: typeof ch.age === "number" ? ch.age : undefined,
+        profession: ch.profession || "",
+
+        stats: Array.isArray(ch.stats) ? ch.stats : [],
+        competenceOverrides,
+
+        specialCompetences: Array.isArray(ch.specialCompetences)
+          ? ch.specialCompetences
+          : [],
+
+        inventory: Array.isArray(ch.inventory) ? ch.inventory : [],
+        weapons: Array.isArray(ch.weapons) ? ch.weapons : [],
+
+        isAlchemist: !!ch.isAlchemist,
+
+        // magie (selon ton modèle)
+        isMage: !!(ch.magic?.isMage || ch.isMage),
+        mageType: ch.magic?.mageType || "outsider",
+
+        phraseGenial: ch.phraseGenial || "",
+        phraseSociete: ch.phraseSociete || "",
+      };
+    });
+  }, [myChars]);
+
   const handleOpenInEditor = (template) => {
     try {
       localStorage.setItem("aria_prefill_character", JSON.stringify(template));
+
+      // ✅ édition réelle : si c’est un perso “serveur”, on marque l’id à éditer
+      if (user && template?.id) {
+        localStorage.setItem("aria_edit_character_id", String(template.id));
+      } else {
+        localStorage.removeItem("aria_edit_character_id");
+      }
     } catch (e) {
       console.warn("Impossible d'écrire dans localStorage:", e);
     }
-    onStart(); // ✅ garde ton flow actuel "Créer un personnage"
+
+    onStart(); // ouvre l’éditeur (CharacterPage)
   };
+
+  const galleryTitle = user ? "Mes personnages" : "Personnages du livre";
+  const gallerySubtitle = user
+    ? myCharsLoading
+      ? "Chargement de tes personnages..."
+      : "Survole pour retourner la carte. Clique pour ouvrir dans l’éditeur."
+    : "Survole pour retourner la carte. Clique pour ouvrir la fiche stylée.";
+
+  const galleryCharacters = user ? myCharsForGallery : bookCharacters;
 
   return (
     <div className="home-page app-home">
@@ -167,7 +278,11 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
                   Créer un personnage
                 </button>
                 {user && (
-                  <button type="button" className="btn-secondary" onClick={onGoToMyCharacters}>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={onGoToMyCharacters}
+                  >
                     Mes personnages
                   </button>
                 )}
@@ -175,8 +290,7 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
             </div>
           </section>
 
-          {/* ✅ Galerie visible uniquement non-logué */}
-    
+      
 
           <HomeAuthPanel
             user={user}
@@ -200,7 +314,13 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
               <li>Gère ton inventaire et exporte ta fiche en PDF.</li>
             </ul>
           </section>
-                {!user && <BookCharacterGallery onOpenInEditor={handleOpenInEditor} />}
+              {/* ✅ Galerie : livre (anon) OU mes persos (logué) */}
+          <BookCharacterGallery
+            title={galleryTitle}
+            subtitle={gallerySubtitle}
+            characters={galleryCharacters}
+            onOpenInEditor={handleOpenInEditor}
+          />
         </main>
       </div>
     </div>
