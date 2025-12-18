@@ -1,34 +1,5 @@
-.identity-portrait {
-  flex: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+/* src/components/CharacterPortrait.css */
 
-.portrait-frame {
-  width: 213px;
-  height: 233px;
-  border-radius: 12px;
-  border: 1px solid rgba(80, 50, 30, 0.8);
-  box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.25),
-    inset 0 0 12px rgba(0, 0, 0, 0.35);
-  background: rgba(249, 243, 229, 0.9);
-  overflow: hidden;
-}
-
-.portrait-image {
-  width: 100%;
-  height: 100%;
-  object-fit:cover;
-}
-
-/* Sur petit écran, on mettra l'image au-dessus (optionnel) */
-@media (max-width: 768px) {
-  .identity-portrait {
-    margin-top: 0.5rem;
-  }
-}
 .portrait-card {
   display: flex;
   flex-direction: column;
@@ -66,20 +37,10 @@
 }
 
 .portrait-placeholder {
-  font-size: 0.3rem;
+  font-size: 0.7rem;
   color: #5a4330;
   text-align: center;
-  padding: 0.3rem;
-}
-
-.portrait-upload-btn {
-  cursor: pointer;
-  font-size: 0.7rem;
-  padding: 0.2rem 0.4rem;
-  border-radius: 999px;
-  border: 1px solid rgba(120, 90, 60, 0.8);
-  background: rgba(0, 0, 0, 0.08);
-  font-family: "MedievalSharp", "Georgia", serif;
+  padding: 0.4rem;
 }
 
 .portrait-url-input {
@@ -91,4 +52,116 @@
   background: rgba(255, 255, 255, 0.7);
   font-size: 0.7rem;
   font-family: "Georgia", serif;
+}
+
+.portrait-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.portrait-upload-btn {
+  cursor: pointer;
+  font-size: 0.6rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 60, 0.8);
+  background: rgba(0, 0, 0, 0.08);
+  font-family: "MedievalSharp", "Georgia", serif;
+}
+
+.portrait-upload-btn:hover {
+  filter: brightness(1.05);
+}
+
+.portrait-primary {
+  background: rgba(120, 40, 20, 0.18);
+}
+
+.portrait-danger {
+  background: rgba(140, 20, 20, 0.18);
+}
+
+/* =============== */
+/* Modal recadrage */
+/* =============== */
+
+.portrait-crop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 6, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.portrait-crop-modal {
+  width: min(520px, 96vw);
+  border-radius: 14px;
+  border: 1px solid rgba(120, 90, 60, 0.9);
+  background: rgba(249, 243, 229, 0.96);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  padding: 0.8rem;
+  background-image: url("/parchment-bg2.jpg");
+}
+
+.portrait-crop-title {
+  font-family: "MedievalSharp", "Georgia", serif;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  color: #3b2a1d;
+}
+
+.portrait-crop-area {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(80, 50, 30, 0.5);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.portrait-crop-controls {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.portrait-crop-zoom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: #3b2a1d;
+  font-family: "Georgia", serif;
+}
+
+.portrait-crop-zoom input[type="range"] {
+  width: 65%;
+}
+
+.portrait-crop-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.portrait-crop-hint {
+  margin-top: 0.6rem;
+  font-size: 0.72rem;
+  color: rgba(60, 45, 30, 0.9);
+  font-family: "Georgia", serif;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .portrait-crop-area {
+    height: 260px;
+  }
 }
