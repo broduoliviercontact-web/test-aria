@@ -182,12 +182,13 @@ flex-direction: column;
   text-align: center;
 }
 .detail-actions {
-    margin-top: 1.5rem;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
+  position: sticky;
+  display: flex;
 
-
+  justify-content: center;
+  bottom: 0;
+  padding: 12px 0;
+  background: linear-gradient(to top, rgba(12, 12, 14, 0.92), rgba(12, 12, 14, 0));
 }
 .detail-hint {
   margin-top: 1rem;
@@ -464,4 +465,24 @@ flex-direction: column;
 
 .gallery-dot--active {
   background: rgba(255, 255, 255, 0.85);
+}
+
+
+/* ✅ Permet de scroller quand le contenu dépasse l’écran */
+.detail-overlay {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: flex-start; /* au lieu de centrer verticalement */
+}
+
+/* ✅ Le panneau interne ne dépasse pas la fenêtre, et devient scrollable */
+.detail-overlay-inner {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  margin: 16px auto;
+}
+
+/* (optionnel mais recommandé) un peu d’air en bas pour ne pas coller les boutons */
+.detail-content {
+  padding-bottom: 10px;
 }
