@@ -1,4 +1,5 @@
-import React, { useMemo, useRef, useState } from "react";
+// src/pages/CharacterPage.jsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 // Context dés
 import { DiceRollProvider } from "../components/DiceRollContext";
@@ -31,6 +32,9 @@ import MagicModal from "../components/MagicModal";
 // PDF
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+
+import { weaponIcons } from "../bladeIcons";
+
 
 function getStatValue(stats, statId) {
   const found = stats?.find((s) => s.id === statId);
@@ -127,7 +131,9 @@ function CreationModal({
         <h3>Mode de calcul des compétences</h3>
 
         <div className="mode-switch">
-          <span className={`mode-label ${skillMode !== "custom" ? "active" : ""}`}>
+          <span
+            className={`mode-label ${skillMode !== "custom" ? "active" : ""}`}
+          >
             Calculs prêts à jouer
           </span>
 
@@ -155,7 +161,7 @@ function CreationModal({
         </p>
 
         <h3>Alchimie</h3>
-        <p>Ce personnage pratique-t-il l&apos;alchimie (création de potions) ?</p>
+        <p>Ce personnage pratique-t-il l&apos;alchimie (création des potions) ?</p>
         <label style={{ fontSize: "0.85rem", marginTop: "0.25rem" }}>
           <input
             type="checkbox"
@@ -290,6 +296,130 @@ export default function CharacterPage({
   const pdfSheetRef = useRef(null);
 
   // ===========================
+  // ✅ ETAPE 2 : PREFILL depuis Home (localStorage)
+  // ===========================
+// ✅ ETAPE 2 : PREFILL depuis Home (localStorage)
+useEffect(() => {
+  let raw = null;
+  try {
+    raw = localStorage.getItem("aria_prefill_character");
+  } catch (e) {
+    raw = null;
+  }
+  if (!raw) return;
+
+  try {
+    const tpl = JSON.parse(raw);
+
+    // --- identité
+    if (tpl?.name) setCharacterName(tpl.name);
+    if (tpl?.frontImage) onChangePortrait(tpl.frontImage);
+    if (typeof tpl?.age === "number") setAge(tpl.age);
+    if (typeof tpl?.profession === "string") setProfession(tpl.profession);
+
+    // --- PV / blessures / armure
+    if (typeof tpl?.hitPoints === "number") {
+      // hitPoints a souvent un setter au parent, mais chez toi c'est une prop "hitPoints" seule.
+      // Donc on ne touche pas si tu n'as pas setHitPoints.
+      // (Si tu as un setter, dis-moi son nom et je l'ajoute.)
+    }
+    if (typeof tpl?.wounds === "number") setWounds(tpl.wounds);
+    if (typeof tpl?.armor === "number") setArmor(tpl.armor);
+
+    // --- stats
+    if (Array.isArray(tpl?.stats) && tpl.stats.length) {
+      setStats(tpl.stats);
+      setStatsRolled(true);
+    }
+
+    // --- compétences : on applique un override par id, sans casser la structure existante
+    if (tpl?.competenceOverrides && typeof tpl.competenceOverrides === "object") {
+      setCompetences((prev) => {
+        const list = Array.isArray(prev) ? prev : [];
+        return list.map((c) => {
+          const id = String(c?.id || "");
+          if (!id) return c;
+          const forced = tpl.competenceOverrides[id];
+          return typeof forced === "number" ? { ...c, score: forced } : c;
+        });
+      });
+      // On considère "validé", sinon l'utilisateur voit des boutons +/-
+      setIsCustomSkillsValidated(true);
+    }
+
+    // --- compétences spéciales
+    if (Array.isArray(tpl?.specialCompetences)) {
+      setSpecialCompetences(tpl.specialCompetences);
+    }
+
+    // --- inventaire
+    if (Array.isArray(tpl?.inventory)) setInventory(tpl.inventory);
+
+    // --- armes
+// --- armes (associer icônes automatiquement)
+if (Array.isArray(tpl?.weapons)) {
+  const icons = Array.isArray(weaponIcons) ? weaponIcons : [];
+  const defaultIcon = icons[0]?.url ?? "/icons/weapon.gif";
+
+  const normalizedWeapons = tpl.weapons.map((w) => {
+    const name = w?.name || "";
+    const damage = w?.damage || "";
+    const validated = typeof w?.validated === "boolean" ? w.validated : true;
+
+    // 1) si iconId fourni → match direct
+    let iconUrl = defaultIcon;
+    if (w?.iconId) {
+      const found = icons.find((i) => i.id === w.iconId);
+      if (found?.url) iconUrl = found.url;
+    } else {
+      // 2) sinon on essaie de matcher par label avec le nom (ex: "sabre")
+      const lower = String(name).toLowerCase();
+      const found = icons.find((i) =>
+        String(i.label || "").toLowerCase().includes(lower) ||
+        lower.includes(String(i.label || "").toLowerCase())
+      );
+      if (found?.url) iconUrl = found.url;
+    }
+
+    return { icon: iconUrl, name, damage, validated };
+  });
+
+  setWeapons(normalizedWeapons);
+}
+
+    // --- alchimie
+  setIsAlchemist(!!tpl?.isAlchemist);
+
+    // Arrive direct dans l’éditeur
+    setShowCreationModal(false);
+
+    // Consommation unique
+    localStorage.removeItem("aria_prefill_character");
+  } catch (e) {
+    console.warn("Prefill template invalide:", e);
+    try {
+      localStorage.removeItem("aria_prefill_character");
+    } catch {}
+  }
+}, [
+  setCharacterName,
+  onChangePortrait,
+  setAge,
+  setProfession,
+  setStats,
+  setStatsRolled,
+  setShowCreationModal,
+  setCompetences,
+  setSpecialCompetences,
+  setInventory,
+  setWeapons,
+  setIsAlchemist,
+  setWounds,
+  setArmor,
+  setIsCustomSkillsValidated,
+]);
+
+  // ===========================
   // MAGIE (modal + state)
   // ===========================
   const [isMagicOpen, setIsMagicOpen] = useState(false);
@@ -304,125 +434,127 @@ export default function CharacterPage({
   // Mage effectif = option magie activée + INT >= 14
   const isMage = !!magic.isMage && intValue >= 14;
 
-// ===========================
-// MAGIE : type de magicien → planchers de compétences
-// ===========================
-const minScoreById = useMemo(() => {
-  const type = magic?.mageType || "outsider";
+  // ===========================
+  // MAGIE : type de magicien → planchers de compétences
+  // ===========================
+  const minScoreById = useMemo(() => {
+    const type = magic?.mageType || "outsider";
 
-  if (type === "academy") {
-    return {
-      connaissance_secrets: 60,
-      lire_ecrire: 80,
+    if (type === "academy") {
+      return {
+        connaissance_secrets: 60,
+        lire_ecrire: 80,
+      };
+    }
+
+    if (type === "misericordieux") {
+      return {
+        connaissance_secrets: 60,
+        lire_ecrire: 80,
+        voler: 30,
+        combat_rapproche: 60,
+      };
+    }
+
+    return {};
+  }, [magic?.mageType]);
+
+  const applyMageType = (type) => {
+    const normalized = type || "outsider";
+
+    // Règles du bouquin
+    // outsider: 52 + joker
+    // academy: 25 + joker
+    // misericordieux: 10 + joker
+    const mapping = {
+      outsider: { deckSize: 53, includeJoker: true },
+      academy: { deckSize: 26, includeJoker: true },
+      misericordieux: { deckSize: 11, includeJoker: true },
+      typeConfirmed: false,
     };
-  }
 
-  if (type === "misericordieux") {
-    return {
-      connaissance_secrets: 60,
-      lire_ecrire: 80,
-      voler: 30,
-      combat_rapproche: 60,
-    };
-  }
+    const cfg = mapping[normalized] || mapping.outsider;
 
-  return {};
-}, [magic?.mageType]);
-
-const applyMageType = (type) => {
-  const normalized = type || "outsider";
-
-  // Règles du bouquin
-  // outsider: 52 + joker
-  // academy: 25 + joker
-  // misericordieux: 10 + joker
-  const mapping = {
-    outsider: { deckSize: 53, includeJoker: true },
-    academy: { deckSize: 26, includeJoker: true },
-    misericordieux: { deckSize: 11, includeJoker: true },
-    typeConfirmed: false,
-
-  };
-
-  const cfg = mapping[normalized] || mapping.outsider;
-
-  // 1) Deck reset + paramètres
-  setMagic((prev) => ({
+    // 1) Deck reset + paramètres
+// --- magie (reset systématique)
+setMagic((prev) => {
+  const enabled = !!tpl?.isMage;
+  return {
     ...prev,
-    mageType: normalized,
-    includeJoker: cfg.includeJoker,
-    deckSize: cfg.deckSize,
+    isMage: enabled,
+    mageType: enabled ? (tpl?.mageType || prev.mageType || "outsider") : "outsider",
+    typeConfirmed: false,
     deck: [],
     currentCard: null,
     used: [],
-  }));
+  };
+});
 
-  // 2) Compétences spéciales imposées (locked)
-  setSpecialCompetences((prev) => {
-    const list = Array.isArray(prev) ? prev : [];
+    // 2) Compétences spéciales imposées (locked)
+    setSpecialCompetences((prev) => {
+      const list = Array.isArray(prev) ? prev : [];
 
-    // on nettoie les compétences magiques qu’on impose
-    const cleaned = list.filter((c) => !String(c?.id || "").startsWith("magic-"));
+      // on nettoie les compétences magiques qu’on impose
+      const cleaned = list.filter((c) => !String(c?.id || "").startsWith("magic-"));
 
-    if (normalized === "academy") {
-      return [
-        ...cleaned,
-        { id: "magic-modelisation", name: "Modélisation", score: 60, locked: true },
-      ];
-    }
+      if (normalized === "academy") {
+        return [
+          ...cleaned,
+          { id: "magic-modelisation", name: "Modélisation", score: 60, locked: true },
+        ];
+      }
 
-    if (normalized === "misericordieux") {
-      return [
-        ...cleaned,
-        { id: "magic-modelisation", name: "Modélisation", score: 80, locked: true },
-        { id: "magic-voler-magie", name: "Voler la magie", score: 30, locked: true },
-      ];
-    }
+      if (normalized === "misericordieux") {
+        return [
+          ...cleaned,
+          { id: "magic-modelisation", name: "Modélisation", score: 80, locked: true },
+          { id: "magic-voler-magie", name: "Voler la magie", score: 30, locked: true },
+        ];
+      }
 
-    return cleaned; // outsider : rien imposé
-  });
-};
+      return cleaned; // outsider : rien imposé
+    });
+  };
 
-function openMagic() {
-  // ✅ On peut ouvrir si la magie est activée,
-  // même si INT < 14 (le tirage restera bloqué)
-  if (!magic?.isMage) return;
-  setIsMagicOpen(true);
-}
-
+  function openMagic() {
+    // ✅ On peut ouvrir si la magie est activée,
+    // même si INT < 14 (le tirage restera bloqué)
+    if (!magic?.isMage) return;
+    setIsMagicOpen(true);
+  }
 
   // ====== MAGIE : logique deck / tirage ======
-function createDeck(deckSize = 24, includeJoker = true) {
-  const families = ["carreau", "coeur", "pique", "trefle"];
-  const full = [];
+  function createDeck(deckSize = 24, includeJoker = true) {
+    const families = ["carreau", "coeur", "pique", "trefle"];
+    const full = [];
 
-  families.forEach((family) => {
-    for (let value = 1; value <= 13; value++) {
-      full.push({ family, value });
+    families.forEach((family) => {
+      for (let value = 1; value <= 13; value++) {
+        full.push({ family, value });
+      }
+    });
+
+    if (includeJoker) {
+      full.push({ family: "joker", value: "joker" });
     }
-  });
 
-  if (includeJoker) {
-    full.push({ family: "joker", value: "joker" });
+    // Shuffle Fisher–Yates
+    for (let i = full.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [full[i], full[j]] = [full[j], full[i]];
+    }
+
+    const size = Math.max(1, Math.min(full.length, Number(deckSize) || 24));
+    return full.slice(0, size);
   }
-
-  // Shuffle Fisher–Yates
-  for (let i = full.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [full[i], full[j]] = [full[j], full[i]];
-  }
-
-  const size = Math.max(1, Math.min(full.length, Number(deckSize) || 24));
-  return full.slice(0, size);
-}
 
   function drawMagicCard() {
     setMagic((prev) => {
       if (prev.currentCard) return prev;
 
-     const deck = prev.deck.length
-  ? [...prev.deck]
-  : createDeck(prev.deckSize, prev.includeJoker !== false);
+      const deck = prev.deck.length
+        ? [...prev.deck]
+        : createDeck(prev.deckSize, prev.includeJoker !== false);
 
       const card = deck.shift();
       if (!card) return prev;
@@ -773,17 +905,17 @@ function createDeck(deckSize = 24, includeJoker = true) {
                 </div>
 
                 <div className="competences-column">
-       <CompetenceList
-  stats={stats}
-  mode={skillMode}
-  isLocked={false}
-  onCompetencesChange={setCompetences}
-  initialCompetences={competences}
-  isCustomValidated={isCustomSkillsValidated}
-  setIsCustomValidated={setIsCustomSkillsValidated}
-  statMode={statMode}
-  minScoreById={minScoreById}
-/>
+                  <CompetenceList
+                    stats={stats}
+                    mode={skillMode}
+                    isLocked={false}
+                    onCompetencesChange={setCompetences}
+                    initialCompetences={competences}
+                    isCustomValidated={isCustomSkillsValidated}
+                    setIsCustomValidated={setIsCustomSkillsValidated}
+                    statMode={statMode}
+                    minScoreById={minScoreById}
+                  />
 
                   <SpecialCompetences
                     specialCompetences={specialCompetences}
@@ -819,7 +951,7 @@ function createDeck(deckSize = 24, includeJoker = true) {
 
             {/* XP + Joueur */}
             <div className="xp-player-section">
-              <CharacterXP xp={xp} onChangeXp={setXp} />
+              <CharacterXP xp={xp} onChange={setXp} />
               <CharacterPlayer
                 playerName={playerName}
                 onPlayerNameChange={setPlayerName}
@@ -922,29 +1054,26 @@ function createDeck(deckSize = 24, includeJoker = true) {
             </button>
 
             {/* MagicModal */}
-<MagicModal
-  isOpen={isMagicOpen}
-  onClose={() => setIsMagicOpen(false)}
-
-  isMage={isMage}
-  intValue={intValue}
-  magicEnabled={magic.isMage}
-
-  mageType={magic?.mageType || "outsider"}
-  onChangeMageType={applyMageType}
-
-typeConfirmed={!!magic?.typeConfirmed}
-onConfirmMageType={() => setMagic((prev) => ({ ...prev, typeConfirmed: true }))}
-
-  remaining={remainingCards}
-  currentCard={magic.currentCard}
-  usedCards={magic.used}
-  onDraw={drawMagicCard}
-  onReset={resetMagic}
-  onUseCurrent={useCurrentCard}
-  onDiscardCurrent={discardCurrentCard}
-/>
-
+            <MagicModal
+              isOpen={isMagicOpen}
+              onClose={() => setIsMagicOpen(false)}
+              isMage={isMage}
+              intValue={intValue}
+              magicEnabled={magic.isMage}
+              mageType={magic?.mageType || "outsider"}
+              onChangeMageType={applyMageType}
+              typeConfirmed={!!magic?.typeConfirmed}
+              onConfirmMageType={() =>
+                setMagic((prev) => ({ ...prev, typeConfirmed: true }))
+              }
+              remaining={remainingCards}
+              currentCard={magic.currentCard}
+              usedCards={magic.used}
+              onDraw={drawMagicCard}
+              onReset={resetMagic}
+              onUseCurrent={useCurrentCard}
+              onDiscardCurrent={discardCurrentCard}
+            />
 
             {/* Modal kit */}
             <EquipmentKitModal

@@ -144,10 +144,13 @@
   opacity: .9;
   background: #fff6;
 }
+
+/* ===== CSS Playing Cards override (diamonds) ===== */
 .playingCards .card.diams,
 .playingCards .card.diamonds {
   color: #c00 !important;
 }
+
 /* ===== main card container ===== */
 .magic-modal__card{
   border: 1px solid rgba(111, 77, 45, .8);
@@ -173,6 +176,14 @@
   font-weight: 800;
 }
 
+/* ✅ Title red/black depending on suit */
+.magic-modal__cardTitle.is-red {
+  color: #c00;
+}
+.magic-modal__cardTitle.is-black {
+  color: #111;
+}
+
 .magic-modal__cardTag{
   font-size: 12px;
   opacity: .85;
@@ -190,26 +201,24 @@
   align-items: center;
   padding: 10px 0 6px;
 }
+.magic-modal__cardPreviewInner{ transform: scale(2) !important; }
 
 /* container pour scaler sans casser le CSS du pack */
 .magic-modal__cardPreviewInner{
-  transform: scale(1.25);
+  --cardScale: 1.6;
+  transform: scale(var(--cardScale));
   transform-origin: center top;
+  margin-bottom: 2rem;
 }
 
-/* un peu plus grand sur desktop */
 @media (min-width: 800px){
-  .magic-modal__cardPreviewInner{
-    transform: scale(1.4);
-  }
+  .magic-modal__cardPreviewInner{ --cardScale: 1.85; }
 }
 
-/* plus petit sur mobile */
 @media (max-width: 420px){
-  .magic-modal__cardPreviewInner{
-    transform: scale(1.1);
-  }
+  .magic-modal__cardPreviewInner{ --cardScale: 1.3; }
 }
+
 
 /* ombre légère aux cartes du pack (dans notre modal) */
 .magic-modal__card .card{
@@ -319,4 +328,130 @@
   .magic-modal__deckactions{
     justify-content: flex-start;
   }
+}
+
+/* ===== extracted inline styles (MagicModal.jsx) ===== */
+
+.magic-modal__sectionBox{
+  margin-bottom: 12px;
+}
+
+.magic-modal__infoBox{
+  margin-bottom: 12px;
+}
+
+.magic-modal__infoText{
+  margin-top: 8px;
+  line-height: 1.35;
+  font-size: 13px;
+}
+
+.magic-modal__pFirst{
+  margin-top: 0;
+}
+
+.magic-modal__pLast{
+  margin-bottom: 0;
+}
+
+.magic-modal__strong{
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.magic-modal__btnTop{
+  margin-top: 10px;
+}
+
+.magic-modal__typeLine{
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.magic-modal__subtleLine{
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.magic-modal__select{
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(111,77,45,.8);
+  background: #fff;
+  cursor: pointer;
+}
+
+.magic-modal__btnFull{
+  margin-top: 10px;
+  width: 100%;
+}
+
+.magic-modal__note{
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+/* ===== Tooltips (types de magicien) ===== */
+
+.magic-tooltip{
+  position: relative;
+  display: inline-block;
+}
+
+.magic-tooltip__label{
+  font-weight: 700;
+  font-size: 1.5rem;
+  cursor:crosshair;
+  text-decoration:underline;
+  text-decoration-style:none;
+  text-underline-offset: 3px;
+}
+
+.magic-tooltip__bubble{
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  width: min(420px, 78vw);
+  z-index: 50;
+
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(111, 77, 45, .75);
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,.18);
+
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #241b12;
+
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+}
+
+/* flèche */
+.magic-tooltip__bubble::before{
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 14px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-left: 1px solid rgba(111, 77, 45, .75);
+  border-top: 1px solid rgba(111, 77, 45, .75);
+  transform: rotate(45deg);
+}
+
+/* show on hover / focus */
+.magic-tooltip:hover .magic-tooltip__bubble,
+.magic-tooltip:focus-within .magic-tooltip__bubble{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }

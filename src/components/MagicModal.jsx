@@ -112,7 +112,7 @@ export default function MagicModal({
   mageType,
   onChangeMageType,
 
-  // ✅ NEW: validation du type
+  // ✅ validation du type
   typeConfirmed = false,
   onConfirmMageType,
 
@@ -168,12 +168,13 @@ export default function MagicModal({
   const canDraw = isMage && meetsInt && remaining !== 0 && !currentCard;
 
   const confirmType = () => {
-    // On ne valide pas si on n'a pas la callback
     if (typeof onConfirmMageType !== "function") return;
     onConfirmMageType();
   };
 
   if (!isOpen) return null;
+
+  const currentSuit = currentCard ? (currentCard.family ?? currentCard.suit) : null;
 
   return (
     <div className="magic-modal__backdrop" onMouseDown={onClose}>
@@ -214,38 +215,56 @@ export default function MagicModal({
                 INFO (première ouverture)
                 =========================== */}
             {showMageInfo && (
-              <div className="magic-modal__locked" style={{ marginBottom: 12 }}>
+              <div className="magic-modal__locked magic-modal__infoBox">
                 <strong>Jouer un magicien</strong>
-                <div style={{ marginTop: 8, lineHeight: 1.35, fontSize: 13 }}>
-                  <p style={{ marginTop: 0 }}>
-                    <span style={{ fontWeight: 700 }}>
-                      Disciple étranger à l’académie
-                    </span>
-                    <br />
-                    Pas formé à l’académie : gros potentiel magique, aucune
-                    compétence magique acquise par défaut.
-                  </p>
 
-                  <p>
-                    <span style={{ fontWeight: 700 }}>
-                      Magicien de la couronne / disciple de l’académie
-                    </span>
-                    <br />
-                    Reconnu publiquement : plus de portes ouvertes, mais potentiel
-                    magique moindre. Suit un code moral strict.
-                  </p>
+                <div className="magic-modal__infoText">
+         <p className="magic-modal__pFirst">
+  <span className="magic-tooltip">
+    <span className="magic-tooltip__label" tabIndex={0}>•
+      Disciple étranger à l’académie
+    </span>
+    <span className="magic-tooltip__bubble">
+      Aucun apprentissage des principes de la noble magie (ni de l’éthique),
+      mais un potentiel magique immense.
+    </span>
+  </span>
+  <br />
+  Pas formé à l’académie : gros potentiel magique, aucune compétence magique acquise par défaut.
+</p>
+                 <p>
+  <span className="magic-tooltip">
+    <span className="magic-tooltip__label" tabIndex={0}>
+      • Magicien de la couronne / disciple de l’académie
+    </span>
+    <span className="magic-tooltip__bubble">
+      Bonne capacité à modéliser la magie, mais moins de potentiel que les autres types.
+      Reconnu publiquement : accès à de nombreux lieux. Doit suivre un code moral
+      et obéir à la couronne.
+    </span>
+  </span>
+  <br />
+  Reconnu publiquement : plus de portes ouvertes, mais potentiel magique moindre. Suit un code moral strict.
+</p>
 
-                  <p style={{ marginBottom: 0 }}>
-                    <span style={{ fontWeight: 700 }}>Miséricordieux</span>
-                    <br />
-                    Corps d’élite : mage très talentueux et combattant. Pouvoirs
-                    dangereux quand le paquet s’épuise.
-                  </p>
+              <p className="magic-modal__pLast">
+  <span className="magic-tooltip">
+    <span className="magic-tooltip__label" tabIndex={0}>
+      • Miséricordieux
+    </span>
+    <span className="magic-tooltip__bubble">
+      Corps d’élite chargé de traquer ceux qui approchent de la fin.
+      Mage très talentueux et combattant. Quand le paquet s’épuise,
+      les pouvoirs deviennent incontrôlables.
+    </span>
+  </span>
+  <br />
+  Corps d’élite : mage très talentueux et combattant. Pouvoirs dangereux quand le paquet s’épuise.
+</p>
                 </div>
 
                 <button
-                  className="magic-modal__btn"
-                  style={{_toggle: undefined, marginTop: 10 }}
+                  className="magic-modal__btn magic-modal__btnTop"
                   onClick={() => setShowMageInfo(false)}
                 >
                   OK, je choisis mon type
@@ -259,50 +278,42 @@ export default function MagicModal({
             {!showMageInfo && (
               <>
                 {hideTypeUI ? (
-                  <div className="magic-modal__locked" style={{ marginBottom: 12 }}>
+                  <div className="magic-modal__locked magic-modal__sectionBox">
                     <strong>Type</strong>
-                    <div style={{ marginTop: 6, fontSize: 13, opacity: 0.9 }}>
+
+                    <div className="magic-modal__typeLine">
                       {mageTypeLabel(mageType)}{" "}
                       <span title="Type verrouillé">🔒</span>
                     </div>
+
                     {hasEverDrawn && (
-                      <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
+                      <div className="magic-modal__subtleLine">
                         Une carte a déjà été tirée : le type est verrouillé.
                       </div>
                     )}
+
                     {typeConfirmed && !hasEverDrawn && (
-                      <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
+                      <div className="magic-modal__subtleLine">
                         Type validé : tu peux maintenant utiliser la magie.
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="magic-modal__locked" style={{ marginBottom: 12 }}>
+                  <div className="magic-modal__locked magic-modal__sectionBox">
                     <strong>Type de magicien</strong>
 
                     <select
                       value={mageType || "outsider"}
                       onChange={(e) => onChangeMageType?.(e.target.value)}
-                      style={{
-                        width: "100%",
-                        marginTop: 8,
-                        padding: "10px 12px",
-                        borderRadius: 10,
-                        border: "1px solid rgba(111,77,45,.8)",
-                        background: "#fff",
-                        cursor: "pointer",
-                      }}
+                      className="magic-modal__select"
                     >
-                      <option value="outsider">
-                        Disciple étranger (52 + Joker)
-                      </option>
+                      <option value="outsider">Disciple étranger (52 + Joker)</option>
                       <option value="academy">Couronne / Académie (25 + Joker)</option>
                       <option value="misericordieux">Miséricordieux (10 + Joker)</option>
                     </select>
 
                     <button
-                      className="magic-modal__btn"
-                      style={{ marginTop: 10, width: "100%" }}
+                      className="magic-modal__btn magic-modal__btnFull"
                       onClick={confirmType}
                       disabled={typeof onConfirmMageType !== "function"}
                       title={
@@ -314,7 +325,7 @@ export default function MagicModal({
                       Valider le type
                     </button>
 
-                    <div style={{ marginTop: 8, fontSize: 12, opacity: 0.85 }}>
+                    <div className="magic-modal__note">
                       Le type sera verrouillé dès qu’une carte est tirée.
                     </div>
                   </div>
@@ -376,7 +387,13 @@ export default function MagicModal({
               ) : (
                 <div className="magic-modal__card">
                   <div className="magic-modal__cardHeader">
-                    <div className="magic-modal__cardTitle">
+                    <div
+                      className={`magic-modal__cardTitle ${
+                        ["coeur", "carreau"].includes(currentSuit)
+                          ? "is-red"
+                          : "is-black"
+                      }`}
+                    >
                       {cardLabel(currentCard)}
                     </div>
                   </div>
@@ -391,7 +408,10 @@ export default function MagicModal({
                     <button className="magic-modal__btn" onClick={onUseCurrent}>
                       Utiliser
                     </button>
-                    <button className="magic-modal__btn ghost" onClick={onDiscardCurrent}>
+                    <button
+                      className="magic-modal__btn ghost"
+                      onClick={onDiscardCurrent}
+                    >
                       Jeter
                     </button>
                   </div>

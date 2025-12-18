@@ -1,4 +1,6 @@
+// src/pages/HomePage.jsx
 import React, { useState } from "react";
+import BookCharacterGallery from "../components/BookCharacterGallery";
 
 function HomeAuthPanel({
   user,
@@ -130,6 +132,15 @@ function HomeAuthPanel({
 export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
   const { user, loading, error, login, register, logout, setError } = auth;
 
+  const handleOpenInEditor = (template) => {
+    try {
+      localStorage.setItem("aria_prefill_character", JSON.stringify(template));
+    } catch (e) {
+      console.warn("Impossible d'écrire dans localStorage:", e);
+    }
+    onStart(); // ✅ garde ton flow actuel "Créer un personnage"
+  };
+
   return (
     <div className="home-page app-home">
       <div className="home-root">
@@ -164,6 +175,9 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
             </div>
           </section>
 
+          {/* ✅ Galerie visible uniquement non-logué */}
+    
+
           <HomeAuthPanel
             user={user}
             loading={loading}
@@ -186,6 +200,7 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
               <li>Gère ton inventaire et exporte ta fiche en PDF.</li>
             </ul>
           </section>
+                {!user && <BookCharacterGallery onOpenInEditor={handleOpenInEditor} />}
         </main>
       </div>
     </div>
