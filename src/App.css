@@ -906,3 +906,61 @@ body.pdf-exporting * {
   display: inline-block;
   border-radius: 8px;
 }
+.auth-mode-switch {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+.auth-form-inline .btn-primary{
+  margin-top: 1rem;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.9);
+display: flex;
+align-items: center;
+justify-content: center;
+  cursor: pointer;
+  font-weight: 600;
+  
+
+  
+}
+
+.auth-form-inline .btn-primary {
+  grid-column: 1 / -1;     /* prend toute la largeur de la grille */
+  justify-self: center;    /* se centre */
+  margin-top: 10px;        /* optionnel */
+}
+/* Aligne labels + inputs */
+.auth-form-inline {
+  display: grid;
+  margin: 1.5rem;
+  grid-template-columns: 120px 280px; /* label | input */
+  column-gap: 14px;
+  row-gap: 10px;
+  align-items: center;
+}
+
+/* Chaque ligne du form devient “transparent” pour la grille */
+.auth-form-inline .auth-field {
+  display: contents;
+}
+
+/* Labels */
+.auth-form-inline .auth-field label {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Inputs */
+.auth-form-inline .auth-field input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Bouton sous les inputs */
+.auth-form-inline .btn-primary {
+  grid-column: 2;
+  justify-self: start;
+}

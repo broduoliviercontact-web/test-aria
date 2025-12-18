@@ -168,6 +168,8 @@ flex-direction: column;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: white;
+  font-size: 2rem;
+  text-align: center;
 }
 
 .detail-desc {

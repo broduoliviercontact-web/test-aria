@@ -7,9 +7,9 @@ export const bookCharacters = [
   {
     id: "book-niklas",
     name: "Niklas Von Trunkel",
-    description: "Niklas Von Trunkel, alchimiste en disgrâce.",
+    description: "Alchimiste en disgrâce.",
     frontImage: "/cards/600px-Niklas_by_Kayende.jpg",
-    backImage: "/aria-background.webp",
+    backImage: "/cards/niklas-back.png",
 
     age: 21,
     profession: "Alchimiste en disgrâce",
@@ -82,9 +82,9 @@ isMage: false,
   {
     id: "book-kaitra",
     name: "Keitra",
-    description: "Keitra, gladiatrice mise à prix.",
+    description: "Gladiatrice mise à prix.",
     frontImage: "/cards/600px-Kaitra_by_Kayende.jpg",
-    backImage: "/aria-background2.webp",
+    backImage: "/cards/keitra-back.png",
 
     age: 20,
     profession: "Gladiatrice mise à prix",
@@ -180,7 +180,7 @@ alchemyPotions: [
     name: "Atlan Grethen de Quirk",
     description: "Noble en exil.",
     frontImage: "/cards/600px-Atlan_by_Kayende.jpg",
-    backImage: "/aria-background.webp",
+    backImage: "/cards/atla-back.png",
 
     age: 22,
     profession: "Noble en exil",
@@ -254,7 +254,7 @@ isMage: false,
     name: "Clodomir de Cuivrechamps",
     description: "Magicien illicite.",
     frontImage: "/cards/600px-Clodomir_by_Kayende.jpg",
-    backImage: "/aria-background2.webp",
+    backImage: "/cards/clodomir-back.png",
 
     age: 24,
     profession: "Magicien illicite",

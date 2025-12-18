@@ -303,7 +303,6 @@ export default function BookCharacterGallery({
                   )}
                 </div>
 
-                <div className="detail-hint">Astuce : tu peux ensuite modifier la fiche comme un personnage normal.</div>
               </div>
             </div>
           </div>
