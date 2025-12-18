@@ -17,6 +17,7 @@
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
   padding: 16px;
+  background-image:  url("/parchment-bg2.jpg");
 }
 
 .magic-modal__header{
@@ -135,6 +136,7 @@
 
 .magic-modal__cardzone{
   margin-top: 6px;
+  
 }
 
 .magic-modal__placeholder{
@@ -157,6 +159,8 @@
   border-radius: 12px;
   padding: 14px;
   background: radial-gradient(circle at 30% 20%, #ffffff, #f7edd6);
+  background-image:  url("/parchment-bg2.jpg");
+  background-size:contain;
 }
 
 .magic-modal__card.is-joker{
@@ -454,4 +458,48 @@
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+
+.magic-modal__cardPreviewImage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: .5rem 0;
+}
+
+.magic-card-img {
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+  display: block;
+  user-select: none;
+}
+
+.magic-card-img.is-large {
+  width: 180px;
+  aspect-ratio: 2.5 / 3.5;
+  object-fit: cover;
+}
+
+.magic-card-img.is-small {
+  width: 70px;
+  aspect-ratio: 2.5 / 3.5;
+  object-fit: cover;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
+.magic-card-back-fallback.large,
+.magic-card-back-fallback.small {
+  width: 180px;
+  aspect-ratio: 2.5 / 3.5;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #2a3a55;
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+}
+
+.magic-card-back-fallback.small {
+  width: 70px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
 }

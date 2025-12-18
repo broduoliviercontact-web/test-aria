@@ -2,6 +2,83 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./MagicModal.css";
 
 /* ===========================
+   Images (deck visuel)
+   =========================== */
+
+function getCardImageSrc(card, { back = false } = {}) {
+  if (back) return "/cards/back.png";
+  if (!card) return null;
+
+  const suit = card.family ?? card.suit;
+
+  // Joker
+  if (suit === "joker" || card.value === "joker") {
+    return "/cards/joker.png";
+  }
+
+  // Valeur -> fichier
+  const v = Number(card.value);
+  const valueMap = {
+    1: "A",
+    11: "J",
+    12: "Q",
+    13: "K",
+    14: "A",
+  };
+  const file = valueMap[v] ?? String(v);
+
+  return `/cards/${suit}/${file}.png`;
+}
+
+
+function CardBack({ size = "large" }) {
+  const [imgOk, setImgOk] = useState(true);
+  const src = "/cards/back.png";
+
+  if (imgOk) {
+    return (
+      <img
+        src={src}
+        alt="Dos de carte"
+        className={`magic-card-img ${size === "small" ? "is-small" : "is-large"}`}
+        draggable="false"
+        onError={() => setImgOk(false)}
+      />
+    );
+  }
+
+  // fallback si back.png absent
+  return <div className={`magic-card-back-fallback ${size}`}>BACK</div>;
+}
+/**
+ * CardFace
+ * Affiche une image si dispo, sinon fallback sur PlayingCard (CSS playing cards)
+ */
+function CardFace({ card, size = "large" }) {
+  const [imgOk, setImgOk] = useState(true);
+  const src = useMemo(() => getCardImageSrc(card), [card]);
+
+  useEffect(() => setImgOk(true), [src]);
+
+  if (!card) return null;
+
+  if (src && imgOk) {
+    return (
+      <img
+        src={src}
+        alt={cardLabel(card)}
+        className={`magic-card-img ${size === "small" ? "is-small" : "is-large"}`}
+        draggable="false"
+        onError={() => setImgOk(false)}
+      />
+    );
+  }
+
+  // fallback CSS si image manquante
+  return <PlayingCard card={card} />;
+}
+
+/* ===========================
    Helpers cartes (CSS Playing Cards)
    =========================== */
 
@@ -51,6 +128,8 @@ function cardLabel(card) {
       : c.value === 13
       ? "Roi"
       : c.value === 14
+      ? "As"
+      : c.value === 1
       ? "As"
       : String(c.value);
 
@@ -219,48 +298,49 @@ export default function MagicModal({
                 <strong>Jouer un magicien</strong>
 
                 <div className="magic-modal__infoText">
-         <p className="magic-modal__pFirst">
-  <span className="magic-tooltip">
-    <span className="magic-tooltip__label" tabIndex={0}>•
-      Disciple étranger à l’académie
-    </span>
-    <span className="magic-tooltip__bubble">
-      Aucun apprentissage des principes de la noble magie (ni de l’éthique),
-      mais un potentiel magique immense.
-    </span>
-  </span>
-  <br />
-  Pas formé à l’académie : gros potentiel magique, aucune compétence magique acquise par défaut.
-</p>
-                 <p>
-  <span className="magic-tooltip">
-    <span className="magic-tooltip__label" tabIndex={0}>
-      • Magicien de la couronne / disciple de l’académie
-    </span>
-    <span className="magic-tooltip__bubble">
-      Bonne capacité à modéliser la magie, mais moins de potentiel que les autres types.
-      Reconnu publiquement : accès à de nombreux lieux. Doit suivre un code moral
-      et obéir à la couronne.
-    </span>
-  </span>
-  <br />
-  Reconnu publiquement : plus de portes ouvertes, mais potentiel magique moindre. Suit un code moral strict.
-</p>
+                  <p className="magic-modal__pFirst">
+                    <span className="magic-tooltip">
+                      <span className="magic-tooltip__label" tabIndex={0}>
+                        • Disciple étranger à l’académie
+                      </span>
+                      <span className="magic-tooltip__bubble">
+                        Aucun apprentissage des principes de la noble magie (ni de l’éthique),
+                        mais un potentiel magique immense.
+                      </span>
+                    </span>
+                    <br />
+                    Pas formé à l’académie : gros potentiel magique, aucune compétence magique acquise par défaut.
+                  </p>
 
-              <p className="magic-modal__pLast">
-  <span className="magic-tooltip">
-    <span className="magic-tooltip__label" tabIndex={0}>
-      • Miséricordieux
-    </span>
-    <span className="magic-tooltip__bubble">
-      Corps d’élite chargé de traquer ceux qui approchent de la fin.
-      Mage très talentueux et combattant. Quand le paquet s’épuise,
-      les pouvoirs deviennent incontrôlables.
-    </span>
-  </span>
-  <br />
-  Corps d’élite : mage très talentueux et combattant. Pouvoirs dangereux quand le paquet s’épuise.
-</p>
+                  <p>
+                    <span className="magic-tooltip">
+                      <span className="magic-tooltip__label" tabIndex={0}>
+                        • Magicien de la couronne / disciple de l’académie
+                      </span>
+                      <span className="magic-tooltip__bubble">
+                        Bonne capacité à modéliser la magie, mais moins de potentiel que les autres types.
+                        Reconnu publiquement : accès à de nombreux lieux. Doit suivre un code moral
+                        et obéir à la couronne.
+                      </span>
+                    </span>
+                    <br />
+                    Reconnu publiquement : plus de portes ouvertes, mais potentiel magique moindre. Suit un code moral strict.
+                  </p>
+
+                  <p className="magic-modal__pLast">
+                    <span className="magic-tooltip">
+                      <span className="magic-tooltip__label" tabIndex={0}>
+                        • Miséricordieux
+                      </span>
+                      <span className="magic-tooltip__bubble">
+                        Corps d’élite chargé de traquer ceux qui approchent de la fin.
+                        Mage très talentueux et combattant. Quand le paquet s’épuise,
+                        les pouvoirs deviennent incontrôlables.
+                      </span>
+                    </span>
+                    <br />
+                    Corps d’élite : mage très talentueux et combattant. Pouvoirs dangereux quand le paquet s’épuise.
+                  </p>
                 </div>
 
                 <button
@@ -282,8 +362,7 @@ export default function MagicModal({
                     <strong>Type</strong>
 
                     <div className="magic-modal__typeLine">
-                      {mageTypeLabel(mageType)}{" "}
-                      <span title="Type verrouillé">🔒</span>
+                      {mageTypeLabel(mageType)} <span title="Type verrouillé">🔒</span>
                     </div>
 
                     {hasEverDrawn && (
@@ -382,36 +461,32 @@ export default function MagicModal({
                 CARTE COURANTE
                 =========================== */}
             <div className="magic-modal__cardzone">
-              {!currentCard ? (
-                <div className="magic-modal__placeholder">Aucune carte tirée.</div>
+  {!currentCard ? (
+  <div className="magic-modal__placeholder">
+    <CardBack size="large" />
+  </div>
               ) : (
                 <div className="magic-modal__card">
                   <div className="magic-modal__cardHeader">
                     <div
                       className={`magic-modal__cardTitle ${
-                        ["coeur", "carreau"].includes(currentSuit)
-                          ? "is-red"
-                          : "is-black"
+                        ["coeur", "carreau"].includes(currentSuit) ? "is-red" : "is-black"
                       }`}
                     >
                       {cardLabel(currentCard)}
                     </div>
                   </div>
 
-                  <div className="playingCards magic-modal__cardPreview">
-                    <div className="magic-modal__cardPreviewInner">
-                      <PlayingCard card={currentCard} />
-                    </div>
+                  {/* ✅ ICI : affichage image (fallback PlayingCard si manquante) */}
+                  <div className="magic-modal__cardPreviewImage">
+                    <CardFace card={currentCard} size="large" />
                   </div>
 
                   <div className="magic-modal__actions">
                     <button className="magic-modal__btn" onClick={onUseCurrent}>
                       Utiliser
                     </button>
-                    <button
-                      className="magic-modal__btn ghost"
-                      onClick={onDiscardCurrent}
-                    >
+                    <button className="magic-modal__btn ghost" onClick={onDiscardCurrent}>
                       Jeter
                     </button>
                   </div>
@@ -428,14 +503,14 @@ export default function MagicModal({
                 <div className="magic-used__count">{usedCards?.length || 0}</div>
               </div>
 
-              <div className="playingCards magic-used__grid">
+              <div className="magic-used__grid">
                 {(!usedCards || usedCards.length === 0) && (
                   <div className="magic-used__empty">Aucune carte consommée.</div>
                 )}
 
                 {usedCards?.slice().reverse().map((c, i) => (
                   <div key={i} className="magic-used__item">
-                    <PlayingCard card={c} />
+                    <CardFace card={c} size="small" />
                   </div>
                 ))}
               </div>
