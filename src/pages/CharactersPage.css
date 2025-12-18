@@ -34,3 +34,10 @@
     gap: 10px;
   }
 }
+
+.weapon-icon-preview {
+  width: 33px;
+  height: 333px; /* 👈 typo */
+}
+
+

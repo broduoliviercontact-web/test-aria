@@ -161,6 +161,32 @@ function AppRoutes() {
     return preferred?.url || list[0]?.url || "";
   }, []);
 
+  // ✅ Normalise les armes venant du backend :
+  // - accepte icon (url), icon (id), ou iconId (id)
+  // - garantit que WeaponList reçoit toujours weapon.icon = URL
+  const normalizeWeaponsFromBackend = useCallback((arr) => {
+    const list = Array.isArray(weaponIcons) ? weaponIcons : [];
+    const byId = new Map(list.map((i) => [String(i.id), i.url]));
+
+    return (Array.isArray(arr) ? arr : []).map((w) => {
+      if (!w || typeof w !== "object") {
+        return { icon: list[0]?.url || "", name: "", damage: "", validated: false };
+      }
+
+      let icon = w.icon;
+
+      // cas 1: icon stocké comme id ("all-for-one")
+      if (typeof icon === "string" && byId.has(icon)) icon = byId.get(icon);
+
+      // cas 2: iconId présent
+      if (!icon && typeof w.iconId === "string" && byId.has(w.iconId)) {
+        icon = byId.get(w.iconId);
+      }
+
+      return { ...w, icon: icon || "" };
+    });
+  }, []);
+
   const handleChangePortrait = useCallback((value) => {
     const finalValue = value || "";
     setPortraitDataUrl(finalValue);
@@ -546,6 +572,18 @@ function AppRoutes() {
       setIsPointBuyValidated(true);
     }
 
+    // ✅ weapons: on stocke aussi iconId (utile si le backend nettoie l'URL)
+    const weaponsForBackend = (Array.isArray(weapons) ? weapons : []).map((w) => {
+      const iconUrl = (w && typeof w === "object" && typeof w.icon === "string") ? w.icon : "";
+      const found = (Array.isArray(weaponIcons) ? weaponIcons : []).find((i) => i.url === iconUrl);
+      return {
+        ...w,
+        icon: iconUrl,
+        iconId: (w && w.iconId) ? String(w.iconId) : (found ? String(found.id) : ""),
+      };
+    });
+
+
     const payloadForBackend = {
       meta: { status: "draft" },
       player: playerName,
@@ -561,7 +599,7 @@ function AppRoutes() {
       alchemyPotions,
       xp,
       inventory,
-      weapons,
+      weapons: weaponsForBackend,
       purseFer,
       competences,
       specialCompetences,
@@ -728,7 +766,7 @@ function AppRoutes() {
 
       setXp(typeof ch.xp === "number" ? ch.xp : 0);
       setInventory(Array.isArray(ch.inventory) ? ch.inventory : []);
-      setWeapons(Array.isArray(ch.weapons) ? ch.weapons : []);
+      setWeapons(normalizeWeaponsFromBackend(ch.weapons));
       setPurseFer(typeof ch.purseFer === "number" ? ch.purseFer : 0);
 
       const hasKitItems =

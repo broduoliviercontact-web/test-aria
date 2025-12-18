@@ -80,17 +80,21 @@ export default function MyCharactersPage({
     });
   }, [myChars]);
 
- const handleOpenInEditor = (template) => {
+const handleOpenInEditor = (template) => {
   try {
-    localStorage.setItem("aria_prefill_character", JSON.stringify(template));
+    // ✅ on garde juste l'id d'édition (utile pour PUT)
     localStorage.setItem("aria_edit_character_id", String(template?.id || ""));
+    // ✅ IMPORTANT : on enlève le prefill sinon ça écrase les données du backend
+    localStorage.removeItem("aria_prefill_character");
   } catch (e) {
     console.warn("localStorage error:", e);
   }
 
-  // ✅ Passe un id, pas un objet
   if (template?.id) onLoadCharacter(template.id);
 };
+
+
+
 const handleDelete = async (ch) => {
   if (!ch?.id) return;
 
