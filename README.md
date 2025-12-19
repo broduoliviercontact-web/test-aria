@@ -36,7 +36,7 @@
 
 **ARIA Character Sheet** est une application web moderne et complète dédiée à la création et gestion de personnages pour le jeu de rôle **ARIA** (créé par [FibreTigre](https://www.fibretigre.com/) et édité par [ElderCraft](https://elder-craft.com/)).
 
-Ce projet personnel met l'accent sur : 
+Ce projet personnel met l'accent sur :  
 - ✨ Une **UX/UI soignée** inspirée des cartes à collectionner
 - 🎲 L'implémentation **fidèle des règles** du jeu
 - 📱 Un design **responsive** (mobile & desktop)
@@ -51,12 +51,12 @@ Ce projet personnel met l'accent sur :
 ### 🧙 Création de personnage
 
 #### Génération des caractéristiques
-- 🎲 **Mode 3d6** : Lancez les dés en 3D , choisissez la meilleure
+- 🎲 **Mode 3d6** :  Lancez les dés en 3D , choisissez la meilleure
 - 📊 **Répartition de points** : 60 points à répartir 
-- ✅ Validation réversible (déverrouillage possible)
+
 
 #### Compétences
-- 🎯 **Mode Prêt à jouer** : Calcul automatique 
+- 🎯 **Mode Prêt à jouer** : Calcul automatique (moyenne des caracs × 5)
 - 🎨 **Mode Personnalisation** : Base calculée + 50 points bonus à répartir
 - 📈 Support des planchers de compétences (magiciens, types spéciaux)
 - 🎲 Test de compétences intégré (d100, critique 01-09, fumble 91-00)
@@ -73,7 +73,7 @@ Ce projet personnel met l'accent sur :
 
 #### Inventaire intelligent
 - 📦 Gestion dynamique des objets (nom, quantité)
-- 🎒 **Kits d'équipement** pré-configurés : 
+- 🎒 **Kits d'équipement** pré-configurés :  
   - Aventurier (arme + équipement de base)
   - Combattant (choix armes :  2×1 main ou 1×2 mains)
   - Érudit (choix :  5 fioles ou 1 sablier)
@@ -96,11 +96,11 @@ Ce projet personnel met l'accent sur :
 
 Système optionnel activable :
 - 🧪 Gestion des potions (nom, composants, effet, difficulté, quantité)
-- 📜 **Compétences auto-ajoutées** : 
+- 📜 **Compétences auto-ajoutées** :  
   - *Identifier une substance* (60%)
   - *Créer une potion* (100%)
 - 🎨 UI immersive (icône fiole animée)
-- 🔒 2 potions de base pré-remplies (verrouillées) : 
+- 🔒 2 potions de base pré-remplies (verrouillées) :  
   - Essence du feu d'Ingramus
   - Passe-Muraille de Karloff
 
@@ -108,7 +108,7 @@ Système optionnel activable :
 
 ### 🔮 Magie (système de cartes)
 
-Système de magie complet basé sur les cartes à jouer : 
+Système de magie complet basé sur les cartes à jouer :  
 
 #### Types de magiciens
 - 🌀 **Outsider** : 53 cartes (52 + joker)
@@ -116,7 +116,7 @@ Système de magie complet basé sur les cartes à jouer :
   - Compétences imposées :  *Connaissance des secrets* ≥60%, *Lire/écrire* ≥80%
   - Compétence spéciale : *Modélisation* (60%)
 - ⚔️ **Miséricordieux** : 11 cartes + joker
-  - Compétences imposées : *Connaissance secrets* ≥60%, *Lire/écrire* ≥80%, *Voler* ≥30%, *Combat rapproché* ≥60%
+  - Compétences imposées :  *Connaissance secrets* ≥60%, *Lire/écrire* ≥80%, *Voler* ≥30%, *Combat rapproché* ≥60%
   - Compétences spéciales : *Modélisation* (80%), *Voler la magie* (30%)
 
 #### Fonctionnalités
@@ -147,7 +147,7 @@ Système de magie complet basé sur les cartes à jouer :
 - 🎨 Modes de couleur (solid / gradient)
 - 📱 Compatible mobile & desktop
 - ⚡ Jet de dés animé (physique réaliste)
-- 🎯 Intégré dans : 
+- 🎯 Intégré dans :  
   - Génération des caractéristiques (3d6)
   - Tests de compétences (d100)
 
@@ -168,21 +168,72 @@ Système de magie complet basé sur les cartes à jouer :
 ![Home](./screenshots/home.gif)
 *Interface d'accueil avec galerie de personnages et authentification*
 
+---
+
 ### Création de personnage
-![Création](./screenshots/creation.png)
+![Création](./screenshots/creation.gif)
 *Choix des modes de création et jets de dés 3D*
 
+---
+
 ### Fiche complète
-![Fiche](./screenshots/character-sheet.png)
+![Fiche](./screenshots/character-sheet.gif)
 *Vue d'ensemble de la fiche :  stats, compétences, inventaire*
 
+---
+
+
+### 🎲 Dés 3D - Génération des caractéristiques
+![Dés 3D Stats](./screenshots/dice-3d-stats.gif)
+*Lancers de dés 3D pour générer les caractéristiques (3d6 par stat)*
+
+---
+
+### 🎲 Dés 3D - Tests de compétences (d100)
+![Dés 3D Compétences](./screenshots/dice-3d-skills.gif)
+*Tests de compétences avec d100 en 3D :  critiques (01-09) et fumbles (91-00)*
+
+---
+
+### Fiche complète
+![Fiche](./screenshots/character-sheet.gif)
+*Vue d'ensemble de la fiche :  stats, compétences, inventaire*
+
+---
+
+### Inventaire & Kits d'équipement
+![Inventaire](./screenshots/inventory.gif)
+*Gestion de l'inventaire avec kits pré-configurés*
+
+---
+
+### Gestion des armes
+![Armes](./screenshots/weapons.gif)
+*Sélection d'icônes d'armes et validation*
+
+---
+
+### Kit d'équipement
+![Kit d'équipement](./screenshots/kit.gif)
+*Sélection d'armes et validation*
+
+---
+
+### Système d'alchimie
+![Alchimie](./screenshots/alchemy.gif)
+*Interface de gestion des potions alchimiques*
+
+---
+
 ### Système de magie
-![Magie](./screenshots/magic.png)
+![Magie](./screenshots/magic.gif)
 *Modal de gestion du deck de cartes magiques*
 
+---
+
 ### Export PDF
-![PDF](./screenshots/pdf.png)
-*Rendu PDF fidèle à la fiche officielle*
+![PDF](./screenshots/pdf.gif)
+*Génération et téléchargement du PDF de la fiche*
 
 ---
 
@@ -205,7 +256,7 @@ Système de magie complet basé sur les cartes à jouer :
 - **html2canvas** (capture DOM → image)
 
 ### Dés 3D
-- **Three. js** (via wrapper custom)
+- **Three.js** (via wrapper custom)
 - **Cannon.js** (physique)
 
 ### Déploiement
@@ -235,7 +286,7 @@ npm install
 
 ### 3. Variables d'environnement
 
-Créer un fichier `.env` à la racine : 
+Créer un fichier `.env` à la racine :  
 
 ```env
 VITE_API_URL=http://localhost:4000
@@ -275,7 +326,7 @@ L'application sera accessible sur `http://localhost:5173`
 
 ### Export PDF
 
-1. Complétez votre fiche
+1.  Complétez votre fiche
 2. Cliquez sur "Exporter en PDF"
 3. Le fichier `fiche-personnage-aria.pdf` se télécharge
 
@@ -299,12 +350,13 @@ src/
 │   ├── MagicModal.jsx        # Système de cartes
 │   ├── StatsDiceRoller.jsx   # Dés 3D (3d6)
 │   ├── Dice3D.jsx            # Moteur de dés
+│   ├── SpecialCompetenceDiceTray.jsx  # Tests d100
 │   ├── BookCharacterGallery.jsx
-│   └── ... 
+│   └── ...  
 ├── data/
 │   └── bookCharacters.js     # Personnages du livre
 ├── bladeIcons. js             # Icônes d'armes
-├── App. jsx                   # Routing & state global
+├── App.jsx                   # Routing & state global
 └── App.css                   # Styles globaux
 ```
 
@@ -340,7 +392,7 @@ src/
 
 ## 🤝 Contribution
 
-Les contributions sont les bienvenues !  Voici comment participer :
+Les contributions sont les bienvenues ! Voici comment participer :
 
 1. Fork le projet
 2. Créez une branche (`git checkout -b feature/AmazingFeature`)
