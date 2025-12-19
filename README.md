@@ -425,7 +425,7 @@ Les contributions sont les bienvenues ! Voici comment participer :
 
 ### Développement
 - **Auteur principal** : [Zuber](https://github.com/broduoliviercontact-web)
-- **Communauté** :  Merci aux joueurs d'ARIA pour leurs retours ! 
+- **Communauté** :  Merci a xavkas_ et  aux joueurs d'ARIA pour leurs retours ! 
 
 ---
 
