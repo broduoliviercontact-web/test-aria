@@ -212,7 +212,7 @@ Système de magie complet basé sur les cartes à jouer :
 ---
 
 ### Gestion des armes
-![Armes](./screenshots/weapons.gif)
+![Armes](./screenshots/weapon.gif)
 
 *Sélection d'icônes d'armes et validation*
 
