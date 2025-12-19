@@ -421,7 +421,7 @@ Les contributions sont les bienvenues ! Voici comment participer :
 - **Style cartes** : [pokemon-cards-css](https://github.com/simeydotme/pokemon-cards-css) (Simon Goellner)
 - **Dés 3D** : [dice](https://github.com/sarahRosannaBusch/dice) (Sarah Rosanna Busch)
 - **Fonts** : Google Fonts (MedievalSharp, Merienda)
-
+- **PDF** :  [jsPDF](https://github.com/MrRio/jsPDF) (Simon Bengtsson),  [html2canvas](https://github.com/niklasvh/html2canvas) (Niklas von Hertzen)
 ### Développement
 - **Auteur principal** : [Zuber](https://github.com/broduoliviercontact-web)
 - **Communauté** :  Merci aux joueurs d'ARIA pour leurs retours ! 
