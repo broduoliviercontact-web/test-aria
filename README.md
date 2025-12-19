@@ -270,7 +270,7 @@ Système de magie complet basé sur les cartes à jouer :
 
 ### Déploiement
 - **Frontend** : Netlify
-- **Backend** : (à préciser :  Railway, Render, Heroku…)
+- **Backend** : Northflank (Node.js)
 
 ---
 
