@@ -354,9 +354,9 @@ body {
 
 .home-logo-img {
   display: block;
-  max-width: 500px;
+  max-width: 600px;
   width: 100%;
-  margin: 0 auto 0.5rem;
+  margin: 4rem auto 0.5rem;
 }
 
 .home-logo {

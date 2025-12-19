@@ -51,12 +51,12 @@ Ce projet personnel met l'accent sur :
 ### 🧙 Création de personnage
 
 #### Génération des caractéristiques
-- 🎲 **Mode 3d6** : Lancez les dés en 3D (jusqu'à 5 séries), choisissez la meilleure
-- 📊 **Répartition de points** : 60 points à répartir (min 0, max 18)
+- 🎲 **Mode 3d6** : Lancez les dés en 3D , choisissez la meilleure
+- 📊 **Répartition de points** : 60 points à répartir 
 - ✅ Validation réversible (déverrouillage possible)
 
 #### Compétences
-- 🎯 **Mode Prêt à jouer** : Calcul automatique (moyenne des caracs × 5)
+- 🎯 **Mode Prêt à jouer** : Calcul automatique 
 - 🎨 **Mode Personnalisation** : Base calculée + 50 points bonus à répartir
 - 📈 Support des planchers de compétences (magiciens, types spéciaux)
 - 🎲 Test de compétences intégré (d100, critique 01-09, fumble 91-00)
@@ -165,7 +165,7 @@ Système de magie complet basé sur les cartes à jouer :
 ## 📸 Aperçu
 
 ### Home page
-![Home](./screenshots/home.png)
+![Home](./screenshots/home.gif)
 *Interface d'accueil avec galerie de personnages et authentification*
 
 ### Création de personnage
