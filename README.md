@@ -3,25 +3,45 @@
 Application web pour créer, gérer et exporter des fiches de personnage pour le jeu de rôle **ARIA**.  
 Interface moderne, logique métier complète, pensée pour un usage réel en table de jeu.
 
-👉 Projet personnel **frontend React** – UX, règles de jeu, export PDF.
+👉 Projet personnel **frontend React** – UX, implémentation des règles, export PDF fidèle à la fiche officielle.
 
 ---
 
 ## ✨ Features
 
+### 🧙 Création & règles de jeu
+- 🎲 Génération des caractéristiques  
+  (jets **3d6** ou **répartition de points**)
+- 🧠 Calcul automatique ou personnalisé des compétences
+- 🧾 Personnages du livre pré-intégrés (pré-remplissage éditable)
 
-- 🎲 Génération des caractéristiques (3d6 ou point-buy)
-- 🎒 Inventaire & kits d’équipement intelligents
-- ⚔️ Weapon list dédiée (armes ≠ inventaire)
-- ⚗️ Alchimie optionnelle (potions & compétences)
-=======
-- 🎲 Génération des caractéristique
-- 🎒 Inventaire 
-- ⚔️ Weapon list dédiée 
-- ⚗️ Alchimie 
+### 🎒 Équipement & gestion
+- 🎒 Inventaire dynamique
+- 🧰 Kits d’équipement intelligents  
+  (logique métier, objets ajoutés automatiquement)
+- ⚔️ Weapon list dédiée  
+  (armes séparées de l’inventaire, icônes, dégâts, validation)
 
-- 💾 Sauvegarde locale & serveur
-- 📄 Export PDF fidèle à la fiche officielle
+### ⚗️ Alchimie
+- Activation optionnelle de l’alchimie
+- Potions, effets, quantités et difficulté
+- Compétences spéciales automatiquement ajoutées
+
+### 🔮 Magie (système de cartes)
+- Activation du don de magie (INT ≥ 14)
+- Choix du **type de magicien** :
+  - Outsider
+  - Académie
+  - Miséricordieux
+- Deck de cartes personnalisé (taille, joker)
+- Tirage, défausse et cartes utilisées
+- Compétences magiques imposées selon le type
+- Modal dédiée à la magie
+
+### 💾 Sauvegarde & export
+- 💾 Sauvegarde locale
+- ☁️ Sauvegarde serveur (compte utilisateur)
+- 📄 Export PDF fidèle à la fiche officielle ARIA
 - 🎲 Dés en 3D (desktop & mobile)
 
 ---
@@ -29,51 +49,62 @@ Interface moderne, logique métier complète, pensée pour un usage réel en tab
 ## 📸 Aperçu
 
 ### Création de personnage & jets de dés
-![Création](./screenshots/creation.png)
-> Choix des modes de jeu, jets de dés en 3D et génération des caractéristiques.
+![Création](./screenshots/creation.png)  
+> Choix des modes de création, jets de dés en 3D et génération des caractéristiques.
 
 ---
 
 ### Inventaire & kits d’équipement
-![Inventaire](./screenshots/inventory.png)
-> Inventaire dynamique + kits avec logique métier (armes placées automatiquement).
+![Inventaire](./screenshots/inventory.png)  
+> Inventaire dynamique avec logique métier (kits, placement automatique des armes).
 
 ---
 
 ### Weapon List
-![Weapons](./screenshots/weapons.png)
+![Weapons](./screenshots/weapons.png)  
 > Gestion dédiée des armes : icône, dégâts, validation.
 
 ---
 
 ### Alchimie
-![Alchimie](./screenshots/alchemy.png)
-> Système d’alchimie activable : potions, effets, difficulté.
+![Alchimie](./screenshots/alchemy.png)  
+> Système d’alchimie activable : potions, effets et difficulté.
+
+---
+
+### Magie
+![Magie](./screenshots/magic.png)  
+> Système de magie par cartes : type de mage, tirage, gestion du deck.
 
 ---
 
 ### Export PDF
-![PDF](./screenshots/pdf.png)
-> Export PDF prêt à être imprimé.
+![PDF](./screenshots/pdf.png)  
+> Export PDF prêt à être imprimé ou partagé.
 
 ---
 
-## 🛠️ Stack
+## 🛠️ Stack technique
 
 - React (Vite)
 - CSS custom
 - jsPDF / html2canvas
-- Backend REST
-- Déployé sur Netlify
+- Backend REST (auth & persistance)
+- Déploiement : Netlify
 
 ---
 
 ## 🙏 Crédits
 
-- Icônes : https://game-icons.net  
-- Dés 3D : https://github.com/sarahRosannaBusch/dice
+- Icônes (armes, UI, symboles) :  
+  - https://game-icons.net  
+  - https://www.flaticon.com
+- Dés 3D :  
+  - https://github.com/sarahRosannaBusch/dice
+- Univers & jeu **ARIA** :  
+  - FibreTigre (créateur) https://www.fibretigre.com/
+  - ElderCraft (éditeur)  https://elder-craft.com/
 
 ---
 
-**Auteur : Zuber**  
-
+**Auteur : Zuber**

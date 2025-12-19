@@ -422,8 +422,11 @@ const trailRef = useRef(0);
         role="dialog"
         aria-modal="true"
       >
+       
         <div className="magic-modal__header">
-          <h2>Magie</h2>
+          <div className="magie-head">
+         <h2>Magie</h2>
+         </div>
           <button className="magic-modal__close" onClick={onClose}>✕</button>
         </div>
 
