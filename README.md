@@ -369,13 +369,6 @@ src/
 └── App.css                   # Styles globaux
 ```
 
-### State management
-
-- **Props drilling** pour la fiche (state dans `App.jsx`)
-- **Context API** pour les jets de dés (`DiceRollContext. jsx`)
-- **localStorage** :  portrait, prefill template
-- **Backend** : persistance via API REST
-
 ---
 
 ## 🗺️ Roadmap
