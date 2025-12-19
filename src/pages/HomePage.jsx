@@ -272,7 +272,14 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
               <p className="hero-text">
                 Cette application te permet de créer un personnage pour Aria,
                 ajuster ses caractéristiques, ses compétences, son inventaire et
-                exporter une fiche PDF prête à être imprimée.
+                exporter une fiche PDF prête à être imprimée. Aria est un jeu de rôle créé par <a
+            className="home-footer__link-home-page"
+            href="https://www.fibretigre.com/"
+            target="_blank"
+            rel="noreferrer"
+          >
+           Fibre Tigre
+          </a >
               </p>
 
               <div className="hero-actions">
@@ -309,11 +316,11 @@ export default function HomePage({ onStart, onGoToMyCharacters, auth }) {
             <h3>Comment ça marche ?</h3>
             <ul className="home-steps">
               <li>Tu peux créer des personnages <strong>sans compte</strong>.</li>
-              <li>Si tu te connectes, tu peux <strong>les sauvegarder</strong> en base.</li>
+              <li>Si tu te connectes, tu peux <strong>les sauvegarder</strong> </li>
               <li>Choisis les modes de création (compétences & caractéristiques).</li>
-              <li>En mode <strong>3d6</strong> : tu choisis un jet et ensuite la zone de dés disparaît.</li>
-              <li>Choisis ton <strong>kit d’équipement</strong> (une seule fois).</li>
-              <li>Gère ton inventaire et exporte ta fiche en PDF.</li>
+              <li>En mode <strong>3d6</strong> : tu lances les dés toi même.</li>
+              <li>Choisis ton <strong>kit d’équipement</strong> .</li>
+              <li>Exporte ta fiche en PDF.</li>
             </ul>
           </section>
               {/* ✅ Galerie : livre (anon) OU mes persos (logué) */}

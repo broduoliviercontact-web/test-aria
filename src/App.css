@@ -427,10 +427,13 @@ body {
   background-repeat: no-repeat;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   border: 2px solid rgba(0, 0, 0, 0.4);
+  
 }
 
 .home-section h3 {
 text-align: center;
+margin-top: 0;
+margin-bottom: 1rem;
 }
 .home-section-text {
   text-align: center;
@@ -439,6 +442,10 @@ text-align: center;
   margin: 0;
   padding-left: 1.2rem;
   list-style: disc;
+  margin-top: 1rem;
+  margin-bottom: 0;
+  list-style: none;
+  text-align: center;
 }
 
 /* ===========================
@@ -974,4 +981,10 @@ body.pdf-exporting * {
 .auth-form-inline .auth-submit-row > .btn-primary {
   margin: 0;            /* évite des marges bizarres */
   justify-self: unset;  /* on laisse flex gérer */
+}
+
+.home-footer__link-home-page{
+  color: #000000;
+  text-decoration: underline;
+
 }
