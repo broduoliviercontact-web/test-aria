@@ -96,9 +96,6 @@ Ce projet personnel met l'accent sur :
 
 Système optionnel activable :
 - 🧪 Gestion des potions (nom, composants, effet, difficulté, quantité)
-- 📜 **Compétences auto-ajoutées** :  
-  - *Identifier une substance* (60%)
-  - *Créer une potion* (100%)
 - 🎨 UI immersive (icône fiole animée)
 - 🔒 2 potions de base pré-remplies (verrouillées) :  
   - Essence du feu d'Ingramus
@@ -166,18 +163,21 @@ Système de magie complet basé sur les cartes à jouer :
 
 ### Home page
 ![Home](./screenshots/home.gif)
+
 *Interface d'accueil avec galerie de personnages et authentification*
 
 ---
 
 ### Création de personnage
 ![Création](./screenshots/creation.gif)
+
 *Choix des modes de création et jets de dés 3D*
 
 ---
 
 ### Fiche complète
 ![Fiche](./screenshots/character-sheet.gif)
+
 *Vue d'ensemble de la fiche :  stats, compétences, inventaire*
 
 ---
@@ -185,54 +185,63 @@ Système de magie complet basé sur les cartes à jouer :
 
 ### 🎲 Dés 3D - Génération des caractéristiques
 ![Dés 3D Stats](./screenshots/dice-3d-stats.gif)
+
 *Lancers de dés 3D pour générer les caractéristiques (3d6 par stat)*
 
 ---
 
 ### 🎲 Dés 3D - Tests de compétences (d100)
 ![Dés 3D Compétences](./screenshots/dice-3d-skills.gif)
+
 *Tests de compétences avec d100 en 3D :  critiques (01-09) et fumbles (91-00)*
 
 ---
 
 ### Fiche complète
 ![Fiche](./screenshots/character-sheet.gif)
+
 *Vue d'ensemble de la fiche :  stats, compétences, inventaire*
 
 ---
 
 ### Inventaire & Kits d'équipement
 ![Inventaire](./screenshots/inventory.gif)
+
 *Gestion de l'inventaire avec kits pré-configurés*
 
 ---
 
 ### Gestion des armes
 ![Armes](./screenshots/weapons.gif)
+
 *Sélection d'icônes d'armes et validation*
 
 ---
 
 ### Kit d'équipement
 ![Kit d'équipement](./screenshots/kit.gif)
+
 *Sélection d'armes et validation*
 
 ---
 
 ### Système d'alchimie
 ![Alchimie](./screenshots/alchemy.gif)
+
 *Interface de gestion des potions alchimiques*
 
 ---
 
 ### Système de magie
 ![Magie](./screenshots/magic.gif)
+
 *Modal de gestion du deck de cartes magiques*
 
 ---
 
 ### Export PDF
 ![PDF](./screenshots/pdf.gif)
+
 *Génération et téléchargement du PDF de la fiche*
 
 ---
